@@ -1,0 +1,233 @@
+@import "../App.scss";
+
+.channel-container {
+	background: $channels-bg;
+	display: flex;
+	flex-direction: column;
+	flex: 0 0 240px;
+
+	.channel-header {
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		flex: 0 0 56px;
+		padding: 28px 24px;
+		box-shadow: 0 1px 0 darken($channels-bg, 4.1%),
+			inset 0 -1px 0 rgba(#000, 0.1);
+		transition: background 0.15s ease;
+
+		.channel-header-dropdown {
+			width: 18px;
+			height: 18px;
+			margin-left: auto;
+			pointer-events: none;
+
+			use {
+				stroke-dasharray: 7;
+				transform-origin: 50%;
+				transition: stroke-dasharray 0.2s ease, transform 0.2s ease;
+			}
+		}
+
+		&:hover,
+		&:focus {
+			background: darken($channels-bg, 2.5%);
+		}
+
+		&:focus use {
+			stroke-dasharray: 14;
+			transform: rotate(-90deg);
+		}
+
+		.channel-header-name {
+			font-size: 1rem;
+			font-weight: 500;
+		}
+	}
+
+	.channel-list-container {
+		flex: 1 1;
+		overflow-y: auto;
+		padding: 0 20px;
+
+		ul {
+			list-style: none;
+		}
+
+		.channels-list-header {
+			cursor: pointer;
+			margin-top: 20px;
+			text-transform: uppercase;
+			color: rgba($body-color, 0.3);
+			font-size: 0.87rem;
+			letter-spacing: 0.04rem;
+			transition: color 0.2s linear;
+			line-height: 30px;
+			position: relative;
+
+			&:hover,
+			&:focus {
+				color: $body-color;
+
+				&::after {
+					opacity: 1;
+				}
+			}
+
+			&::after {
+				position: absolute;
+				top: 10px;
+				right: 0;
+				content: " ";
+				width: 10px;
+				height: 10px;
+				opacity: 0.3;
+				transition: opacity 0.2s linear;
+				background: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMCAxMCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTguOTksMy45OUg2LjAxVjEuMDFDNi4wMSwwLjQ1Miw1LjU1OCwwLDUsMFMzLjk5LDAuNDUyLDMuOTksMS4wMVYzLjk5SDEuMDFDMC40NTIsMy45OSwwLDQuNDQyLDAsNWMwLDAuNTU4LDAuNDUyLDEuMDEsMS4wMSwxLjAxSDMuOTlWOC45OUMzLjk5LDkuNTQ4LDQuNDQyLDEwLDUsMTBzMS4wMS0wLjQ1MiwxLjAxLTEuMDFWNi4wMUg4Ljk5QzkuNTQ4LDYuMDEsMTAsNS41NTgsMTAsNUMxMCw0LjQ0Miw5LjU0OCwzLjk5LDguOTksMy45OXoiLz48L3N2Zz4=)
+					no-repeat 50%;
+			}
+		}
+
+		.channels-list-text,
+		.channels-list-voice {
+			margin: 0 -20px 0 -20px;
+		}
+
+		.channels-header-name {
+			font-size: 1rem;
+			font-weight: 500;
+		}
+
+		.channel {
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			padding: 8px 20px 10px 20px;
+			opacity: 0.3;
+			width: 100%;
+
+			.button {
+				display: none;
+				opacity: 0.2;
+
+				&:hover,
+				&:focus {
+					opacity: 1;
+				}
+			}
+
+			&.active,
+			&:hover,
+			&:focus {
+				opacity: 1;
+
+				.button {
+					display: block;
+				}
+			}
+
+			.channel-name {
+				font-size: 0.9rem;
+				font-weight: 300;
+			}
+
+			.button:first-of-type {
+				margin-left: auto;
+				margin-right: 8px;
+			}
+
+			.button {
+				width: 16px;
+				height: 16px;
+			}
+		}
+
+		.channel-text {
+			position: relative;
+
+			&.active,
+			&:hover,
+			&:focus {
+				background: linear-gradient(to right, #282b30 85%, #2e3136);
+
+				&::before {
+					content: " ";
+					width: 2px;
+					height: 100%;
+					position: absolute;
+					left: 0;
+					background: #7289da;
+				}
+			}
+
+			&:not(.active) {
+				&:focus::before,
+				&:hover::before {
+					opacity: 0.25;
+				}
+			}
+
+			.channel-name {
+				@extend .hash-before !optional;
+				&::before {
+					font-weight: 400 !important;
+				}
+			}
+		}
+	}
+
+	.channel-footer-container {
+		display: flex;
+		align-items: center;
+		flex: 0 0 70px;
+		margin-top: auto;
+		background: darken($channels-bg, 2.35%);
+		border-top: 1px solid $border-accent;
+		padding: 0 10px;
+
+		.channels-footer-details {
+			margin-left: 10px;
+		}
+
+		.channels-footer-controls {
+			margin-left: auto;
+			display: flex;
+
+			.button {
+				display: block;
+				width: 32px;
+				height: 32px;
+
+				svg {
+					width: 16px;
+				}
+
+				&:hover svg,
+				&:focus svg {
+					filter: brightness(200%);
+				}
+			}
+		}
+
+		.avatar {
+			width: 30px;
+			height: 30px;
+			border-radius: 50%;
+		}
+
+		.username,
+		.tag {
+			display: block;
+			font-weight: 300;
+		}
+
+		.username {
+			font-size: 0.9rem;
+		}
+
+		.tag {
+			color: rgba($body-color, 0.45);
+			font-size: 0.7rem;
+		}
+	}
+}

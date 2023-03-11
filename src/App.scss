@@ -1,8 +1,90 @@
-.app-container {
+$body-bg: #121416;
+$body-color: #fff;
+$servers-bg: #1e2124;
+$channels-bg: #2e3136;
+$border-accent: darken($channels-bg, 7.7%);
+$chat-bg: #36393e;
+$menu-bg: $chat-bg;
+$server-bg: $channels-bg;
+$server-bg-active: #7289da;
+$server-marker-unread: #8a8e94;
+$server-marker-active: #fff;
+$button-bg: #2e3136;
+$button-bg-active: lighten($button-bg, 5%);
+
+//Global
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+	// we override focus on specific elements
+	&:focus {
+		outline: 0;
+	}
+}
+
+html,
+body {
+	height: 100%;
+	background: $body-bg;
+	color: $body-color;
+	font-size: 16px;
+	font-family: "Uni Sans";
 	display: block;
+	margin: 0 0 0 0;
+	line-height: 1;
+	padding: 0;
+	overflow: hidden;
+	background: transparent;
+	user-select: none;
+	text-rendering: optimizeLegibility;
+}
+
+.app-mount {
+	.app-container {
+		height: 100%;
+		display: flex;
+	}
+}
+
+// ICONS
+svg[id] {
+	width: 0;
 	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
+}
+
+// BUTTON
+.button {
+	background: $button-bg;
+	border: 0;
+	color: inherit;
+	cursor: pointer;
+	font: inherit;
+	line-height: normal;
+	overflow: visible;
+	appearance: none;
+	user-select: none;
+
+	> svg,
+	> img {
+		max-width: 100%;
+		max-height: 100%;
+	}
+}
+
+.button-group {
+	.button:focus,
+	.button:active {
+		background: $button-bg-active;
+	}
+
+	.button:not(:last-of-type) {
+		border-right: 1px solid $border-accent;
+	}
+
+	.button + .button {
+		box-shadow: inset 1px 0 0 #393c41;
+	}
 }
