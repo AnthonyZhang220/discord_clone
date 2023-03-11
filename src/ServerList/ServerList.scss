@@ -29,7 +29,7 @@
 		background: hsl(225, 6%, 13%);
 
 		.serverlist-scroller {
-			overflow: hidden scroll;
+			scrollbar-width: none;
 			padding-right: 0px;
 			-webkit-user-select: none;
 			-moz-user-select: none;
@@ -37,7 +37,6 @@
 			user-select: none;
 			padding: 12px 0 0;
 
-			scrollbar-width: none;
 
 			position: relative;
 			-webkit-box-sizing: border-box;
