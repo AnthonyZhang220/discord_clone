@@ -11,8 +11,8 @@ import ListItem from '@mui/material/ListItem';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
-import './Chat.scss'
 import { Typography } from '@mui/material';
+import './Chat.scss'
 
 
 
@@ -56,8 +56,8 @@ export default function Chat() {
                             <Box className="scroll-content">
                                 <List component="ol" className="scrollerInner">
                                     {messages.map(({ primary, secondary, person }, index) => (
-                                        <Box component="li" className="message">
-                                            <ListItem key={index + person}>
+                                        <Box className="message" key={index + person}>
+                                            <ListItem >
                                                 <ListItemAvatar>
                                                     <Avatar alt="Profile Picture" src={person} />
                                                 </ListItemAvatar>

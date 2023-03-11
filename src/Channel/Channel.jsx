@@ -30,15 +30,15 @@ const Channel = () => {
     return (
         <Box component="aside" className='channel-container'>
             <Box component="header" className="channel-header" onClick={(e) => handleHeader(e)}>
-                <Typography component="h3" classNmae="channel-header-name">
+                <Typography component="h3" className="channel-header-name">
                     My Server
                 </Typography>
                 <IconButton aria-label="dropdown" className="channel-header-dropdown">
                     <ArrowDropDownIcon />
                 </IconButton>
             </Box>
-            <Box component="component" className="channel-list-container">
-                <Box component="header" className="channel-list-header">
+            <Box component="header" className="channel-list-container">
+                <Box className="channel-list-header">
                     <Typography component="h5" className="channel-list-header">
                         Text Channel
                     </Typography>
@@ -55,7 +55,7 @@ const Channel = () => {
                             </IconButton>
                         </Box>
                         <Box component="li" className="channel focusable channel-text">
-                            <span className="channel-name">help</span>
+                            <Box component="span" className="channel-name">help</Box>
                             <IconButton aria-label="settings">
                                 <SettingsIcon />
                             </IconButton>
@@ -68,11 +68,11 @@ const Channel = () => {
             </Box>
             <Box component="footer" className="channel-footer-container">
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" className="avatar" />
-                <div className="channels-footer-details">
-                    <span className="username">yourself</span>
-                    <span className="tag">#0001</span>
-                </div>
-                <div className="channels-footer-controls button-group">
+                <Box className="channels-footer-details">
+                    <Box component="span" className="username">yourself</Box>
+                    <Box component="span" className="tag">#0001</Box>
+                </Box>
+                <Box className="channels-footer-controls button-group">
                     {
                         muted ?
                             <IconButton aria-label="Mute" onClick={() => setMuted(!muted)}>
@@ -95,7 +95,7 @@ const Channel = () => {
                     <IconButton aria-label="Settings">
                         <SettingsIcon />
                     </IconButton>
-                </div>
+                </Box>
             </Box>
         </Box>
     )
