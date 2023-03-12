@@ -54,7 +54,7 @@
 			list-style: none;
 		}
 
-		.channels-list-header {
+		.channel-list-header {
 			cursor: pointer;
 			margin-top: 20px;
 			text-transform: uppercase;
@@ -88,13 +88,13 @@
 			}
 		}
 
-		.channels-list-text,
-		.channels-list-voice {
+		.channel-list-text,
+		.channel-list-voice {
 			margin: 0 -20px 0 -20px;
 		}
 
-		.channels-header-name {
-			font-size: 1rem;
+		.channel-header-name {
+			font-size: 0.75rem;
 			font-weight: 500;
 		}
 
@@ -108,7 +108,7 @@
 
 			.button {
 				display: none;
-				opacity: 0.2;
+				opacity: 0.8;
 
 				&:hover,
 				&:focus {
@@ -168,7 +168,7 @@
 			}
 
 			.channel-name {
-				@extend .hash-before !optional;
+				@extend .hash-before;
 				&::before {
 					font-weight: 400 !important;
 				}
@@ -184,6 +184,9 @@
 		background: darken($channels-bg, 2.35%);
 		border-top: 1px solid $border-accent;
 		padding: 0 10px;
+
+		.channel-footer-profile {
+		}
 
 		.channels-footer-details {
 			margin-left: 10px;
@@ -230,4 +233,12 @@
 			font-size: 0.7rem;
 		}
 	}
+}
+
+.hash-before::before
+{
+	content: "#";
+	margin-right: 10px;
+	font-weight: 300;
+	color: #8A8E94;
 }

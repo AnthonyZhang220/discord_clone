@@ -14,7 +14,7 @@
 		display: flex;
 		align-items: center;
 
-		.children {
+		.chat-name {
 			font-weight: bold;
 			font-size: 1.3rem;
 			letter-spacing: 0.05rem;
@@ -39,12 +39,12 @@
 
 	.hash-before::before {
 		content: "#";
-		margin-right: 2px;
+		margin-right: 10px;
 		font-weight: 300;
 		color: #8a8e94;
 	}
 
-	.content :before {
+	.content::before {
 		content: "";
 		position: absolute;
 		display: block;
