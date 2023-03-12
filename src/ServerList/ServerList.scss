@@ -1,6 +1,7 @@
 @import "../App.scss";
 
-.serverlist-container {
+// SERVERS
+.servers {
 	height: 100%;
 	background: $servers-bg;
 	flex: 0 0 70px;
@@ -15,131 +16,170 @@
 	&::-webkit-scrollbar {
 		display: none;
 	}
+}
 
-	.serverlist-tree {
-		display: -webkit-box;
-		display: -ms-flexbox;
-		display: flex;
-		-webkit-box-orient: vertical;
-		-webkit-box-direction: normal;
-		-ms-flex-direction: column;
-		flex-direction: column;
-		height: 100%;
-		position: relative;
-		background: hsl(225, 6%, 13%);
+// SERVER
+.server {
+	width: 50px;
+	height: 50px;
+	border-radius: 25px;
+	background-color: $server-bg;
+	background-repeat: no-repeat;
+	margin-bottom: 8px;
+	cursor: pointer;
+	position: relative;
 
-		.serverlist-scroller {
-			scrollbar-width: none;
-			padding-right: 0px;
-			-webkit-user-select: none;
-			-moz-user-select: none;
-			-ms-user-select: none;
-			user-select: none;
-			padding: 12px 0 0;
+	&:not(.active) {
+		animation: server-hover-out 0.6s ease;
 
-
-			position: relative;
-			-webkit-box-sizing: border-box;
-			box-sizing: border-box;
-			min-height: 0;
-			-webkit-box-flex: 1;
-			-ms-flex: 1 1 auto;
-			flex: 1 1 auto;
-
-			// SERVER
-			.serverlist-items {
-				width: 50px;
-				height: 50px;
-				border-radius: 25px;
-				background-color: $server-bg;
-				background-repeat: no-repeat;
-				margin-bottom: 8px;
-				cursor: pointer;
-				position: relative;
-
-				&:not(.active) {
-					animation: server-hover-out 0.6s ease;
-
-					&:hover,
-					&:focus {
-						animation: server-hover-in 0.8s ease forwards;
-					}
-				}
-
-				.server-icon {
-					border-radius: inherit;
-					width: 100%;
-					height: 100%;
-					display: flex;
-					align-items: center;
-					justify-content: center;
-				}
-
-				.server-icon > img {
-					border-radius: inherit;
-					max-width: 100%;
-				}
-
-				&.server-friends {
-					margin-bottom: 46px;
-					text-align: center;
-
-					svg {
-						max-width: 60%;
-						max-height: 60%;
-					}
-
-					&.active::before {
-						display: none;
-					}
-
-					&::after {
-						content: "2 ONLINE";
-						color: rgba($body-color, 0.3);
-						pointer-events: none;
-						font-weight: 300;
-						font-size: 0.65rem;
-						position: absolute;
-						bottom: -35px;
-						left: 3px;
-						padding-bottom: 10px;
-						border-bottom: 2px solid lighten($servers-bg, 5%);
-					}
-				}
-
-				// unread/active
-				&::before {
-					position: absolute;
-					top: 20px;
-					left: -15px;
-					content: " ";
-					display: block;
-					width: 10px;
-					height: 10px;
-					border-radius: 25px;
-				}
-
-				&.active {
-					border-radius: 15px;
-					background-color: $server-bg-active;
-				}
-
-				&.unread::before {
-					background: $server-marker-unread;
-				}
-
-				&.active::before {
-					background: $server-marker-active;
-					height: 40px;
-					top: 5px;
-				}
-
-				&.active.unread::before {
-					transition: all 0.2s ease-in-out;
-				}
-			}
+		&:hover,
+		&:focus {
+			animation: server-hover-in 0.8s ease forwards;
 		}
 	}
+
+	.server-icon {
+		border-radius: inherit;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.server-icon > img {
+		border-radius: inherit;
+		max-width: 100%;
+	}
+
+	&.server-friends {
+		margin-bottom: 46px;
+		text-align: center;
+
+		svg {
+			max-width: 60%;
+			max-height: 60%;
+		}
+
+		// &.active::before {
+		// 	display: none;
+		// }
+
+		&::after {
+			content: "2 ONLINE";
+			color: rgba($body-color, 0.3);
+			pointer-events: none;
+			font-weight: 300;
+			font-size: 0.65rem;
+			position: absolute;
+			bottom: -35px;
+			left: 3px;
+			padding-bottom: 10px;
+			border-bottom: 2px solid lighten($servers-bg, 5%);
+		}
+
+		// unread/active
+		&::before {
+			position: absolute;
+			top: 20px;
+			left: -15px;
+			content: " ";
+			display: block;
+			width: 10px;
+			height: 10px;
+			border-radius: 25px;
+		}
+
+		&.active {
+			border-radius: 15px;
+			background-color: $server-bg-active;
+		}
+
+		&.unread::before {
+			background: $server-marker-unread;
+		}
+
+		&.active::before {
+			background: $server-marker-active;
+			height: 40px;
+			top: 5px;
+		}
+
+		&.active.unread::before {
+			transition: all 0.2s ease-in-out;
+		}
+	}
+
+	// unread/active
+	&::before {
+		position: absolute;
+		top: 20px;
+		left: -15px;
+		content: " ";
+		display: block;
+		width: 10px;
+		height: 10px;
+		border-radius: 25px;
+	}
+
+	&.active {
+		border-radius: 15px;
+		background-color: $server-bg-active;
+	}
+
+	&.unread::before {
+		background: $server-marker-unread;
+	}
+
+	&.active::before {
+		background: $server-marker-active;
+		height: 40px;
+		top: 5px;
+	}
+
+	&.active.unread::before {
+		transition: all 0.2s ease-in-out;
+	}
+}
+
+// BUTTON
+.button {
+	background: $button-bg;
+	border: 0;
+	color: inherit;
+	cursor: pointer;
+	font: inherit;
+	line-height: normal;
+	overflow: visible;
+	appearance: none;
+	user-select: none;
+
+	> svg,
+	> img {
+		max-width: 100%;
+		max-height: 100%;
+	}
+}
+
+.button-group {
+	.button:focus,
+	.button:active {
+		background: $button-bg-active;
+	}
+
+	.button:not(:last-of-type) {
+		border-right: 1px solid $border-accent;
+	}
+
+	.button + .button {
+		box-shadow: inset 1px 0 0 #393c41;
+	}
+}
+
+// ICONS
+svg[id] {
+	width: 0;
+	position: absolute;
 }
 
 // ANIMATIONS

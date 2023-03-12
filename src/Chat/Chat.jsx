@@ -1,4 +1,5 @@
 import React from 'react'
+import { io } from 'socket.io-client'
 
 
 //material ui comp
@@ -15,36 +16,67 @@ import { Typography } from '@mui/material';
 import './Chat.scss'
 
 
+const URL = 'http://localhost:3000';
+export const socket = io(URL);
 
-
-function refreshMessages() {
+function refreshChat() {
     const getRandomInt = (max) => Math.floor(Math.random() * Math.floor(max));
 
-    return Array.from(new Array(50)).map(
+    return Array.from(new Array(5)).map(
         () => messageExamples[getRandomInt(messageExamples.length)],
     );
 }
 
 export default function Chat() {
 
+
     const [value, setValue] = React.useState(0);
     const ref = React.useRef();
-    const [messages, setMessages] = React.useState(() => refreshMessages());
+    const formRef = React.useRef();
+    const chatScroller = React.useRef();
+    const [message, setMessage] = React.useState("");
+    const [chatList, setChatList] = React.useState([])
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        // //get message text
+        // const message = e.target.elements.message.value;
+        //emit message to server
+        socket.emit("chatMessage", message)
+    }
+
+    const handleForm = (e) => {
+        setMessage(e.target.value)
+        console.log(message)
+    }
 
     React.useEffect(() => {
+
         ref.current.scrollTop = 0;
-        setMessages(refreshMessages());
-    }, [value, setMessages]);
+
+        socket.on('message', message => {
+            setChatList((data) => [...data, message])
+            console.log(chatList)
+
+            //scroll new message
+            chatScroller.current.scrollTop = chatScroller.current.scrollHeight;
+
+        })
+
+        return () => {
+
+        }
+
+    }, [socket, value]);
 
     return (
         <Box className="chat-container" ref={ref}>
             <CssBaseline />
             <Box className="chat-title" component="section">
-                <Box className="children">
-                    <Typography>
-                        general
-                    </Typography>
-                </Box>
+                <Typography component="h6" variant="h6" className="chat-name">
+                    general
+                </Typography>
                 <Box className="toolbar">
 
                 </Box>
@@ -52,16 +84,16 @@ export default function Chat() {
             <Box className="content">
                 <Box className="chat-content" component="main">
                     <Box className="messageWrapper">
-                        <Box className="messageScroller">
+                        <Box className="messageScroller" ref={chatScroller}>
                             <Box className="scroll-content">
                                 <List component="ol" className="scrollerInner">
-                                    {messages.map(({ primary, secondary, person }, index) => (
-                                        <Box className="message" key={index + person}>
-                                            <ListItem >
+                                    {chatList.map((message, index) => (
+                                        <Box className="message" key={index} component="li">
+                                            <ListItem className="message" key={index} component="li" >
                                                 <ListItemAvatar>
-                                                    <Avatar alt="Profile Picture" src={person} />
+                                                    <Avatar alt="Profile Picture" />
                                                 </ListItemAvatar>
-                                                <ListItemText primary={primary} secondary={secondary} />
+                                                <ListItemText primary={message} secondary={message} primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2" }} />
                                             </ListItem>
                                         </Box>
                                     ))}
@@ -72,52 +104,10 @@ export default function Chat() {
                     </Box>
                 </Box>
             </Box>
-            <Box className="form" component="form">
-                <TextField type="chat" className="textArea" sx={{ backgroundColor: "hsl(225, 7%, 24%)", }} />
+            <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleSubmit(e)}>
+                <TextField type="chat" className="textArea" onChange={(e) => handleForm(e)} />
             </Box>
         </Box>
 
     )
 }
-
-const messageExamples = [
-    {
-        primary: 'Brunch this week?',
-        secondary: "I'll be in the neighbourhood this week. Let's grab a bite to eat",
-        person: '/static/images/avatar/5.jpg',
-    },
-    {
-        primary: 'Birthday Gift',
-        secondary: `Do you have a suggestion for a good present for John on his work
-      anniversary. I am really confused & would love your thoughts on it.`,
-        person: '/static/images/avatar/1.jpg',
-    },
-    {
-        primary: 'Recipe to try',
-        secondary: 'I am try out this new BBQ recipe, I think this might be amazing',
-        person: '/static/images/avatar/2.jpg',
-    },
-    {
-        primary: 'Yes!',
-        secondary: 'I have the tickets to the ReactConf for this year.',
-        person: '/static/images/avatar/3.jpg',
-    },
-    {
-        primary: "Doctor's Appointment",
-        secondary: 'My appointment for the doctor was rescheduled for next Saturday.',
-        person: '/static/images/avatar/4.jpg',
-    },
-    {
-        primary: 'Discussion',
-        secondary: `Menus that are generated by the bottom app bar (such as a bottom
-      navigation drawer or overflow menu) open as bottom sheets at a higher elevation
-      than the bar.`,
-        person: '/static/images/avatar/5.jpg',
-    },
-    {
-        primary: 'Summer BBQ',
-        secondary: `Who wants to have a cookout this weekend? I just got some furniture
-      for my backyard and would love to fire up the grill.`,
-        person: '/static/images/avatar/1.jpg',
-    },
-];

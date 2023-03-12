@@ -1,5 +1,5 @@
 $body-bg: #121416;
-$body-color: #fff;
+$body-color: #ffffff;
 $servers-bg: #1e2124;
 $channels-bg: #2e3136;
 $border-accent: darken($channels-bg, 7.7%);
@@ -11,6 +11,7 @@ $server-marker-unread: #8a8e94;
 $server-marker-active: #fff;
 $button-bg: #2e3136;
 $button-bg-active: lighten($button-bg, 5%);
+$icon-color: #b8b9bf;
 
 //Global
 * {
