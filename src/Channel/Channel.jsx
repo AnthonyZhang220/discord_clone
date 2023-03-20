@@ -1,4 +1,8 @@
 import React from 'react'
+import { auth } from '../firebase';
+
+
+
 import { Stack } from '@mui/system'
 import { Avatar, Typography } from '@mui/material'
 import { Box } from '@mui/system'
@@ -9,16 +13,24 @@ import HeadsetIcon from '@mui/icons-material/Headset';
 import HeadsetOffIcon from '@mui/icons-material/HeadsetOff';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
+import { Tooltip } from '@mui/material';
+import { Button } from '@mui/material';
+
 
 import "./Channel.scss"
 
-const Channel = () => {
+
+
+const Channel = ({ currentUser, signOut }) => {
+
+
 
     const [muted, setMuted] = React.useState(true);
     const [defen, setDefen] = React.useState(false);
 
 
     React.useEffect(() => {
+
         const $ = document.querySelectorAll.bind(document);
 
         $(".channel-text").forEach(el => {
@@ -42,7 +54,7 @@ const Channel = () => {
             el.addEventListener("mousedown", e => e.preventDefault());
             el.setAttribute("tabindex", "0");
         });
-    })
+    }, [])
 
     return (
         <Box component="aside" className='channel-container'>
@@ -85,36 +97,47 @@ const Channel = () => {
                 </Box>
             </Box>
             <Box component="footer" className="channel-footer-container">
-                <IconButton className="channel-footer-profile">
-                    <Avatar alt="Remy Sharp" src="/static/images/avatar/1.jpg" className="avatar" />
+                <Button className="channel-footer-profile" onClick={signOut}>
+                    <Avatar alt="Name" src={currentUser.profileURL ? currentUser.profileURL : "https://cdn.discordapp.com/icons/41771983423143937/edc44e98a690a1f76c5ddec68a0a6b9e.png"} className="avatar" />
                     <Box className="channels-footer-details">
-                        <Box component="span" className="username">yourself</Box>
-                        <Box component="span" className="tag">#0001</Box>
+                        <Box component="span" className="username">{currentUser.name ? currentUser.name : "Name"}</Box>
+                        <Box component="span" className="tag"></Box>
                     </Box>
-                </IconButton>
+                </Button>
                 <Box className="channels-footer-controls button-group">
                     {
                         muted ?
-                            <IconButton aria-label="Mute" onClick={() => setMuted(!muted)}>
-                                <MicOffIcon />
-                            </IconButton> :
-                            <IconButton aria-label="Mute" onClick={() => setMuted(!muted)}>
-                                <MicIcon />
-                            </IconButton>
+                            <Tooltip title="Unmute" placement='top'>
+                                <IconButton aria-label="Mute" color="error" onClick={() => setMuted(!muted)}>
+                                    <MicOffIcon />
+                                </IconButton>
+                            </Tooltip>
+                            :
+                            <Tooltip title="Mute" placement='top'>
+                                <IconButton aria-label="Mute" color="success" onClick={() => setMuted(!muted)}>
+                                    <MicIcon />
+                                </IconButton>
+                            </Tooltip>
                     }
                     {
                         defen ?
-                            <IconButton aria-label="Defen" onClick={() => setDefen(!defen)}>
-                                <HeadsetOffIcon />
-                            </IconButton> :
-                            <IconButton aria-label="Defen" onClick={() => setDefen(!defen)}>
-                                <HeadsetIcon />
-                            </IconButton>
-
+                            <Tooltip title="Undefen" placement='top'>
+                                <IconButton aria-label="Defen" color="error" onClick={() => setDefen(!defen)}>
+                                    <HeadsetOffIcon />
+                                </IconButton>
+                            </Tooltip>
+                            :
+                            <Tooltip title="Defen" placement='top'>
+                                <IconButton aria-label="Defen" color="success" onClick={() => setDefen(!defen)}>
+                                    <HeadsetIcon />
+                                </IconButton>
+                            </Tooltip>
                     }
-                    <IconButton aria-label="Settings">
-                        <SettingsIcon />
-                    </IconButton>
+                    <Tooltip title="Settings" >
+                        <IconButton aria-label="Settings">
+                            <SettingsIcon />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
             </Box>
         </Box>

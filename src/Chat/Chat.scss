@@ -13,6 +13,9 @@
 		border-bottom: 1px solid darken($menu-bg, 2.5%);
 		display: flex;
 		align-items: center;
+		// box-shadow: 0 1px 0 darken($channels-bg, 4.1%),
+		// 	inset 0 -1px 0 rgba(#000, 0.1);
+		// transition: background 0.15s ease;
 
 		.chat-name {
 			font-weight: bold;
@@ -22,7 +25,7 @@
 			@extend .hash-before;
 		}
 
-		.toolbar {
+		.signin {
 			-webkit-box-flex: 0;
 			-ms-flex: 0 0 auto;
 			flex: 0 0 auto;
@@ -109,7 +112,7 @@
 				display: -ms-flexbox;
 				display: flex;
 
-				.messageScroller {
+				.scroller {
 					position: absolute;
 					top: 0;
 					bottom: 0;
@@ -124,13 +127,11 @@
 					-ms-flex: 1 1 auto;
 					flex: 1 1 auto;
 
-					overflow-anchor: none;
 					overflow-y: scroll;
 					overflow-x: hidden;
 
 					.scroller-content {
 						position: relative;
-						overflow-anchor: none;
 						-webkit-box-orient: vertical;
 						-webkit-box-direction: normal;
 						-ms-flex-direction: column;
@@ -142,9 +143,9 @@
 						-ms-flex-align: stretch;
 						align-items: stretch;
 						min-height: 100%;
+
 						.scrollerInner {
 							min-height: 0;
-							overflow: hidden;
 
 							list-style: none;
 
@@ -156,9 +157,11 @@
 							margin-inline-end: 0px;
 							padding-inline-start: 40px;
 							color: hsl(240, 2%, 88%);
+
 							.message {
 								outline: none;
 								position: relative;
+								color: hsl(240, 2%, 88%);
 							}
 
 							.scrollerSpacer {
@@ -169,28 +172,11 @@
 								-ms-flex: 0 0 auto;
 								flex: 0 0 auto;
 								pointer-events: none;
+								color: hsl(240, 2%, 88%);
 							}
 						}
 					}
 				}
-			}
-		}
-
-		.form {
-			position: relative;
-			-ms-flex-negative: 0;
-			flex-shrink: 0;
-			padding-left: 16px;
-			padding-right: 16px;
-			margin-top: -8px;
-
-			.textArea {
-				position: relative;
-				width: 100%;
-				text-indent: 0;
-				border-radius: 8px;
-				margin-bottom: 24px;
-				background-color: var(--background-primary);
 			}
 		}
 	}
