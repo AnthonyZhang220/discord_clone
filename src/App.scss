@@ -26,6 +26,28 @@ $icon-color: #b8b9bf;
 	}
 }
 
+// /* ===== Scrollbar CSS ===== */
+// /* Firefox */
+// * {
+// 	scrollbar-width: thin;
+// 	scrollbar-color: #1a1b1e #2b2d31;
+// }
+
+// /* Chrome, Edge, and Safari */
+// *::-webkit-scrollbar {
+// 	width: 10px;
+// }
+
+// *::-webkit-scrollbar-track {
+// 	background: #2b2d31;
+// }
+
+// *::-webkit-scrollbar-thumb {
+// 	background-color: #1a1b1e;
+// 	border-radius: 15px;
+// 	border: 0px none #ffffff;
+// }
+
 html,
 body {
 	height: 100%;

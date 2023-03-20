@@ -11,7 +11,7 @@
 		display: flex;
 		align-items: center;
 		flex: 0 0 56px;
-		padding: 28px 24px;
+		padding: 0 20px 0 20px;
 		box-shadow: 0 1px 0 darken($channels-bg, 4.1%),
 			inset 0 -1px 0 rgba(#000, 0.1);
 		transition: background 0.15s ease;
@@ -198,11 +198,11 @@
 
 			.button {
 				display: block;
-				width: 32px;
-				height: 32px;
+				width: 28px;
+				height: 28px;
 
 				svg {
-					width: 16px;
+					width: 12px;
 				}
 
 				&:hover svg,
@@ -235,10 +235,9 @@
 	}
 }
 
-.hash-before::before
-{
+.hash-before::before {
 	content: "#";
 	margin-right: 10px;
 	font-weight: 300;
-	color: #8A8E94;
+	color: #8a8e94;
 }
