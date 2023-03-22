@@ -1,53 +1,39 @@
 import React from 'react'
 import { Stack } from '@mui/system'
-import { Avatar, Button, Modal, TextField } from '@mui/material'
+import { Avatar, Button, Modal, TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material'
 import { Box } from '@mui/system'
 import AddIcon from '@mui/icons-material/Add';
 
 import { db } from "../firebase";
-import { onSnapshot, query, where, addDoc, collection, Timestamp } from 'firebase/firestore';
+import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, getDocs } from 'firebase/firestore';
 
 
 import "./ServerList.scss"
 
 
-const ServerList = ({ currentUser }) => {
+const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurrentServer, setCurrentServer, setServerModal, serverModal }) => {
 
+    const [serverList, setServerList] = React.useState([]);
 
-    const [serverList, setServerList] = React.useState();
-    const [newServerInfo, setNewServerInfo] = React.useState({ name: "", serverPic: "" });
-    const [modal, setModal] = React.useState(false);
+    // Get list of servers that belong to the current user
+    React.useEffect(() => {
+        if (currentUser) {
+            const q = query(collection(db, 'servers'), where('members', 'array-contains', currentUser.uid));
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                const userServers = [];
+                snapshot.forEach((doc) => {
+                    userServers.push({
+                        name: doc.data().name,
+                        serverPic: doc.data().serverPic,
+                        uid: doc.id,
+                    });
+                });
+                setServerList(userServers);
+            });
+        }
 
+    }, [currentUser]);
 
-    const showModal = () => {
-        setModal(true);
-    }
-
-    const handleModalClose = () => {
-        setModal(false);
-    }
-
-    const handleAddServer = () => {
-
-        const { serverPic, name } = newServerInfo;
-
-        addDoc(collection(db, "servers"), {
-            serverPic: serverPic,
-            name: name,
-            uid,
-        }).then(() => {
-            handleModalClose();
-        })
-    }
-
-    const handleServerInfo = (e) => {
-        const { name, value } = e.target;
-
-        setNewServerInfo({
-            ...newServerInfo,
-            [name]: value,
-        })
-    }
 
 
     // serverList UI
@@ -74,23 +60,6 @@ const ServerList = ({ currentUser }) => {
 
     }, [])
 
-    //server UI Render
-    React.useEffect(() => {
-        const q = query(collection(db, "servers"), where("members", "array-contains", currentUser.uid));
-        const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-            let serverList = [];
-            QuerySnapshot.forEach((doc) => {
-                serverList.push({ ...doc.data(), id: doc.id });
-            })
-            console.log(serverList)
-            setServerList(serverList)
-        })
-
-        return () => {
-            unsubscribe();
-        }
-    }, [])
-
 
     return (
         <Box component='aside' className="servers">
@@ -98,28 +67,38 @@ const ServerList = ({ currentUser }) => {
                 <Box className="server focusable server-friends unread" role="button" aria-label="Discord Developers unread">
                     <Avatar className="server-icon" src="https://cdn.discordapp.com/embed/avatars/0.png" />
                 </Box>
-                {serverList?.map(({ serverPic }) => (
-                    <Box className="server focusable unread">
+                {serverList.map(({ name, serverPic, uid }) => (
+                    <Box className="server focusable" key={uid} onClick={() => handleCurrentServer(name, uid)}>
                         <Avatar className="server-icon" src={serverPic} />
                     </Box>
                 ))}
                 <Box className="server focusable" >
-                    <AddIcon className="server-icon" onClick={() => showModal()} />
+                    <AddIcon className="server-icon" onClick={() => setServerModal(true)} />
                 </Box>
-                <Modal
-                    open={modal}
-                    onClose={handleModalClose}
-                >
-                    <Box component="form">
-                        <TextField label="Server Name" name="name" onChange={e => handleServerInfo(e)} />
-                        <TextField label="Server Profile" name="serverPic" onChange={e => handleServerInfo(e)} />
-                        <Button variant='text' onClick={handleModalClose}>Back</Button>
-                        <Button variant='contained' onClick={handleAddServer}>Create</Button>
-
-                    </Box>
-                </Modal>
-
             </Box>
+            <Dialog open={serverModal} onClose={() => setServerModal(false)}>
+                <DialogTitle>Create a server</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Give your new server a personality with a name and an icon. You can alwats change it later.
+                    </DialogContentText>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        id="name"
+                        label="SERVER NAME"
+                        type="name"
+                        name="name"
+                        fullWidth
+                        variant="standard"
+                        onChange={e => handleServerInfo(e)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button variant='text' onClick={() => setServerModal(false)}>Back</Button>
+                    <Button variant='contained' onClick={handleAddServer}>Create</Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     )
 }

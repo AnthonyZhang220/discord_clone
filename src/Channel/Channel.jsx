@@ -1,8 +1,10 @@
 import React from 'react'
 import { auth } from '../firebase';
+import { db } from "../firebase";
+import { onSnapshot, query, where, addDoc, collection } from 'firebase/firestore';
 
 
-
+import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material'
 import { Stack } from '@mui/system'
 import { Avatar, Typography } from '@mui/material'
 import { Box } from '@mui/system'
@@ -15,19 +17,38 @@ import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import { Tooltip } from '@mui/material';
 import { Button } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
 
 
 import "./Channel.scss"
 
 
 
-const Channel = ({ currentUser, signOut }) => {
+const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handleCurrentChannel, channelModal, setChannelModal, handleChannelInfo }) => {
 
 
+    const [channelList, setChannelList] = React.useState([])
 
     const [muted, setMuted] = React.useState(true);
     const [defen, setDefen] = React.useState(false);
 
+
+
+
+    //get channel list
+    React.useEffect(() => {
+        if (currentServer) {
+            const q = query(collection(db, "channels"), where("serverRef", "==", currentServer.uid));
+            const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+                let channelList = [];
+                QuerySnapshot.forEach((doc) => {
+                    channelList.push({ ...doc.data(), id: doc.id });
+                })
+                setChannelList(channelList)
+            })
+        }
+
+    }, [currentServer])
 
     React.useEffect(() => {
 
@@ -54,13 +75,19 @@ const Channel = ({ currentUser, signOut }) => {
             el.addEventListener("mousedown", e => e.preventDefault());
             el.setAttribute("tabindex", "0");
         });
+
+    }, [])
+
+
+    React.useEffect(() => {
+
     }, [])
 
     return (
         <Box component="aside" className='channel-container'>
             <Box component="header" className="channel-header focusable">
                 <Typography component="h3" className="channel-header-name" variant='h3'>
-                    My Server
+                    {currentServer.name}
                 </Typography>
                 <IconButton aria-label="dropdown" className="channel-header-dropdown">
                     <ArrowDropDownIcon />
@@ -71,27 +98,44 @@ const Channel = ({ currentUser, signOut }) => {
                     <Typography component="h6" variant="h6">
                         Text Channels
                     </Typography>
+                    <IconButton onClick={(() => setChannelModal(true))}>
+                        <AddIcon />
+                    </IconButton>
+                    <Dialog className="Create-Channel-Modal" open={channelModal} onClose={() => setChannelModal(false)}>
+                        <DialogTitle>Create Channel</DialogTitle>
+                        <DialogContent>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="name"
+                                label="CHANNEL NAME"
+                                type="name"
+                                name="name"
+                                fullWidth
+                                variant="standard"
+                                onChange={e => handleChannelInfo(e)}
+                            />
+                        </DialogContent>
+                        <DialogActions>
+                            <Button variant="text" onClick={() => setChannelModal(false)}>Cancel</Button>
+                            <Button variant='contained' onClick={handleAddChannel}>Create Channel</Button>
+                        </DialogActions>
+                    </Dialog>
                     <Box component="ul" className="channel-list-text">
-                        <Box component="li" className="channel focusable channel-text active">
-                            <Box component="span" className="channel-name">general</Box>
-                            <IconButton aria-label="settings" className="button">
-                                <SettingsIcon />
-                            </IconButton>
-                            <IconButton aria-label="settings" className="button">
-                                <SettingsIcon />
-                            </IconButton>
-                        </Box>
-                        <Box component="li" className="channel focusable channel-text">
-                            <Box component="span" className="channel-name">help</Box>
-                            <IconButton aria-label="settings" className="button">
-                                <SettingsIcon />
-                            </IconButton>
-                            <IconButton aria-label="settings" className="button">
-                                <SettingsIcon />
-                            </IconButton>
-                        </Box>
+                        {channelList.map(({ name, uid }) => (
+                            <Box component="li" className="channel focusable channel-text active" onClick={() => handleCurrentChannel(name, uid)}>
+                                <Box component="span" className="channel-name">{name}</Box>
+                                <IconButton aria-label="settings" className="button">
+                                    <SettingsIcon />
+                                </IconButton>
+                                <IconButton aria-label="settings" className="button">
+                                    <SettingsIcon />
+                                </IconButton>
+                            </Box>
+                        ))}
                     </Box>
                 </Box>
+
                 <Box component="header" className="channel-list-header focusable">
                     <Typography component="h6" variant="h6">Voice Channels</Typography>
                 </Box>

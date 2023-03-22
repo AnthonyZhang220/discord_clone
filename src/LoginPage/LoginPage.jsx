@@ -2,7 +2,7 @@ import React from 'react'
 import { Box, Typography, FormHelperText, Button } from '@mui/material'
 
 import { auth, db } from '../firebase'
-import { doc, setDoc } from 'firebase/firestore'
+import { doc, setDoc, updateDoc } from 'firebase/firestore'
 
 import { Link, useNavigate } from 'react-router-dom'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth'
@@ -26,7 +26,6 @@ export function RegisterPage() {
         })
 
     const handleNewUserFormSubmit = (e) => {
-        e.preventDefault();
 
         const { name, value } = e.target;
 
@@ -41,31 +40,29 @@ export function RegisterPage() {
         createUserWithEmailAndPassword(auth, newUser.email, newUser.password)
             .then((userCredential) => {
                 // Signed in 
+
                 const user = userCredential.user;
-                return setDoc(doc(db, "users", user.uid), {
-                    displayName: newUser.username,
+                const userRef = doc(db, "users", user.uid);
+                setDoc(userRef, {
                     email: newUser.email,
+                    profileURL: "",
+                    userId: user.uid,
+                    createdAt: Timestamp.fromDate(new Date()),
+                    displayName: newUser.username,
                 })
+
 
                 // ...
             }).then(() => {
                 navigate("../channels")
             })
-            .catch((error) => {
-                const errorCode = error.code;
-                console.log(errorCode)
-                const errorMessage = error.message;
-                console.log(errorMessage)
-                // ..
-            });
     }
 
     //create a new account
     React.useEffect(() => {
-        console.log(newUser)
 
 
-    }, [newUser])
+    }, [newUser.username])
 
     return (
         <Box component="main" className="register-page">
@@ -80,16 +77,16 @@ export function RegisterPage() {
                         <Box className="input-position">
                             <Box className="form-group">
                                 <FormHelperText className="input-placeholder">Email</FormHelperText>
-                                <input className="form-style" type="email" name='email' value={newUser.email} onChange={e => handleNewUserFormSubmit(e)} style={{ marginBottom: "20px" }} />
+                                <input className="form-style" type="email" name='email' onChange={e => handleNewUserFormSubmit(e)} style={{ marginBottom: "20px" }} />
                             </Box>
                             <Box className="form-group">
                                 <FormHelperText className="input-placeholder">username</FormHelperText>
-                                <input className="form-style" type="text" name='username' value={newUser.username} onChange={e => handleNewUserFormSubmit(e)} style={{ marginBottom: "20px" }}
+                                <input className="form-style" type="text" name='username' onChange={e => handleNewUserFormSubmit(e)} style={{ marginBottom: "20px" }}
                                 />
                             </Box>
                             <Box className="form-group">
                                 <FormHelperText id="outlined-weight-helper-text" className="input-placeholder">Password</FormHelperText>
-                                <input className="form-style" type="password" name="password" value={newUser.password} onChange={e => handleNewUserFormSubmit(e)}
+                                <input className="form-style" type="password" name="password" onChange={e => handleNewUserFormSubmit(e)}
                                     style={{ marginBottom: "20px" }}
                                 />
                             </Box>
@@ -148,11 +145,6 @@ export default function LoginPage({ googleSignIn }) {
                 // Password reset email sent!
                 navigate("../reset")
             })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // ..
-            });
 
     }
 
@@ -166,10 +158,6 @@ export default function LoginPage({ googleSignIn }) {
                 // ...
 
             })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-            });
     }
 
 
@@ -185,7 +173,6 @@ export default function LoginPage({ googleSignIn }) {
     }
 
     React.useEffect(() => {
-        console.log(emailSignInInfo)
     }, [emailSignInInfo])
 
     return (

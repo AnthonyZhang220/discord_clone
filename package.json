@@ -38,6 +38,7 @@
     "react-dom": "^18.2.0",
     "react-firebase-hooks": "^5.1.1",
     "react-router-dom": "^6.9.0",
+    "redux": "^4.2.1",
     "sass": "^1.58.3",
     "sass-loader": "^13.2.0",
     "socket.io": "^4.6.1",
