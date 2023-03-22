@@ -59,8 +59,6 @@ export default function Chat() {
 
         const { uid, displayName, photoURL } = auth.currentUser;
 
-        console.log(auth.currentUser)
-
         addDoc(collection(db, "messages"), {
             text: message,
             name: displayName,

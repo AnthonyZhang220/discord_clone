@@ -5,11 +5,14 @@ import Channel from './Channel/Channel'
 import { Box } from '@mui/system'
 import { createTheme, ThemeProvider, responsiveFontSizes } from '@mui/material'
 import { Routes, Route, useNavigate } from 'react-router-dom'
+import { Avatar, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText } from '@mui/material'
 
 
 import "./App.scss";
 import LoginPage, { ResetPasswordPage } from './LoginPage/LoginPage'
 import { RegisterPage } from './LoginPage/LoginPage'
+import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, setDoc, doc, getDocs, QuerySnapshot } from 'firebase/firestore';
+import { db } from './firebase'
 
 
 let theme = createTheme({
@@ -55,16 +58,32 @@ theme = responsiveFontSizes(theme);
 //google signin
 import { auth } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from 'firebase/auth';
+import { CloseFullscreen } from '@mui/icons-material'
+
+
 
 const App = () => {
     const navigate = useNavigate();
-
     // const [user] = useAuthState(auth);
-
-    const [currentUser, setCurrentUser] = React.useState({ name: "", profileURL: "", uid: 0 });
-
     const provider = new GoogleAuthProvider();
+
+    //show modal for new server/channel
+    const [channelModal, setChannelModal] = React.useState(false);
+    const [serverModal, setServerModal] = React.useState(false);
+
+    //store server/channel list for UI render
+
+    //add new server/channel
+    const [newChannel, setNewChannel] = React.useState({ name: "" })
+    const [newServerInfo, setNewServerInfo] = React.useState({ name: "", serverPic: "" });
+
+    //current Login USER/SERVER/CHANNEL
+    const [currentUser, setCurrentUser] = React.useState({ name: null, profileURL: null, uid: null });
+    const [currentServer, setCurrentServer] = React.useState({ name: "", uid: null });
+    const [currentChannel, setCurrentChannel] = React.useState({ name: "", uid: null });
+
+
 
     //google sign in with redirect
     const googleSignIn = () => {
@@ -75,7 +94,8 @@ const App = () => {
 
 
     }
-    //
+
+    //auth sign out function
     const signOut = () => {
         auth.signOut().then(() => {
             setCurrentUser(null)
@@ -83,6 +103,73 @@ const App = () => {
             navigate("/", { replace: true })
         })
     }
+
+
+    const handleCurrentServer = (serverName, serverUid) => {
+        setCurrentServer({ name: serverName, uid: serverUid })
+    }
+
+
+    const handleCurrentChannel = (channelName, channelUid) => {
+        setCurrentChannel({ name: channelName, uid: channelUid })
+    }
+
+
+    const handleChannelModalClose = () => {
+        setChannelModal(false);
+    }
+    const handleServerModalClose = () => {
+        setServerModal(false);
+    }
+
+
+    //add new Server
+    const handleAddServer = () => {
+
+        const { serverPic, name } = newServerInfo;
+
+        addDoc(collection(db, "servers"), {
+            serverPic: serverPic,
+            name: name,
+            ownerId: currentUser.uid,
+            createdAt: Timestamp.fromDate(new Date()),
+            members: [currentUser.uid]
+        }).then(() => {
+            handleServerModalClose();
+        })
+    }
+
+    const handleServerInfo = (e) => {
+        const { name, value } = e.target;
+
+        setNewServerInfo({
+            ...newServerInfo,
+            [name]: value,
+        })
+    }
+    const handleChannelInfo = (e) => {
+        const { name, value } = e.target;
+
+        setNewChannel({
+            ...newChannel,
+            [name]: value,
+        })
+    }
+
+    //add new channel
+    const handleAddChannel = () => {
+        const { name } = newChannel;
+
+        addDoc(collection(db, "channels"), {
+            name: name,
+            serverRef: currentServer.uid,
+            createdAt: Timestamp.fromDate(new Date()),
+            messages: [],
+        }).then(() => {
+            handleChannelModalClose();
+        })
+    }
+
 
 
     //google sign in with redirect
@@ -95,32 +182,27 @@ const App = () => {
 
                 // The signed-in user info.
                 const user = result.user;
-                return setDoc(doc(db, "users", user.uid), {
+                setDoc(doc(db, "users", user.uid), {
                     displayName: user.name,
                     email: user.email,
                 })
                 // IdP data available using getAdditionalUserInfo(result)
                 // ...
-            }).catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The AuthCredential type that was used.
-                const credential = GoogleAuthProvider.credentialFromError(error);
-                // ...
-            });
+            })
     }, [])
 
     //auth/login state change
     React.useEffect(() => {
-
-        const loginState = auth.onAuthStateChanged((user) => {
+        const loginState = onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log(user)
+                setDoc(doc(db, "users", user.uid), {
+                    displayName: user.displayName,
+                    email: user.email,
+                    profileURL: user.photoURL,
+                    userId: user.uid,
+                    createdAt: Timestamp.fromDate(new Date()),
+                })
                 setCurrentUser({ name: user.displayName, profileURL: user.photoURL, uid: user.uid })
-                console.log(currentUser);
                 navigate('../channels')
             } else {
                 setCurrentUser({ name: "", profileURL: "", uid: null })
@@ -135,6 +217,14 @@ const App = () => {
         }
 
     }, [])
+
+
+    // React.useEffect(()=>{
+    //     console.log(serverList)
+    //     console.log(currentUser)
+
+    // },[serverList, currentUser])
+
 
     return (
         <ThemeProvider theme={theme}>
@@ -155,11 +245,28 @@ const App = () => {
                     element={
                         <Box className="app-mount">
                             <Box className="app-container"  >
-                                <ServerList currentUser={currentUser} />
-                                <Channel
+                                <ServerList
+                                    handleAddServer={handleAddServer}
+                                    handleServerInfo={handleServerInfo}
+                                    handleCurrentServer={handleCurrentServer}
+                                    setCurrentServer={setCurrentChannel}
                                     currentUser={currentUser}
-                                    signOut={signOut} />
-                                <Chat currentUser={currentUser} />
+                                    setServerModal={setServerModal}
+                                    serverModal={serverModal}
+                                />
+                                <Channel
+                                    currentServer={currentServer}
+                                    currentUser={currentUser}
+                                    signOut={signOut}
+                                    handleAddChannel={handleAddChannel}
+                                    handleCurrentChannel={handleCurrentChannel}
+                                    channelModal={channelModal}
+                                    setChannelModal={setChannelModal}
+                                    handleChannelInfo={handleChannelInfo}
+                                />
+                                <Chat
+                                    currentUser={currentUser}
+                                    currentServer={currentServer} />
                             </Box>
                         </Box>
                     } />
