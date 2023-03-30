@@ -1,0 +1,32 @@
+.userstatus-container {
+	background-color: #2b2d31;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	height: 100%;
+
+	.userstatus-memberlist-wrapper {
+		-webkit-box-pack: center;
+		-ms-flex-pack: center;
+		justify-content: center;
+		min-width: 240px;
+		position: relative;
+		max-height: 100%;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+
+		.userstatus-memberlist {
+			width: 240px;
+			padding: 0 0 20px;
+			-webkit-box-flex: 0;
+			-ms-flex: 0 0 auto;
+			flex: 0 0 auto;
+			height: auto;
+		}
+	}
+}

@@ -1,9 +1,9 @@
 $body-bg: #121416;
 $body-color: #ffffff;
-$servers-bg: #1e2124;
-$channels-bg: #2e3136;
+$servers-bg: #1e1f22;
+$channels-bg: #2b2d31;
 $border-accent: darken($channels-bg, 7.7%);
-$chat-bg: #36393e;
+$chat-bg: #313338;
 $menu-bg: $chat-bg;
 $server-bg: $channels-bg;
 $server-bg-active: #7289da;
@@ -26,27 +26,38 @@ $icon-color: #b8b9bf;
 	}
 }
 
-// /* ===== Scrollbar CSS ===== */
-// /* Firefox */
-// * {
-// 	scrollbar-width: thin;
-// 	scrollbar-color: #1a1b1e #2b2d31;
-// }
+/* ===== Scrollbar CSS ===== */
+/* Firefox */
+* {
+	scrollbar-width: auto;
+}
 
-// /* Chrome, Edge, and Safari */
-// *::-webkit-scrollbar {
-// 	width: 10px;
-// }
+/* Chrome, Edge, and Safari */
+*::-webkit-scrollbar {
+	width: 16px;
+	height: 16px;
+}
 
-// *::-webkit-scrollbar-track {
-// 	background: #2b2d31;
-// }
+*::-webkit-scrollbar-track {
+	background: #2b2d31;
+	margin-bottom: 8px;
+}
 
-// *::-webkit-scrollbar-thumb {
-// 	background-color: #1a1b1e;
-// 	border-radius: 15px;
-// 	border: 0px none #ffffff;
-// }
+*::-webkit-scrollbar-thumb {
+	min-height: 40px;
+	background-color: #1a1b1e;
+	border-radius: 15px;
+	border: 0px none #ffffff;
+}
+*::-webkit-scrollbar-thumb,
+*::-webkit-scrollbar-track {
+	border: 4px solid transparent;
+	background-clip: padding-box;
+	border-radius: 8px;
+}
+*::-webkit-scrollbar-corner {
+	background-color: transparent;
+}
 
 html,
 body {
@@ -62,7 +73,7 @@ body {
 	margin: 0 0 0 0;
 	line-height: 1;
 	padding: 0;
-	overflow: hidden;
+	// overflow: hidden;
 	background: transparent;
 	user-select: none;
 	text-rendering: optimizeLegibility;

@@ -1,4 +1,5 @@
 import React from 'react'
+import UserStatus from '../UserStatus/UserStatus';
 //socket-io-client
 import { io } from 'socket.io-client'
 
@@ -13,6 +14,7 @@ import {
     query,
     orderBy,
     onSnapshot,
+    where,
     limitToLast,
 } from "firebase/firestore";
 import { db } from "../firebase";
@@ -32,6 +34,7 @@ import { IconButton, Typography } from '@mui/material';
 import { Divider } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { InputAdornment } from '@mui/material';
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 
 import './Chat.scss'
 
@@ -40,94 +43,58 @@ import './Chat.scss'
 // const URL = 'http://localhost:3000';
 // export const socket = io(URL);
 
-export default function Chat() {
+export default function Chat({ currentMessage, currentChannel, handleAddMessage, handleChatInfo, currentServer }) {
 
 
     const formRef = React.useRef();
     const chatScroller = React.useRef();
-    const [message, setMessage] = React.useState("");
     const [chatList, setChatList] = React.useState([]);
+    const [openMember, setOpenMember] = React.useState(false);
 
-
-    //send message
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        if (message.trim() === "") {
-            return;
-        }
-
-        const { uid, displayName, photoURL } = auth.currentUser;
-
-        addDoc(collection(db, "messages"), {
-            text: message,
-            name: displayName,
-            avatar: photoURL,
-            createdAt: Timestamp.fromDate(new Date()),
-            uid,
-        }).then(() => {
-            setMessage("")
-        })
-
-        //scroll on new message
-        // chatScroller.current.scrollIntoView({ behavior: "smooth" });
-
-        // //get message text
-        // const message = e.target.elements.message.value;
-        //emit message to server
-        // socket.emit("chatMessage", message)
-    }
-
-    const handleForm = (e) => {
-        setMessage(e.target.value)
+    const handleShowMemberList = () => {
+        setOpenMember(!openMember)
     }
 
     React.useEffect(() => {
+        if (currentChannel) {
+            const q = query(
+                collection(db, "messages"),
+                where("channelRef", "==", currentChannel.uid || ""),
+                orderBy("createdAt"),
+                limitToLast(20)
+            );
 
-        const q = query(
-            collection(db, "messages"),
-            orderBy("createdAt"),
-            limitToLast(10)
-        );
-
-        const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-            let chatList = [];
-            QuerySnapshot.forEach((doc) => {
-                chatList.push({ ...doc.data(), id: doc.id });
+            const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+                let chatList = [];
+                QuerySnapshot.forEach((doc) => {
+                    chatList.push({ ...doc.data(), id: doc.id });
+                });
+                setChatList(chatList);
             });
-            setChatList(chatList);
-        });
-
-
-
-        // socket.on('message', message => {
-        //     setChatList((data) => [...data, message])
-        //     console.log(chatList)
-
-        //     //scroll new message
-        chatScroller.current.scrollIntoView({ behavior: "smooth" });
-
-        // })
-
-
-        return () => {
-            unsubscribe();
         }
 
-    }, []);
+        //scroll new message
+        chatScroller.current.scrollIntoView({ behavior: "smooth" });
+
+    }, [currentChannel]);
 
     return (
         <Box className="chat-container">
             <CssBaseline />
-            <Box className="chat-title" component="section">
-                <Typography component="h6" variant="h6" className="chat-name">
-                    general
-                </Typography>
+            <Box className="chat-header" component="section">
+                <Box className="chat-header-name">
+                    <Typography component="h3" variant="h3" className="chat-header-hashtag">
+                        {currentChannel.name}
+                    </Typography>
+                </Box>
+                <Box className="chat-header-feature">
+                    <PeopleAltIcon color="white" onClick={() => handleShowMemberList()} />
+                </Box>
             </Box>
             <Box className="content">
                 <Box className="chat-content" component="main">
                     <Box className="messageWrapper">
-                        <Box className="scroller">
+                        <Box component="div" className="scroller">
                             <Box className="scroll-content">
                                 <List component="ol" className="scrollerInner">
                                     {chatList.map(({ text, name, avatar, createdAt }, index) => (
@@ -169,34 +136,40 @@ export default function Chat() {
                             </Box>
                         </Box>
                     </Box>
-                </Box>
-            </Box>
-            <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleSubmit(e)} sx={{
-                position: "relative",
-                msFlexPositive: "false",
-                flexShrink: "0",
-                paddingLeft: "16px",
-                paddingRight: "16px",
-                marginTop: "-8px",
-                color: "#ffffff"
-            }}>
-                <TextField type="chat" className="textArea" placeholder='Enter Your Message here'
-                    InputProps={{
-                        startAdornment: <InputAdornment position="start">
-                            <IconButton>
-                                <AddCircleIcon />
-                            </IconButton>
-                        </InputAdornment>,
-                    }}
-                    onChange={(e) => handleForm(e)} sx={{
+                    <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleAddMessage(e)} sx={{
                         position: "relative",
-                        display: "flex",
-                        width: "100%",
-                        textIndent: "0",
-                        borderRadius: "8px",
-                        marginBottom: "24px",
-                        backgroundColor: "#383a40",
-                    }} />
+                        msFlexPositive: "false",
+                        flexShrink: "0",
+                        paddingLeft: "16px",
+                        paddingRight: "16px",
+                        marginTop: "-8px",
+                        color: "#ffffff"
+                    }}>
+                        <TextField className="textArea" placeholder='Enter Your Message here'
+                            InputProps={{
+                                startAdornment: <InputAdornment position="start">
+                                    <IconButton>
+                                        <AddCircleIcon />
+                                    </IconButton>
+                                </InputAdornment>,
+                            }}
+                            onChange={(e) => handleChatInfo(e)} sx={{
+                                position: "relative",
+                                display: "flex",
+                                width: "100%",
+                                textIndent: "0",
+                                borderRadius: "8px",
+                                marginBottom: "24px",
+                                backgroundColor: "#383a40",
+                            }} />
+                    </Box>
+                </Box>
+                {
+                    openMember ?
+                        <UserStatus currentServer={currentServer} />
+                        :
+                        null
+                }
             </Box>
         </Box>
 

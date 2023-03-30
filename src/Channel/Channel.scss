@@ -20,24 +20,23 @@
 			width: 18px;
 			height: 18px;
 			margin-left: auto;
-			pointer-events: none;
 
-			use {
-				stroke-dasharray: 7;
-				transform-origin: 50%;
-				transition: stroke-dasharray 0.2s ease, transform 0.2s ease;
-			}
+			// use {
+			// 	stroke-dasharray: 7;
+			// 	transform-origin: 50%;
+			// 	transition: stroke-dasharray 0.2s ease, transform 0.2s ease;
+			// }
 		}
 
 		&:hover,
 		&:focus {
-			background: darken($channels-bg, 2.5%);
+			background: lighten($channels-bg, 2.5%);
 		}
 
-		&:focus use {
-			stroke-dasharray: 14;
-			transform: rotate(-90deg);
-		}
+		// &:focus use {
+		// 	stroke-dasharray: 14;
+		// 	transform: rotate(-90deg);
+		// }
 
 		.channel-header-name {
 			font-size: 1rem;
@@ -73,8 +72,6 @@
 					opacity: 1;
 				}
 			}
-
-			
 		}
 
 		.channel-list-text,
@@ -168,58 +165,57 @@
 	.channel-footer-container {
 		display: flex;
 		align-items: center;
-		flex: 0 0 70px;
 		margin-top: auto;
-		background: darken($channels-bg, 2.35%);
-		border-top: 1px solid $border-accent;
-		padding: 0 10px;
+		background: #232428;
+		padding: 0 8px;
+		font-size: 14px;
+		height: 52px;
+		-webkit-box-align: center;
+		margin-bottom: 1px;
 
 		.channel-footer-profile {
-		}
-
-		.channels-footer-details {
-			margin-left: 10px;
-		}
-
-		.channels-footer-controls {
-			margin-left: auto;
+			-webkit-box-align: center;
+			-ms-flex-align: center;
+			align-items: center;
+			display: -webkit-box;
+			display: -ms-flexbox;
 			display: flex;
+			margin-left: -2px;
+			min-width: 120px;
+			padding-left: 2px;
+			margin-right: 8px;
+			border-radius: 4px;
+			cursor: pointer;
 
-			.button {
-				display: block;
-				width: 28px;
-				height: 28px;
+			&:hover {
+				background: lighten(#232428, 2.5%);
+			}
 
-				svg {
-					width: 12px;
-				}
-
-				&:hover svg,
-				&:focus svg {
-					filter: brightness(200%);
-				}
+			.channels-footer-details {
+				padding-bottom: 4px;
+				padding-left: 8px;
+				padding-top: 4px;
+				-webkit-user-select: text;
+				-moz-user-select: text;
+				-ms-user-select: text;
+				user-select: text;
+				-webkit-box-flex: 1;
+				-ms-flex-positive: 1;
+				flex-grow: 1;
+				margin-right: 4px;
+				min-width: 0;
 			}
 		}
 
-		.avatar {
-			width: 30px;
-			height: 30px;
-			border-radius: 50%;
-		}
+		.channel-footer-controls {
+			display: flex;
+			margin-left: auto;
+			margin-right: auto;
+			flex: 0 1 auto;
 
-		.username,
-		.tag {
-			display: block;
-			font-weight: 300;
-		}
-
-		.username {
-			font-size: 0.9rem;
-		}
-
-		.tag {
-			color: rgba($body-color, 0.45);
-			font-size: 0.7rem;
+			.channels-footer-button {
+				padding: 0 2px 0 2px;
+			}
 		}
 	}
 }
@@ -229,4 +225,81 @@
 	margin-right: 10px;
 	font-weight: 300;
 	color: #8a8e94;
+}
+
+.user-detail-paper {
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	-webkit-box-flex: 1;
+	-ms-flex-positive: 1;
+	flex-grow: 1;
+	border-radius: 8px 8px 0 0;
+
+	.user-detail-top {
+		.user-detail-banner {
+			min-width: 340px;
+			min-height: 60px;
+			height: 60px;
+			width: 100%;
+
+			mask {
+				rect {
+					fill: white;
+					x: 0;
+					y: 0;
+					width: 100%;
+					height: 100%;
+				}
+
+				circle {
+					fill: black;
+					cx: 62;
+					cy: 56;
+					r: 46;
+				}
+			}
+
+			foreignObject {
+				x: 0;
+				y: 0;
+				width: 100%;
+				height: 100%;
+				mask: url(#uid_347);
+				overflow: visible;
+				display: block;
+
+				:not(svg) {
+					transform-origin: 0px 0px;
+				}
+			}
+		}
+		.user-detail-avatar {
+			position: absolute;
+			z-index: 0;
+			left: 22px;
+			top: 16px;
+			cursor: pointer;
+		}
+	}
+
+	.user-detail-list {
+		position: relative;
+		border-radius: 8px;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		-webkit-box-orient: vertical;
+		-webkit-box-direction: normal;
+		-ms-flex-direction: column;
+		flex-direction: column;
+		overflow: hidden;
+		margin: 48px 16px 16px 16px;
+		padding: 4px 0 4px 0;
+		max-height: calc(100vh - 128px);
+	}
 }
