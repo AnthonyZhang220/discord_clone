@@ -61,9 +61,9 @@
 			max-height: 60%;
 		}
 
-		// &.active::before {
-		// 	display: none;
-		// }
+		&.active::before {
+			display: none;
+		}
 
 		&::after {
 			content: "2 ONLINE";
