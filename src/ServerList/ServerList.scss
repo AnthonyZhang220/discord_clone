@@ -127,6 +127,15 @@
 		background-color: $server-bg-active;
 	}
 
+	&:hover {
+		&::before {
+			background: $server-marker-active;
+			height: 30px;
+			top: 10px;
+			animation: 1.2s ease-in-out forwards;
+		}
+	}
+
 	&.unread::before {
 		background: $server-marker-unread;
 	}

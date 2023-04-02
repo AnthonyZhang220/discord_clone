@@ -1,7 +1,7 @@
 import React from 'react'
 import { auth } from '../firebase';
 import { db } from "../firebase";
-import { onSnapshot, query, where, addDoc, collection, deleteDoc, doc, updateDoc } from 'firebase/firestore';
+import { onSnapshot, query, where, addDoc, collection, deleteDoc, doc, updateDoc, getDocs } from 'firebase/firestore';
 
 
 import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, ListItemText, ListItem, ListItemIcon, Paper, Badge, ClickAwayListener, List, ListItemButton, Popover } from '@mui/material'
@@ -15,7 +15,6 @@ import HeadsetIcon from '@mui/icons-material/Headset';
 import HeadsetOffIcon from '@mui/icons-material/HeadsetOff';
 import MicIcon from '@mui/icons-material/Mic';
 import MicOffIcon from '@mui/icons-material/MicOff';
-import { Tooltip } from '@mui/material';
 import { Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
@@ -31,10 +30,25 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
+import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+
+import CircleIcon from '@mui/icons-material/Circle';
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
+import NumbersIcon from '@mui/icons-material/Numbers';
+import InputLabel from '@mui/material/InputLabel';
+import { TextFieldProps } from '@mui/material/TextField';
+import FormControl from '@mui/material/FormControl';
+import InputBase from '@mui/material/InputBase';
 
 
 import "./Channel.scss"
 import { async } from '@firebase/util';
+import { Circle } from '@mui/icons-material';
+
+import StatusList from '../StatusList';
 
 
 
@@ -42,8 +56,23 @@ const StyledListItemButton = styled(ListItemButton)(() => ({
     padding: "2px 2px 2px 2px",
 }));
 
+const BootstrapInput = styled(InputBase)(({ theme }) => ({
+    'label + &': {
+        marginTop: theme.spacing(3),
+    },
+    '& .MuiInputBase-input': {
+        borderRadius: 4,
+        position: 'relative',
+        backgroundColor: "#1e1f22",
+        border: 'none',
+        fontSize: 16,
+        padding: '10px 12px',
+        color: "#ffffff"
+    },
+}));
 
-const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handleCurrentChannel, channelModal, setChannelModal, handleChannelInfo, currentChannel }) => {
+
+const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handleCurrentChannel, channelModal, setChannelModal, handleChannelInfo, currentChannel, setCurrentUser, setCurrentServer, newChannel }) => {
 
 
     const [channelList, setChannelList] = React.useState([])
@@ -66,7 +95,6 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                 setChannelList(channelList)
             })
         }
-
     }, [currentServer])
 
     React.useEffect(() => {
@@ -123,31 +151,87 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
         setOpenSettings(false)
     }
 
-    const handleDeleteServer = () => {
-        handleServerSettingsClose();
+    const handleDeleteServer = async () => {
 
         const parse = JSON.parse(localStorage.getItem(`${currentUser.uid}`))
         const newLocal = parse.filter(({ currentServer }) => currentServer != currentServer.uid);
         localStorage.setItem(`${currentUser.uid}`, JSON.stringify(newLocal))
 
         const serverRef = doc(db, "servers", currentServer.uid)
-        deleteDoc(serverRef)
+        const channelRef = query(collection(db, 'channels'), where('serverRef', '==', currentServer.uid));
+        const messageRef = query(collection(db, 'messages'), where('serverRef', '==', currentServer.uid));
+
+        await getDocs(messageRef)
+            .then((querySnapshot) => {
+                // Iterate through the documents and delete them
+                querySnapshot.forEach((doc) => {
+                    deleteDoc(doc.ref);
+                });
+            })
+            .catch((error) => {
+                console.error('Error deleting documents: ', error);
+            });
+
+        await getDocs(channelRef)
+            .then((querySnapshot) => {
+                // Iterate through the documents and delete them
+                querySnapshot.forEach((doc) => {
+                    deleteDoc(doc.ref);
+                });
+                setChannelList([])
+            })
+            .catch((error) => {
+                console.error('Error deleting documents: ', error);
+            });
+
+        await deleteDoc(serverRef).then(() => {
+            setCurrentServer({ ...currentServer, name: "" })
+            handleServerSettingsClose();
+        });
+
+
     }
 
-    const handleStatus = () => {
+    const handleStatusOpen = () => {
         setOpenStatus(true);
+    }
+
+    const handleStatusClose = () => {
+        setOpenStatus(false);
     }
 
     const changeStatus = async (status) => {
         await updateDoc(doc(db, "users", currentUser.uid), {
             status: status
         })
+        setCurrentUser({ ...currentUser, status: status })
     }
 
+    const statusFormat = (status) => {
+        if (status === "online") {
+            return "Online"
+        }
+        if (status === "offline") {
+            return "Offline"
+        }
+        if (status === "donotdisturb") {
+            return "Do Not Disturb"
+        }
+        if (status === "invisible") {
+            return "Invisible"
+        }
+        if (status === "idle") {
+            return "Idle"
+        }
+    }
 
+    const handleInvite = () => {
+
+    }
 
     //user avatar click
     const UserDetail = () => {
+
         return (
             <Popover
                 className='user-detail-paper'
@@ -183,14 +267,16 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                             <foreignObject className="user-detail-object">
                             </foreignObject>
                         </svg>
-                        <StyledBadge
+                        <Badge
                             overlap="circular"
                             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                            variant="dot"
                             className="user-detail-avatar"
+                            badgeContent={
+                                <StatusList status={currentUser.status} />
+                            }
                         >
-                            <Avatar alt="Name" sx={{ width: "75px", height: "75px" }} src={currentUser.profileURL ? currentUser.profileURL : "https://cdn.discordapp.com/icons/41771983423143937/edc44e98a690a1f76c5ddec68a0a6b9e.png"} />
-                        </StyledBadge>
+                            <Avatar alt={currentUser.name} sx={{ width: "75px", height: "75px" }} src={currentUser.profileURL} />
+                        </Badge>
                     </Box>
                     <Box className="user-detail-list" sx={{ backgroundColor: "#111214" }}>
                         <ListItem dense>
@@ -209,19 +295,80 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                             </StyledListItemButton>
                         </ListItem>
                         <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
-                        <ListItem dense ref={userStatusRef}>
-                            <StyledListItemButton onFocus={handleStatus} sx={{
-                                "&:hover": {
-                                    backgroundColor: "#5865f2",
-                                    borderRadius: "4px",
-                                }
-                            }}>
-                                <SwapVertIcon edge="start" sx={{ color: "white" }} />
-                                <ListItemText primary={currentUser.status} />
-                                <NavigateNextIcon edge="end" sx={{ color: "white" }} />
-                            </StyledListItemButton>
+                        <ListItem dense>
+                            <HtmlTooltip
+                                disableFocusListener disableTouchListener
+                                placement="right"
+                                title={
+                                    <React.Fragment>
+                                        <ListItem sx={{ pl: 1, pr: 1 }}>
+                                            <StyledListItemButton onClick={() => changeStatus("online")} sx={{
+                                                "&:hover": {
+                                                    backgroundColor: "#5865f2",
+                                                    borderRadius: "4px",
+                                                }
+                                            }}>
+                                                <CircleIcon edge="start" sx={{ mr: 2, color: "#23a55a" }} />
+                                                <ListItemText primary="Online" />
+                                            </StyledListItemButton>
+                                        </ListItem>
+                                        <Divider sx={{ backgroundColor: "white", mt: 0.5, mb: 0.5 }} variant="middle" />
+                                        <ListItem sx={{ pl: 1, pr: 1 }}>
+                                            <StyledListItemButton onClick={() => changeStatus("idle")} sx={{
+                                                "&:hover": {
+                                                    backgroundColor: "#5865f2",
+                                                    borderRadius: "4px",
+                                                }
+                                            }}>
+                                                <DarkModeIcon edge="start" sx={{ mr: 2, color: "#f0b132" }} />
+                                                <ListItemText primary="Idle" />
+                                            </StyledListItemButton>
+                                        </ListItem>
+                                        <ListItem sx={{ pl: 1, pr: 1 }}>
+                                            <StyledListItemButton onClick={() => changeStatus("donotdisturb")} sx={{
+                                                "&:hover": {
+                                                    backgroundColor: "#5865f2",
+                                                    borderRadius: "4px",
+                                                }
+                                            }}>
+                                                <RemoveCircleIcon edge="start" sx={{ mr: 2, color: "#f23f43" }} />
+                                                <ListItemText primary="Do Not Disturb" secondary="You will not receive any desktop notifications." secondaryTypographyProps={{
+                                                    style: {
+                                                        color: "white"
+                                                    }
+                                                }} />
+                                            </StyledListItemButton>
+                                        </ListItem>
+                                        <ListItem sx={{ pl: 1, pr: 1 }}>
+                                            <StyledListItemButton onClick={() => changeStatus("invisible")} sx={{
+                                                "&:hover": {
+                                                    backgroundColor: "#5865f2",
+                                                    borderRadius: "4px",
+                                                }
+                                            }}>
+                                                <StopCircleIcon edge="start" sx={{ color: "#80848e", mr: 2 }} />
+                                                <ListItemText primary="Invisible" secondary="You will not appear online, but will have full access." secondaryTypographyProps={{
+                                                    style: {
+                                                        color: "white"
+                                                    }
+                                                }} />
+                                            </StyledListItemButton>
+                                        </ListItem>
+                                    </React.Fragment>
+                                }>
+                                <StyledListItemButton sx={{
+                                    "&:hover": {
+                                        backgroundColor: "#5865f2",
+                                        borderRadius: "4px",
+                                    }
+                                }}>
+
+                                    <StatusList edge={"start"} status={currentUser.status} size={15} />
+                                    <ListItemText primary={statusFormat(currentUser.status)} sx={{ ml: 1 }} />
+                                    <NavigateNextIcon edge="end" sx={{ color: "white" }} />
+                                </StyledListItemButton>
+                            </HtmlTooltip>
                         </ListItem>
-                        <Status />
                         <ListItem dense >
                             <StyledListItemButton onClick={handleUserDetailClose} sx={{
                                 "&:hover": {
@@ -251,82 +398,18 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
         )
     }
 
-    //user status
-    const Status = () => {
 
-
-        return (
-            <Popover
-                className='user-detail-paper'
-                open={openStatus}
-                onClose={handleStatus}
-                anchorReference="anchorEl"
-                anchorEl={userStatusRef.current}
-                PaperProps={{
-                    style: {
-                        background: "#111214", borderRadius: "4px", width: "340px", fontSize: 14,
-                        display: "flex",
-                        flexDirection: "column",
-                        flexGrow: 1,
-                        maxHeight: "calc(100vh - 28px)",
-                    }
-                }}
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 300,
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-            >
-                <Box>
-                    <ListItem dense sx={{ p: 0.75 }}>
-                        <ListItemButton onClick={() => changeStatus("online")} sx={{
-                            "&:hover": {
-                                backgroundColor: "#5865f2",
-                                borderRadius: "4px",
-                            }
-                        }}>
-                            <ListItemText primary="Online" />
-                        </ListItemButton>
-                    </ListItem>
-                    <Divider />
-                    <ListItem dense sx={{ p: 0.75 }}>
-                        <ListItemButton onClick={() => changeStatus("idle")} sx={{
-                            "&:hover": {
-                                backgroundColor: "#5865f2",
-                                borderRadius: "4px",
-                            }
-                        }}>
-                            <ListItemText primary="Idle" />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem dense sx={{ p: 0.75 }}>
-                        <ListItemButton onClick={() => changeStatus("donotdisturb")} sx={{
-                            "&:hover": {
-                                backgroundColor: "#5865f2",
-                                borderRadius: "4px",
-                            }
-                        }}>
-                            <ListItemText primary="Do Not Disturb" secondary="You will not receive any desktop notifications." />
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem dense sx={{ p: 0.75 }}>
-                        <ListItemButton onClick={() => changeStatus("invisible")} sx={{
-                            "&:hover": {
-                                backgroundColor: "#5865f2",
-                                borderRadius: "4px",
-                            }
-                        }}>
-                            <ListItemText primary="Invisible" secondary="You will not appear online, but will have full access." />
-                        </ListItemButton>
-                    </ListItem>
-                </Box>
-
-            </Popover>
-        )
-    }
+    const HtmlTooltip = styled(({ className, ...props }) => (
+        <Tooltip {...props} classes={{ popper: className }} />
+    ))(() => ({
+        [`& .${tooltipClasses.tooltip}`]: {
+            background: "#111214", borderRadius: "4px", width: "340px", fontSize: 12,
+            display: "flex",
+            flexDirection: "column",
+            flexGrow: 1,
+            maxHeight: "calc(100vh - 28px)",
+        },
+    }));
 
     //server settings menu
     const ServerMenu = () => {
@@ -339,7 +422,7 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                 anchorReference="anchorEl"
                 PaperProps={{
                     style: {
-                        backgroundColor: "#111214", borderRadius: "4px", width: "220px", fontSize: 14
+                        backgroundColor: "#111214", borderRadius: "4px", width: "220px"
                     }
                 }}
                 anchorOrigin={{
@@ -351,42 +434,61 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                     horizontal: 'center',
                 }}
             >
-
-                <ListItem dense sx={{ p: 0.75 }}>
-                    <ListItemButton onClick={handleServerSettingsClose} sx={{
+                <ListItem sx={{
+                    p: 0.75
+                }}>
+                    <ListItemButton onClick={handleInvite} sx={{
+                        color: "#949cf7",
+                        borderRadius: "4px",
                         "&:hover": {
                             backgroundColor: "#5865f2",
-                            borderRadius: "4px",
+                            color: "#ffffff"
                         }
                     }}>
-                        <ListItemText primary="Server Settings" />
-                        <SettingsIcon edge="end" sx={{ color: "white" }} />
+                        <Typography variant='h6' sx={{ color: "inherit", marginRight: "auto" }}>
+                            Invite People
+                        </Typography>
+                        <PersonAddAlt1Icon sx={{ marginLeft: "auto", fontSize: 20 }} />
                     </ListItemButton>
                 </ListItem>
-                <Divider style={{ color: "#8a8e94" }} />
-                <ListItem dense sx={{ p: 0.75 }}>
-                    <ListItemButton onClick={handleDeleteServer} sx={{
+                <ListItem sx={{ p: 0.75 }}>
+                    <ListItemButton onClick={handleServerSettingsClose} sx={{
+                        color: "#ffffff",
+                        borderRadius: "4px",
                         "&:hover": {
-                            backgroundColor: "red",
-                            borderRadius: "4px",
+                            backgroundColor: "#5865f2",
+                            color: "#ffffff"
                         }
                     }}>
-                        <ListItemText color="red" primary="Delete Server" />
-                        <DeleteForeverIcon edge="end" sx={{ color: "white" }} />
+                        <Typography variant='h6' sx={{ color: "inherit", marginRight: "auto" }}>
+                            Server Settings
+                        </Typography>
+                        <SettingsIcon sx={{ marginLeft: "auto", fontSize: 20 }} />
+                    </ListItemButton>
+                </ListItem>
+                <Divider sx={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
+                <ListItem sx={{ p: 0.75 }}>
+                    <ListItemButton onClick={handleDeleteServer} sx={{
+                        color: "#f23f42",
+                        borderRadius: "4px",
+                        "&:hover": {
+                            backgroundColor: "#f23f42",
+                            color: "#ffffff"
+                        }
+                    }}>
+                        <Typography variant='h6' sx={{ color: "inherit", marginRight: "auto" }}>
+                            Delete Server
+                        </Typography>
+                        <DeleteForeverIcon sx={{ marginLeft: "auto", fontSize: 20 }} />
                     </ListItemButton>
                 </ListItem>
             </Popover>
         )
     }
 
-
-    const StyledBadge = styled(Badge)(({ theme }) => ({
-        '& .MuiBadge-badge': {
-            backgroundColor: '#44b700',
-            color: '#44b700',
-            boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-        },
-    }));
+    React.useEffect(() => {
+        console.log(currentUser.status)
+    }, [currentUser.status])
 
     return (
         <Box component="aside" className='channel-container'>
@@ -408,27 +510,43 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
             <ServerMenu handleServerSettingsClose={handleServerSettingsClose} openSettings={openSettings} channelHeaderRef={channelHeaderRef} handleDeleteServer={handleDeleteServer} />
             <Box component="section" className="channel-list-container">
                 <Box component="header" className="channel-list-header focusable">
-                    <Typography component="h6" variant="h6">
-                        Text Channels
-                    </Typography>
-                    <AddIcon onClick={(() => setChannelModal(true))} sx={{ marginLeft: "auto", fontSize: 12 }} />
-                    <Dialog className="Create-Channel-Modal" open={channelModal} onClose={() => setChannelModal(false)}>
-                        <DialogTitle>Create Channel</DialogTitle>
+                    <Box>
+                        <Typography component="h6" variant="h6">
+                            Text Channels
+                        </Typography>
+                    </Box>
+                    <Box sx={{ marginLeft: "auto", fontSize: 12 }}>
+                        <AddIcon onClick={(() => setChannelModal(true))} />
+                    </Box>
+                    <Dialog className="Create-Channel-Modal" open={channelModal} onClose={() => setChannelModal(false)} PaperProps={{
+                        style: {
+                            textAlign: "start",
+                            backgroundColor: "#313338",
+                            width: "440px"
+                        }
+                    }}>
+                        <DialogTitle sx={{ color: "#ffffff" }} variant='h3'>Create Channel</DialogTitle>
                         <DialogContent>
-                            <TextField
-                                autoFocus
-                                margin="dense"
-                                id="name"
-                                label="CHANNEL NAME"
-                                type="name"
-                                name="name"
-                                fullWidth
-                                variant="standard"
-                                onChange={e => handleChannelInfo(e)}
-                            />
+                            <Box component="form">
+                                <FormControl variant="standard" required fullWidth>
+                                    <InputLabel shrink sx={{
+                                        color: "#ffffff"
+                                    }}>
+                                        CHANNEL NAME
+                                    </InputLabel>
+                                    <BootstrapInput
+                                        id="name"
+                                        name="name"
+                                        variant="outlined"
+                                        autoComplete="off"
+                                        onChange={e => handleChannelInfo(e)}
+                                        placeholder="new-channel"
+                                    />
+                                </FormControl>
+                            </Box>
                         </DialogContent>
                         <DialogActions>
-                            <Button variant="text" onClick={() => setChannelModal(false)}>Cancel</Button>
+                            <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => setChannelModal(false)}>Cancel</Button>
                             <Button variant='contained' onClick={handleAddChannel}>Create Channel</Button>
                         </DialogActions>
                     </Dialog>
@@ -436,33 +554,32 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                 <Box component="ul" className="channel-list-text">
                     {channelList.map(({ name, id }) => (
                         <Box key={id} id={id} component="li" className={`channel channel-text ${id === currentChannel.uid ? "active" : ""}`} onClick={() => handleCurrentChannel(name, id)}>
+                            <NumbersIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />
                             <Box component="span" className="channel-name">{name}</Box>
-                            <IconButton aria-label="settings" className="button">
-                                <SettingsIcon />
-                            </IconButton>
                             <IconButton aria-label="settings" className="button">
                                 <SettingsIcon />
                             </IconButton>
                         </Box>
                     ))}
                 </Box>
-
                 <Box component="header" className="channel-list-header focusable">
                     <Typography component="h6" variant="h6">Voice Channels</Typography>
                 </Box>
             </Box>
             <Box component="footer" className="channel-footer-container" ref={userAvatarRef}>
                 <Box onClick={handleUserDetailOpen} className="channel-footer-profile" >
-                    <StyledBadge
+                    <Badge
                         overlap="circular"
                         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                        variant="dot"
+                        badgeContent={
+                            <StatusList status={currentUser.status} size={12} />
+                        }
                     >
-                        <Avatar alt="Name" sx={{ width: "30px", height: "30px" }} src={currentUser.profileURL ? currentUser.profileURL : "https://cdn.discordapp.com/icons/41771983423143937/edc44e98a690a1f76c5ddec68a0a6b9e.png"} className="avatar" />
-                    </StyledBadge>
+                        <Avatar alt={currentUser.name} sx={{ width: "30px", height: "30px" }} src={currentUser.profileURL} className="avatar" />
+                    </Badge>
                     <Box className="channels-footer-details">
                         <Box className="username" sx={{ fontSize: 14 }}>
-                            {currentUser.name ? currentUser.name : "Name"}
+                            {currentUser.name}
                         </Box>
                         <Box component="span" className="tag"></Box>
                     </Box>

@@ -56,13 +56,6 @@ let theme = createTheme({
                 color: 'secondary'
             }
         },
-        MuiListItem: {
-            defaultProps: {
-                "&:hover": {
-                    backgroundColor: "#5865f2",
-                }
-            }
-        }
     },
     palette: {
         primary: {
@@ -80,7 +73,6 @@ theme = responsiveFontSizes(theme);
 import { auth } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from 'firebase/auth';
-import { CloseFullscreen } from '@mui/icons-material'
 import { async } from '@firebase/util'
 
 
@@ -97,8 +89,10 @@ const App = () => {
     //store server/channel list for UI render
 
     //add new server/channel
-    const [newChannel, setNewChannel] = React.useState({ name: "" })
+    const [newChannel, setNewChannel] = React.useState("")
     const [newServerInfo, setNewServerInfo] = React.useState({ name: "", serverPic: "" });
+    const [serverURL, setServerURL] = React.useState(null);
+    const [file, setFile] = React.useState(null);
 
     //current Login USER/SERVER/CHANNEL
     const [currentUser, setCurrentUser] = React.useState({ name: null, profileURL: null, uid: null, createdAt: null });
@@ -108,7 +102,6 @@ const App = () => {
 
     const [imageDir, setImageDir] = React.useState("")
 
-    const [file, setFile] = React.useState(null);
 
 
 
@@ -220,9 +213,11 @@ const App = () => {
             ownerId: currentUser.uid,
             createdAt: Timestamp.fromDate(new Date()),
             members: [currentUser.uid]
+        }).then(() => {
+            setNewServerInfo({ name: "", serverPic: "" })
+            setServerURL(null);
+            handleServerModalClose();
         })
-
-
 
     }
 
@@ -236,12 +231,7 @@ const App = () => {
         })
     }
     const handleChannelInfo = (e) => {
-        const { name, value } = e.target;
-
-        setNewChannel({
-            ...newChannel,
-            [name]: value,
-        })
+        setNewChannel(e.target.value)
     }
 
     const handleChatInfo = (e) => {
@@ -250,32 +240,38 @@ const App = () => {
 
 
     //add new channel to db
-    const handleAddChannel = () => {
-        const { name } = newChannel;
+    const handleAddChannel = async () => {
 
-        addDoc(collection(db, "channels"), {
-            name: name,
+        await addDoc(collection(db, "channels"), {
+            name: newChannel,
             serverRef: currentServer.uid,
             createdAt: Timestamp.fromDate(new Date()),
             messages: [],
         }).then(() => {
+            setNewChannel("")
             handleChannelModalClose();
         })
+
     }
+
+    React.useEffect(() => {
+        console.log(currentMessage)
+    }, [currentMessage])
 
 
     //add new message to db
-    const handleAddMessage = (e) => {
+    const handleAddMessage = async (e) => {
         e.preventDefault();
 
-        if (currentMessage.trim() === "") {
-            return;
-        }
+        // if (currentMessage.trim() == "") {
+        //     return;
+        // }
 
         const { uid, displayName, photoURL } = auth.currentUser;
 
-        addDoc(collection(db, "messages"), {
-            text: currentMessage,
+        await addDoc(collection(db, "messages"), {
+            type: "text",
+            content: currentMessage,
             name: displayName,
             avatar: photoURL,
             createdAt: Timestamp.fromDate(new Date()),
@@ -285,6 +281,7 @@ const App = () => {
         }).then(() => {
             setCurrentMessage("")
         })
+
     }
 
 
@@ -293,10 +290,6 @@ const App = () => {
     React.useEffect(() => {
         getRedirectResult(auth)
             .then((result) => {
-                // This gives you a Google Access Token. You can use it to access Google APIs.
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                const token = credential.accessToken;
-
                 // The signed-in user info.
                 const user = result.user;
                 setDoc(doc(db, "users", user.uid), {
@@ -307,7 +300,6 @@ const App = () => {
                 // ...
             })
     }, [])
-
 
     //auth/login state change
     React.useEffect(() => {
@@ -338,7 +330,7 @@ const App = () => {
                 updateDoc(doc(db, "users", currentUser.uid), {
                     status: "offline",
                 })
-                setCurrentUser({ name: "", profileURL: "", uid: null })
+                setCurrentUser({ name: "", profileURL: "", uid: null, status: null })
                 navigate('../')
 
             }
@@ -366,7 +358,6 @@ const App = () => {
                     element={<ResetPasswordPage />} />
                 <Route path="/register"
                     element={<RegisterPage />} />
-
                 <Route path="/channels"
                     element={
                         <Box className="app-mount">
@@ -382,25 +373,30 @@ const App = () => {
                                     serverModal={serverModal}
                                     file={file}
                                     setFile={setFile}
+                                    serverURL={serverURL}
+                                    setServerURL={setServerURL}
                                 />
                                 <Channel
                                     currentServer={currentServer}
+                                    setCurrentServer={setCurrentServer}
                                     currentUser={currentUser}
                                     currentChannel={currentChannel}
+                                    setCurrentUser={setCurrentUser}
                                     signOut={signOut}
                                     handleAddChannel={handleAddChannel}
                                     handleCurrentChannel={handleCurrentChannel}
                                     channelModal={channelModal}
                                     setChannelModal={setChannelModal}
                                     handleChannelInfo={handleChannelInfo}
+                                    newChannel={newChannel}
                                 />
                                 <Chat
                                     currentUser={currentUser}
                                     currentServer={currentServer}
                                     currentChannel={currentChannel}
                                     handleAddMessage={handleAddMessage}
-                                    currentMessage={currentMessage}
                                     handleChatInfo={handleChatInfo}
+                                    currentMessage={currentMessage}
                                 />
                             </Box>
                         </Box>

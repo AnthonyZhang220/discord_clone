@@ -1,13 +1,15 @@
 import React from 'react'
 import { Box, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography, Avatar, Badge, ListSubheader } from '@mui/material'
 import { styled } from '@mui/material/styles';
+import StatusList from '../StatusList';
+import { lighten } from '@mui/material/styles';
 
 import { doc, getDoc, where, query, collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
-import "./UserStatus.scss"
+import "./MemberStatus.scss"
 
-function UserStatus({ currentServer }) {
+function MemberStatus({ currentServer }) {
 
 
     const [memberList, setMemberList] = React.useState([]);
@@ -15,22 +17,18 @@ function UserStatus({ currentServer }) {
 
     const getMemberList = async () => {
 
-        if (currentServer) {
+        if (currentServer.uid) {
             const serverRef = doc(db, "servers", currentServer.uid)
-            const serverDoc = await getDoc(serverRef)
-
-            const memberIds = serverDoc.data().members;
-            setMemberId(memberIds);
+            await getDoc(serverRef).then((doc) => {
+                const memberIds = doc.data().members;
+                setMemberId(memberIds);
+            })
         }
     }
 
     React.useEffect(() => {
         getMemberList();
-    }, [currentServer])
-
-    React.useEffect(() => {
-        console.log(memberList)
-    }, [memberList])
+    }, [currentServer.uid])
 
 
     React.useEffect(() => {
@@ -44,21 +42,13 @@ function UserStatus({ currentServer }) {
                         displayName: doc.data().displayName,
                         profileURL: doc.data().profileURL,
                         status: doc.data().status,
+                        userId: doc.data().userId
                     });
                 });
                 setMemberList(memberList);
             });
         }
     }, [memberId])
-
-
-    const StyledBadge = styled(Badge)(({ theme }) => ({
-        '& .MuiBadge-badge': {
-            backgroundColor: '#44b700',
-            color: '#44b700',
-            boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-        },
-    }));
 
 
     return (
@@ -68,9 +58,9 @@ function UserStatus({ currentServer }) {
                     <Box component="header" className="userstatus-online focusable">
                         <List>
                             {
-                                memberList?.map(({ displayName, profileURL, status }) => (
-                                    status === "online" ?
-                                        <List subheader={
+                                memberList?.map(({ displayName, profileURL, status, userId }) => (
+                                    status === "online" || status === "idle" || status === "donotdisturb" ?
+                                        <List key={userId} subheader={
                                             <ListSubheader component="div" sx={{ backgroundColor: "#2b2d31", color: "white" }}>
                                                 Online { }
                                             </ListSubheader>
@@ -78,35 +68,39 @@ function UserStatus({ currentServer }) {
                                             <ListItem disablePadding>
                                                 <ListItemButton>
                                                     <ListItemAvatar >
-                                                        <StyledBadge
+                                                        <Badge
                                                             overlap="circular"
                                                             anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                                                            variant="dot"
+                                                            badgeContent={
+                                                                <StatusList status={status} size={15} />
+                                                            }
                                                         >
                                                             <Avatar alt={displayName} src={profileURL} />
-                                                        </StyledBadge>
+                                                        </Badge>
                                                     </ListItemAvatar>
                                                     <ListItemText primary={displayName} />
                                                 </ListItemButton>
                                             </ListItem>
                                         </List>
                                         :
-                                        status === "offline" ?
-                                            <List subheader={
+                                        status === "offline" || status === "invisible" ?
+                                            <List key={userId} subheader={
                                                 <ListSubheader component="div" sx={{ backgroundColor: "#2b2d31", color: "white" }}>
                                                     Offline
                                                 </ListSubheader>
                                             }>
-                                                <ListItem disablePadding>
+                                                <ListItem disablePadding sx={{ opacity: 0.3 }}>
                                                     <ListItemButton>
                                                         <ListItemAvatar >
-                                                            <StyledBadge
+                                                            <Badge
                                                                 overlap="circular"
                                                                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                                                                variant="dot"
+                                                                badgeContent={
+                                                                    <StatusList size={12} />
+                                                                }
                                                             >
                                                                 <Avatar alt={displayName} src={profileURL} />
-                                                            </StyledBadge>
+                                                            </Badge>
                                                         </ListItemAvatar>
                                                         <ListItemText primary={displayName} />
                                                     </ListItemButton>
@@ -123,4 +117,4 @@ function UserStatus({ currentServer }) {
     )
 }
 
-export default UserStatus
+export default MemberStatus

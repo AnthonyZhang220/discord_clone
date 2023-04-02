@@ -63,6 +63,7 @@
 			transition: color 0.2s linear;
 			line-height: 30px;
 			position: relative;
+			display: flex;
 
 			&:hover,
 			&:focus {
@@ -90,7 +91,7 @@
 			align-items: center;
 			padding: 8px 20px 10px 20px;
 			opacity: 0.3;
-			width: 100%;
+			width: 240px;
 
 			.button {
 				display: none;
@@ -113,8 +114,10 @@
 			}
 
 			.channel-name {
-				font-size: 0.9rem;
-				font-weight: 300;
+				font-size: 1rem;
+				font-weight: normal;
+				text-overflow: ellipsis;
+				overflow-x: hidden;
 			}
 
 			.button:first-of-type {
@@ -150,13 +153,6 @@
 				&:focus::before,
 				&:hover::before {
 					opacity: 0.25;
-				}
-			}
-
-			.channel-name {
-				@extend .hash-before;
-				&::before {
-					font-weight: 400 !important;
 				}
 			}
 		}
@@ -220,12 +216,12 @@
 	}
 }
 
-.hash-before::before {
-	content: "#";
-	margin-right: 10px;
-	font-weight: 300;
-	color: #8a8e94;
-}
+// .hash-before::before {
+// 	content: "#";
+// 	margin-right: 10px;
+// 	font-weight: 300;
+// 	color: #8a8e94;
+// }
 
 .user-detail-paper {
 	display: -webkit-box;
