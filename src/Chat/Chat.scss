@@ -18,12 +18,15 @@
 		transition: background 0.15s ease;
 
 		.chat-header-name {
-			font-weight: bold;
+			display: flex;
+			font-weight: normal;
 			font-size: 1.3rem;
 			letter-spacing: 0.05rem;
+			align-items: center;
 
 			.chat-header-hashtag {
-				@extend .hash-before;
+				font-size: 1.2rem;
+				font-weight: 300;
 			}
 		}
 
@@ -44,13 +47,6 @@
 			-ms-flex-align: center;
 			align-items: center;
 		}
-	}
-
-	.hash-before::before {
-		content: "#";
-		margin-right: 10px;
-		font-weight: 300;
-		color: #8a8e94;
 	}
 
 	.content::before {
@@ -163,8 +159,8 @@
 							color: hsl(240, 2%, 88%);
 
 							.message {
-								outline: none;
 								position: relative;
+								outline: none;
 								color: hsl(240, 2%, 88%);
 							}
 
