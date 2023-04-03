@@ -46,6 +46,8 @@ import InputBase from '@mui/material/InputBase';
 import { ClickAwayListener } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import NumbersIcon from '@mui/icons-material/Numbers';
+import Snackbar from '@mui/material/Snackbar';
+import { Alert } from '@mui/material';
 
 import './Chat.scss'
 
@@ -72,6 +74,8 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
     const [openMember, setOpenMember] = React.useState(true);
     const [openUpload, setOpenUpload] = React.useState(false);
     const [fileUpload, setFileUpload] = React.useState(null);
+    const [fileError, setFileError] = React.useState(false);
+    const [fileErrorMessage, setFileErrorMessage] = React.useState("");
 
     const handleShowMemberList = () => {
         setOpenMember(!openMember)
@@ -81,20 +85,41 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
         setOpenUpload(true)
     }
 
+    function bytesToMB(bytes) {
+        const mb = bytes / (1024 * 1024);
+        return mb.toFixed(2);
+    }
+
     const handleUploadFile = async (e) => {
 
         const fileUploaded = e.target.files[0]
+
+        const fileSize = fileUploaded.size;
+        const fileType = fileUploaded.type;
+        const fileName = fileUploaded.name;
+
+        const mb = bytesToMB(fileSize);
 
         if (!fileUploaded) {
             return;
         }
 
+        if (mb > 50) {
+            setFileError(true);
+            setFileErrorMessage("File exceeds 50MB.")
+            return;
+        }
+
+        // if(fileType !== ){
+        //     setFileError(true);
+        //     setFileErrorMessage("File format unsupported.")
+        //     return;
+        // }
+
         // setFileUpload(fileUploaded)
         const date = new Date();
         const timeString = date.toISOString();
 
-        const fileType = fileUploaded.type;
-        const fileName = fileUploaded.name;
 
         const messageMediaRef = ref(storage, `messages/${currentUser.uid}/${fileName}-${timeString}`)
         const uploadProgress = await uploadBytes(messageMediaRef, fileUploaded)
@@ -104,7 +129,8 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
         await addDoc(collection(db, "messages"), {
             type: fileType,
             content: url,
-            name: currentUser.name,
+            fileName: fileName,
+            userName: currentUser.name,
             avatar: currentUser.profileURL,
             createdAt: Timestamp.fromDate(new Date()),
             channelRef: currentChannel.uid,
@@ -117,9 +143,43 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
 
     }
 
+
+    const convertDate = (date) => {
+        const newDate = new Date(date.seconds * 1000)
+        const formattedDate = newDate.toLocaleDateString('en-US', { month: "2-digit", day: "2-digit", year: "2-digit" })
+        const now = new Date();
+        const timeDiff = Math.abs(now.getTime() - newDate.getTime())
+
+        const oneDay = 24 * 60 * 60 * 1000;
+
+        const millisecondsInCurrentDay = now.getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+        if (timeDiff <= millisecondsInCurrentDay) {
+            return "Today at"
+        }
+
+        if (timeDiff <= millisecondsInCurrentDay + oneDay) {
+            return "Yesterday at"
+        }
+
+        return formattedDate;
+
+    }
+
+    const convertTime = (time) => {
+        const newTime = new Date(time.seconds * 1000)
+        const formattedTime = newTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+
+        return formattedTime;
+    }
+
     React.useEffect(() => {
         console.log(fileUpload)
     }, [fileUpload])
+
+    const GroupChatbyPeopleAndDate = () => {
+
+    }
 
     React.useEffect(() => {
         if (currentChannel) {
@@ -135,24 +195,30 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                 QuerySnapshot.forEach((doc) => {
                     chatList.push({ ...doc.data(), id: doc.id });
                 });
+
                 setChatList(chatList);
+                //scroll new message
             });
         }
 
-        //scroll new message
-        // chatScroller.current.scrollIntoView({ behavior: "smooth" });
+        chatScroller.current.scrollIntoView({ behavior: "smooth" });
 
     }, [currentChannel]);
 
-    const ChatItem = ({ content, name, avatar, createdAt, type }) => {
+    const ChatItem = ({ content, userName, avatar, createdAt, type, fileName }) => {
 
         const FormatChat = () => {
 
             if (type.indexOf("image/") != -1) {
-                return <img alt={content} src={content} />
-            } else if (type.indexOf("video/") != -1) {
-                return <audio controls src={content} />
+                return <img alt={content} src={content} style={{ maxHeight: "350px", aspectRatio: "auto", borderRadius: "8px", maxWidth: "550px" }} />
             } else if (type.indexOf("audio/") != -1) {
+                return (
+                    <React.Fragment>
+                        <Typography component="div" variant='p'>{fileName}</Typography>
+                        <audio controls src={content} />
+                    </React.Fragment>
+                )
+            } else if (type.indexOf("video/") != -1) {
                 return (
                     <video controls width="400" >
                         <source src={content} type={type} />
@@ -163,49 +229,61 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
             }
         }
 
+
         return (
-            <ListItem className="message" >
-                <ListItemAvatar>
-                    <Avatar alt="Profile Picture" src={avatar} />
-                </ListItemAvatar>
-                <ListItemText primary={
-                    <React.Fragment>
-                        {name}
-                        <Typography
-                            sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
-                            component="span"
-                            variant="p"
-                            color="text.primary"
-                            marginLeft="10px"
-                        >
-                            {new Date(createdAt.seconds * 1000).toLocaleDateString('en-US', { month: "2-digit", day: "2-digit", year: "2-digit" })}
-                        </Typography>
-                        &nbsp;
-                        <Typography
-                            sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
-                            component="span"
-                            variant="p"
-                            color="text.primary"
-                        >
-                            {new Date(createdAt.seconds * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                        </Typography>
-                    </React.Fragment>
-                }
-                    secondary={<React.Fragment>
-                        <FormatChat />
-                    </React.Fragment>
-                    } primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2", color: "white" }} />
+            <ListItem className="message" sx={{ pl: 0, pr: 0 }}>
+                <ListItemButton sx={{ cursor: "default", m: 0 }}>
+                    <ListItemAvatar>
+                        <Avatar alt="Profile Picture" src={avatar} />
+                    </ListItemAvatar>
+                    <ListItemText primary={
+                        <React.Fragment>
+                            {userName}
+                            <Typography
+                                sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
+                                component="span"
+                                variant="p"
+                                color="text.primary"
+                                marginLeft="10px"
+                            >
+                                {convertDate(createdAt)}
+                            </Typography>
+                            &nbsp;
+                            <Typography
+                                sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
+                                component="span"
+                                variant="p"
+                                color="text.primary"
+                            >
+                                {convertTime(createdAt)}
+                            </Typography>
+                        </React.Fragment>
+                    }
+                        secondary={<React.Fragment>
+                            <FormatChat />
+                        </React.Fragment>
+                        } primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2", color: "white" }} />
+                </ListItemButton>
             </ListItem>
         )
     }
 
     const ChatList = () => {
+
+        React.useEffect(() => {
+            chatList.forEach((message) => {
+                if (!chatList[message.uid]) {
+                    chatList[message.uid] = [];
+                }
+                chatList[message.uid].push(message)
+            })
+        }, [chatList])
+
+
         return (
             <List component="ol" className="scrollerInner">
-                {chatList.map(({ content, name, avatar, createdAt, type }, index) => (
-                    <Box className="message" key={index}>
-                        <ChatItem content={content} name={name} avatar={avatar} createdAt={createdAt} type={type} />
-                    </Box>
+                {chatList.map(({ content, userName, avatar, createdAt, type, fileName }, index) => (
+                    <ChatItem className="message" content={content} userName={userName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} />
                 ))}
                 {/* <Divider>CENTER</Divider> */}
                 <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
@@ -237,6 +315,19 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                     <Box className="messageWrapper">
                         <Box component="div" className="scroller">
                             <Box className="scroll-content">
+                                <List>
+                                    <ListItem>
+                                        <IconButton sx={{ color: "#ffffff" }}>
+                                            <NumbersIcon sx={{ fontSize: 50 }} />
+                                        </IconButton>
+                                    </ListItem>
+                                    <ListItem>
+                                        <Typography variant='h3'>Welcome to #{currentChannel.name}!</Typography>
+                                    </ListItem>
+                                    <ListItem>
+                                        <Typography variant="body2">This is the start of the #{currentChannel.name} channel.</Typography>
+                                    </ListItem>
+                                </List>
                                 <ChatList />
                             </Box>
                         </Box>
@@ -285,7 +376,7 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                                                         }} >
                                                             <input id="file" name="file" type="file" accept='audio/*,video/*,image/*' style={{ display: "none" }} onChange={(e) => handleUploadFile(e)} />
                                                             <FileUploadIcon edge="start" />
-                                                            <ListItemText primary="Upload a File" secondary="Accept format, image, video, audio, text." secondaryTypographyProps={{ color: "#fff" }} />
+                                                            <ListItemText primary="Upload a File" secondary="Accept format, image, video, audio, text. File size limit <50MB." secondaryTypographyProps={{ color: "#fff" }} />
                                                         </ListItemButton>
                                                     </Box>
                                                 }>
@@ -313,6 +404,11 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                         :
                         null
                 }
+                <Snackbar open={fileError} autoHideDuration={3000} onClose={() => setFileError(false)} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
+                    <Alert onClose={() => setFileError(false)} severity="error" sx={{ width: '100%', fontWeight: "bold" }}>
+                        {fileErrorMessage}
+                    </Alert>
+                </Snackbar>
             </Box>
         </Box>
     )

@@ -4,7 +4,7 @@ import { db } from "../firebase";
 import { onSnapshot, query, where, addDoc, collection, deleteDoc, doc, updateDoc, getDocs } from 'firebase/firestore';
 
 
-import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, ListItemText, ListItem, ListItemIcon, Paper, Badge, ClickAwayListener, List, ListItemButton, Popover } from '@mui/material'
+import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, ListItemText, ListItem, ListItemIcon, Paper, Badge, ClickAwayListener, List, ListItemButton, Popover, InputAdornment } from '@mui/material'
 import { Stack } from '@mui/system'
 import { Avatar, Typography } from '@mui/material'
 import { Box } from '@mui/system'
@@ -68,6 +68,14 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
         fontSize: 16,
         padding: '10px 12px',
         color: "#ffffff"
+    },
+}));
+
+const BootstrapTooltip = styled(({ className, ...props }) => (
+    <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+    [`& .${tooltipClasses.tooltip}`]: {
+        backgroundColor: "#1e2124",
     },
 }));
 
@@ -225,9 +233,6 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
         }
     }
 
-    const handleInvite = () => {
-
-    }
 
     //user avatar click
     const UserDetail = () => {
@@ -411,6 +416,59 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
         },
     }));
 
+    const handleInvite = () => {
+        handleServerSettingsClose()
+        setInviteDialog(true)
+    }
+
+    const [inviteDialog, setInviteDialog] = React.useState(false);
+    const [copyed, setCopyed] = React.useState(false);
+
+    const copyToClip = () => {
+        navigator.clipboard.writeText(currentServer.uid).then(() => {
+            setCopyed(true);
+        })
+    }
+
+    //invite people
+    const InviteDialog = () => {
+        return (
+            <Dialog className="Create-Channel-Modal" open={inviteDialog} onClose={() => setInviteDialog(false)} PaperProps={{
+                style: {
+                    textAlign: "start",
+                    backgroundColor: "#313338",
+                    width: "440px"
+                }
+            }}>
+                <DialogTitle sx={{ color: "#ffffff" }} variant='h3'>Invite friends to {currentServer.name}</DialogTitle>
+                <DialogContent>
+                    <Box component="form">
+                        <FormControl variant="standard" required fullWidth>
+                            <InputLabel shrink sx={{
+                                color: "#ffffff"
+                            }}>
+                                OR, SEND A SERVER ID TO A FRIEND
+                            </InputLabel>
+                            <BootstrapInput
+                                id="name"
+                                name="name"
+                                variant="outlined"
+                                autoComplete="off"
+                                defaultValue={currentServer.uid}
+                                readOnly
+                                endAdornment={
+                                    <InputAdornment position="end">
+                                        <Button onClick={() => copyToClip()}>Copy</Button>
+                                    </InputAdornment>
+                                }
+                            />
+                        </FormControl>
+                    </Box>
+                </DialogContent>
+            </Dialog>
+        )
+    }
+
     //server settings menu
     const ServerMenu = () => {
 
@@ -516,7 +574,12 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                         </Typography>
                     </Box>
                     <Box sx={{ marginLeft: "auto", fontSize: 12 }}>
-                        <AddIcon onClick={(() => setChannelModal(true))} />
+                        <BootstrapTooltip title={
+                            <React.Fragment>
+                                <Typography variant="body1" sx={{ m: 0.5 }} >Create Channel</Typography>
+                            </React.Fragment>} placement="top">
+                            <AddIcon onClick={(() => setChannelModal(true))} />
+                        </BootstrapTooltip>
                     </Box>
                     <Dialog className="Create-Channel-Modal" open={channelModal} onClose={() => setChannelModal(false)} PaperProps={{
                         style: {
@@ -621,6 +684,7 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                     </Tooltip>
                 </Box>
             </Box>
+            <InviteDialog />
         </Box>
     )
 }
