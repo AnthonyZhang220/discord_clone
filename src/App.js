@@ -11,7 +11,7 @@ import { Avatar, Button, TextField, Dialog, DialogActions, DialogContent, Dialog
 import "./App.scss";
 import LoginPage, { ResetPasswordPage } from './LoginPage/LoginPage'
 import { RegisterPage } from './LoginPage/LoginPage'
-import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, setDoc, doc, getDocs, QuerySnapshot, updateDoc, getDoc } from 'firebase/firestore';
+import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, setDoc, doc, getDocs, QuerySnapshot, updateDoc, getDoc, documentId } from 'firebase/firestore';
 import { storage } from './firebase'
 import { db } from './firebase'
 import { uploadBytesResumable, uploadBytes, ref, getDownloadURL } from 'firebase/storage';
@@ -192,8 +192,13 @@ const App = () => {
             contentType: "image/*"
         }
 
+        const fileName = file.name;
+
+        const date = new Date();
+        const timeString = date.toISOString();
+
         // Upload file and metadata to the object 'images/mountains.jpg'
-        const serverProfileRef = ref(storage, `serverProfile/${currentUser.uid}/${newServerInfo.name}`, metadata);
+        const serverProfileRef = ref(storage, `serverProfile/${currentUser.uid}/${fileName}-${timeString}`, metadata);
 
         const uploadProgress = await uploadBytes(serverProfileRef, file)
         const url = await getDownloadURL(serverProfileRef)
@@ -204,19 +209,27 @@ const App = () => {
         const { serverPic, name } = newServerInfo;
 
         const serverDoc = collection(db, "servers");
+        const channelDoc = collection(db, "channels");
 
         //upload image
-
         await addDoc(serverDoc, {
             serverPic: url,
             name: name,
             ownerId: currentUser.uid,
             createdAt: Timestamp.fromDate(new Date()),
-            members: [currentUser.uid]
-        }).then(() => {
-            setNewServerInfo({ name: "", serverPic: "" })
-            setServerURL(null);
-            handleServerModalClose();
+            members: [currentUser.uid],
+        }).then((doc) => {
+            addDoc(channelDoc, {
+                name: "general",
+                serverRef: doc.id,
+                createdAt: Timestamp.fromDate(new Date()),
+                messages: [],
+            }).then(() => {
+                setNewServerInfo({ name: "", serverPic: "" })
+                setServerURL(null);
+                handleServerModalClose();
+            })
+
         })
 
     }
@@ -272,7 +285,8 @@ const App = () => {
         await addDoc(collection(db, "messages"), {
             type: "text",
             content: currentMessage,
-            name: displayName,
+            fileName: "",
+            userName: displayName,
             avatar: photoURL,
             createdAt: Timestamp.fromDate(new Date()),
             channelRef: currentChannel.uid,

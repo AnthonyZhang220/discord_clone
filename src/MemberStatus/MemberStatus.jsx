@@ -1,5 +1,5 @@
 import React from 'react'
-import { Box, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography, Avatar, Badge, ListSubheader } from '@mui/material'
+import { Box, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography, Avatar, Badge, ListSubheader, Popover, Divider } from '@mui/material'
 import { styled } from '@mui/material/styles';
 import StatusList from '../StatusList';
 import { lighten } from '@mui/material/styles';
@@ -9,11 +9,20 @@ import { db } from '../firebase';
 
 import "./MemberStatus.scss"
 
+
+const StyledListItemButton = styled(ListItemButton)(() => ({
+    padding: "2px 2px 2px 2px",
+}));
+
 function MemberStatus({ currentServer }) {
 
 
     const [memberList, setMemberList] = React.useState([]);
     const [memberId, setMemberId] = React.useState([]);
+    const [memberDetail, setMemberDetail] = React.useState({})
+    const memberRef = React.useRef(null);
+
+    const [openMemberDetail, setOpenMemberDetail] = React.useState(false);
 
     const getMemberList = async () => {
 
@@ -46,9 +55,88 @@ function MemberStatus({ currentServer }) {
                     });
                 });
                 setMemberList(memberList);
+
             });
         }
     }, [memberId])
+
+
+
+    const handleOpenMemberDetail = async (memberId) => {
+        const memberDoc = doc(db, "users", memberId)
+        await getDoc(memberDoc).then((doc) => {
+            setMemberDetail({ name: doc.data().displayName, status: doc.data().status, profileURL: doc.data().profileURL, createdAt: doc.data().createdAt })
+
+            setOpenMemberDetail(true);
+        })
+    }
+
+    const MemberDetail = () => {
+        return (
+            <Popover
+                className='member-detail-paper'
+                open={openMemberDetail}
+                onClose={() => setOpenMemberDetail(false)}
+                anchorReference="anchorEl"
+                anchorEl={memberRef.current}
+                PaperProps={{
+                    style: {
+                        background: "#232428", borderRadius: "8px 8px 8px 8px", width: "340px", fontSize: 14,
+                        display: "flex",
+                        flexDirection: "column",
+                        flexGrow: 1,
+                        maxHeight: "calc(100vh - 28px)",
+                    }
+                }}
+                anchorOrigin={{
+                    vertical: 0,
+                    horizontal: -350,
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}
+            >
+                <Box className="member-detail-top">
+                    <svg className="member-detail-banner">
+                        <mask id="uid_347">
+                            <rect></rect>
+                            <circle></circle>
+                        </mask>
+                        <foreignObject className="member-detail-object">
+                        </foreignObject>
+                    </svg>
+                    <Badge
+                        overlap="circular"
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        className="member-detail-avatar"
+                        badgeContent={
+                            <StatusList status={memberDetail.status} />
+                        }
+                    >
+                        <Avatar alt={memberDetail.name} sx={{ width: "75px", height: "75px" }} src={memberDetail.profileURL} />
+                    </Badge>
+                </Box>
+                <Box className="member-detail-list" sx={{ backgroundColor: "#111214" }}>
+                    <ListItem dense>
+                        <StyledListItemButton>
+                            <ListItemText primary={memberDetail.name} primaryTypographyProps={{ variant: "h3" }} />
+                        </StyledListItemButton>
+                    </ListItem>
+                    <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
+                    <ListItem dense>
+                        <StyledListItemButton>
+                            <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(memberDetail.createdAt).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
+                                style: {
+                                    color: "white"
+                                }
+                            }} />
+                        </StyledListItemButton>
+                    </ListItem>
+                </Box>
+            </Popover>
+        )
+    }
 
 
     return (
@@ -65,8 +153,8 @@ function MemberStatus({ currentServer }) {
                                                 Online { }
                                             </ListSubheader>
                                         }>
-                                            <ListItem disablePadding>
-                                                <ListItemButton>
+                                            <ListItem disablePadding ref={memberRef}>
+                                                <ListItemButton onClick={() => handleOpenMemberDetail(userId)}>
                                                     <ListItemAvatar >
                                                         <Badge
                                                             overlap="circular"
@@ -113,6 +201,7 @@ function MemberStatus({ currentServer }) {
                     </Box>
                 </Box>
             </Box>
+            <MemberDetail />
         </Box>
     )
 }

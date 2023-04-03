@@ -1,6 +1,6 @@
 import React from 'react'
 import { Stack } from '@mui/system'
-import { Avatar, Button, Modal, TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Typography, IconButton } from '@mui/material'
+import { Avatar, Button, Modal, TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Typography, IconButton, ListItemButton, ListItemText } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import { TooltipProps } from '@mui/material';
@@ -20,6 +20,7 @@ import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, ge
 
 import "./ServerList.scss"
 import { Link } from 'react-router-dom';
+import { NavigateNext } from '@mui/icons-material';
 
 
 const BootstrapTooltip = styled(({ className, ...props }) => (
@@ -81,6 +82,152 @@ const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurr
 
     }, [currentUser]);
 
+    const [openJoin, setOpenJoin] = React.useState(false)
+    const [openCreate, setOpenCreate] = React.useState(false);
+    const [serverID, setServerID] = React.useState("")
+
+    const handleOpenJoin = () => {
+        setOpenJoin(true)
+    }
+
+    const handleJoinServer = async () => {
+        const updateRef = doc(db, "servers", serverID);
+        await updateDoc(updateRef, {
+            members: arrayUnion(currentUser.uid)
+        })
+    }
+
+    const ServerDialog = React.useMemo(() => {
+        return (
+            <Dialog PaperProps={{
+                style: {
+                    textAlign: "center",
+                    backgroundColor: "#ffffff",
+                    width: "440px"
+                }
+            }} open={serverModal} onClose={() => setServerModal(false)}>
+                <DialogTitle sx={{ color: "#060607" }} variant='h3'>Create a server</DialogTitle>
+                <DialogContent>
+                    <DialogContentText variant='h5'>
+                        Your server is where you and your friends hang out. Make yours and start talking.
+                    </DialogContentText>
+                    <ListItemButton sx={{ borderRadius: "8px" }} onClick={() => setOpenCreate(true)}>
+                        <ListItemText variant="h5" sx={{ color: "black" }}>
+                            Create My Own
+                        </ListItemText>
+                        <NavigateNext edge="end" />
+                    </ListItemButton>
+                </DialogContent>
+                <DialogActions sx={{ backgroundColor: "#f2f3f5", flexDirection: "column" }}>
+                    <DialogContentText variant='h4'>
+                        Have an invite already?
+                    </DialogContentText>
+                    <Button variant='contained' onClick={() => handleOpenJoin()} >Join a Server</Button>
+                </DialogActions>
+            </Dialog>
+        )
+    }, [serverModal])
+
+    const CreateServerDialog = React.useMemo(() => {
+        return (
+            <Dialog PaperProps={{
+                style: {
+                    textAlign: "center",
+                    backgroundColor: "#ffffff",
+                    width: "440px"
+                }
+            }} open={openCreate} onClose={() => setOpenCreate(false)}>
+                <DialogTitle sx={{ color: "#060607" }} variant='h3'>Create a server</DialogTitle>
+                <DialogContent>
+                    <DialogContentText variant='h5'>
+                        Give your new server a personality with a name and an icon. You can always change it later.
+                    </DialogContentText>
+                    {
+                        serverURL ?
+                            <Box component="label">
+                                <Box component="img" src={serverURL} sx={{ width: "75px", height: "75px", borderRadius: "50% 50%", mt: 4 }} />
+                                <Box component="input" type="file" onChange={e => handleFile(e)} sx={{ display: "none" }} />
+                            </Box>
+                            :
+                            <React.Fragment>
+                                <IconButton sx={{ mt: 4 }}>
+                                    <Box component="label">
+                                        <Badge badgeContent={<AddIcon />} color="primary">
+                                            <PhotoCameraIcon sx={{ fontSize: 50 }} />
+                                            <Box component="input" type="file" onChange={e => handleFile(e)} sx={{ display: "none" }} />
+                                        </Badge>
+                                    </Box>
+                                </IconButton>
+                            </React.Fragment>
+                    }
+                    <Box component="form">
+                        <FormControl variant="standard" required fullWidth>
+                            <InputLabel shrink sx={{
+                                color: "#4e5058"
+                            }}>
+                                SERVER NAME
+                            </InputLabel>
+                            <BootstrapInput
+                                id="name"
+                                type="name"
+                                name="name"
+                                variant="outlined"
+                                autoComplete='off'
+                                onChange={e => handleServerInfo(e)}
+                                placeholder={`${currentUser.name}'s Server`}
+                            />
+                        </FormControl>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ backgroundColor: "#f2f3f5" }}>
+                    <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => setOpenCreate(false)}>Back</Button>
+                    <Button variant='contained' onClick={handleAddServer}>Create</Button>
+                </DialogActions>
+            </Dialog>
+        )
+    }, [openCreate])
+
+    const JoinServerDialog = React.useMemo(() => {
+        return (
+            <Dialog PaperProps={{
+                style: {
+                    textAlign: "center",
+                    backgroundColor: "#ffffff",
+                    width: "440px"
+                }
+            }} open={openJoin} onClose={() => setOpenJoin(false)}>
+                <DialogTitle sx={{ color: "#060607" }} variant='h3'>Join a Server</DialogTitle>
+                <DialogContent>
+                    <DialogContentText variant='h5'>
+                        Enter an invite below to join an existing server
+                    </DialogContentText>
+                    <Box component="form">
+                        <FormControl variant="standard" required fullWidth>
+                            <InputLabel shrink sx={{
+                                color: "#4e5058"
+                            }}>
+                                Invite ID
+                            </InputLabel>
+                            <BootstrapInput
+                                id="name"
+                                type="name"
+                                name="name"
+                                variant="outlined"
+                                autoComplete='off'
+                                onChange={e => setServerID(e.target.value)}
+                                placeholder="Server ID"
+                            />
+                        </FormControl>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ backgroundColor: "#f2f3f5" }}>
+                    <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => setOpenJoin(false)}>Back</Button>
+                    <Button variant='contained' onClick={handleJoinServer}>Join Server</Button>
+                </DialogActions>
+            </Dialog>
+        )
+    }, [openJoin])
+
     return (
         <Box component='aside' className="servers">
             <Box className="servers-list">
@@ -110,60 +257,9 @@ const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurr
                             <AddIcon className="server-icon" />
                         </IconButton>
                     </BootstrapTooltip>
-                    <Dialog PaperProps={{
-                        style: {
-                            textAlign: "center",
-                            backgroundColor: "#ffffff",
-                            width: "440px"
-                        }
-                    }} open={serverModal} onClose={() => setServerModal(false)}>
-                        <DialogTitle sx={{ color: "#060607" }} variant='h3'>Create a server</DialogTitle>
-                        <DialogContent>
-                            <DialogContentText variant='h5'>
-                                Give your new server a personality with a name and an icon. You can always change it later.
-                            </DialogContentText>
-                            {
-                                serverURL ?
-                                    <Box component="label">
-                                        <Box component="img" src={serverURL} sx={{ width: "75px", height: "75px", borderRadius: "50% 50%", mt: 4 }} />
-                                        <Box component="input" type="file" onChange={e => handleFile(e)} sx={{ display: "none" }} />
-                                    </Box>
-                                    :
-                                    <React.Fragment>
-                                        <IconButton sx={{ mt: 4 }}>
-                                            <Box component="label">
-                                                <Badge badgeContent={<AddIcon />} color="primary">
-                                                    <PhotoCameraIcon sx={{ fontSize: 50 }} />
-                                                    <Box component="input" type="file" onChange={e => handleFile(e)} sx={{ display: "none" }} />
-                                                </Badge>
-                                            </Box>
-                                        </IconButton>
-                                    </React.Fragment>
-                            }
-                            <Box component="form">
-                                <FormControl variant="standard" required fullWidth>
-                                    <InputLabel shrink sx={{
-                                        color: "#4e5058"
-                                    }}>
-                                        SERVER NAME
-                                    </InputLabel>
-                                    <BootstrapInput
-                                        id="name"
-                                        type="name"
-                                        name="name"
-                                        variant="outlined"
-                                        autoComplete='off'
-                                        onChange={e => handleServerInfo(e)}
-                                        placeholder={`${currentUser.name}'s Server`}
-                                    />
-                                </FormControl>
-                            </Box>
-                        </DialogContent>
-                        <DialogActions sx={{ backgroundColor: "#f2f3f5" }}>
-                            <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => setServerModal(false)}>Back</Button>
-                            <Button variant='contained' onClick={handleAddServer}>Create</Button>
-                        </DialogActions>
-                    </Dialog>
+                    {ServerDialog}
+                    {CreateServerDialog}
+                    {JoinServerDialog}
                 </Box>
                 <BootstrapTooltip title={
                     <React.Fragment>
