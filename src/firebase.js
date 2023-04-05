@@ -28,35 +28,3 @@ const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 export const storage = getStorage(app);
-
-
-//Define Data Model
-
-// User document model
-const User = {
-    username: '',
-    email: '',
-    servers: []
-};
-
-// Server document model
-const Server = {
-    name: '',
-    owner: null,
-    members: [],
-    channels: []
-};
-
-// Channel document model
-const Channel = {
-    name: '',
-    server: null,
-    messages: []
-};
-
-// Message document model
-const Message = {
-    content: '',
-    author: null,
-    timestamp: null
-};

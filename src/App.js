@@ -13,8 +13,12 @@ import LoginPage, { ResetPasswordPage } from './LoginPage/LoginPage'
 import { RegisterPage } from './LoginPage/LoginPage'
 import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, setDoc, doc, getDocs, QuerySnapshot, updateDoc, getDoc, documentId } from 'firebase/firestore';
 import { storage } from './firebase'
-import { db } from './firebase'
+import { db, auth } from './firebase'
 import { uploadBytesResumable, uploadBytes, ref, getDownloadURL } from 'firebase/storage';
+import { FacebookAuthProvider } from "firebase/auth";
+import { TwitterAuthProvider } from "firebase/auth";
+import { GithubAuthProvider } from "firebase/auth";
+
 
 
 let theme = createTheme({
@@ -70,17 +74,20 @@ let theme = createTheme({
 theme = responsiveFontSizes(theme);
 
 //google signin
-import { auth } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from 'firebase/auth';
 import { async } from '@firebase/util'
+import { useFormControlUnstyledContext } from '@mui/base'
 
 
 
 const App = () => {
     const navigate = useNavigate();
     // const [user] = useAuthState(auth);
-    const provider = new GoogleAuthProvider();
+    const GoogleProvider = new GoogleAuthProvider();
+    const FacebookProvider = new FacebookAuthProvider();
+    const TwitterProvider = new TwitterAuthProvider();
+    const GithubProvider = new GithubAuthProvider();
 
     //show modal for new server/channel
     const [channelModal, setChannelModal] = React.useState(false);
@@ -108,12 +115,81 @@ const App = () => {
     //google sign in with redirect
     const googleSignIn = () => {
         // This will trigger a full page redirect away from your app
-        signInWithRedirect(auth, provider).then(() => {
-            navigate("../channels")
-        })
-
-
+        signInWithRedirect(auth, GoogleProvider)
     }
+
+    const facebookSignIn = () => {
+        signInWithRedirect(auth, FacebookProvider)
+    }
+
+    const twitterSignIn = () => {
+        signInWithRedirect(auth, TwitterProvider)
+    }
+    const githubSignIn = () => {
+        signInWithRedirect(auth, GithubProvider)
+    }
+
+    // const getResult = async () => {
+    //     const result = await getRedirectResult(auth)
+    //     const user = result.user;
+
+    // }
+
+
+
+
+    //google sign in with redirect
+    // React.useEffect(() => {
+    //     const unmount = async () => {
+    //         const result = await getRedirectResult(auth);
+    //         // The signed-in user info.
+    //         const user = result.user;
+    //         setDoc(doc(db, "users", user.uid), {
+    //             displayName: user.name,
+    //             email: user.email,
+    //         })
+    //         // IdP data available using getAdditionalUserInfo(result)
+    //         // ...
+    //     }
+    // }, [])
+
+    // React.useEffect(() => {
+
+    //     const unsubscribe = async () => {
+    //         const result = await getRedirectResult(auth);
+
+    //         const credential = GithubAuthProvider.credentialFromResult(result);
+    //         if (credential) {
+    //             // This gives you a GitHub Access Token. You can use it to access the GitHub API.
+    //             const token = credential.accessToken;
+    //             // ...
+    //         }
+    //         // The signed-in user info.
+    //         const user = result.user;
+    //         setDoc(doc(db, "users", user.uid), {
+    //             displayName: user.displayName,
+    //             email: user.email,
+    //             profileURL: user.photoURL,
+    //             userId: user.uid,
+    //             createdAt: Timestamp.fromDate(new Date()),
+    //             status: "online",
+    //         })
+
+    //         setCurrentUser({ name: user.displayName, profileURL: user.photoURL, uid: user.uid, createdAt: user.metadata.creationTime, status: "online" })
+
+
+    //         //if user not in the storage, add to the local storage
+    //         if (!localStorage.getItem(`${user.uid}`)) {
+    //             localStorage.setItem(`${user.uid}`, JSON.stringify([]));
+    //         } else {
+    //             const defaultServer = JSON.parse(localStorage.getItem(`${user.uid}`))
+    //             setCurrentServer({ ...currentServer, uid: defaultServer[1].currentServer })
+    //             setCurrentChannel({ name: defaultServer[1].currentChannelName, uid: defaultServer[1].currentChannel })
+    //         }
+    //         navigate('../channels')
+    //     }
+
+    // }, [])
 
     //auth sign out function
     const signOut = () => {
@@ -184,6 +260,8 @@ const App = () => {
     }
 
 
+
+    const [openCreate, setOpenCreate] = React.useState(false);
     //add new Server with handleUploadServerImage();
     const handleAddServer = async () => {
         // Create the file metadata
@@ -227,7 +305,9 @@ const App = () => {
             }).then(() => {
                 setNewServerInfo({ name: "", serverPic: "" })
                 setServerURL(null);
+                setFile(null);
                 handleServerModalClose();
+                setOpenCreate(false)
             })
 
         })
@@ -267,11 +347,6 @@ const App = () => {
 
     }
 
-    React.useEffect(() => {
-        console.log(currentMessage)
-    }, [currentMessage])
-
-
     //add new message to db
     const handleAddMessage = async (e) => {
         e.preventDefault();
@@ -295,50 +370,33 @@ const App = () => {
         }).then(() => {
             setCurrentMessage("")
         })
-
     }
-
-
-
-    //google sign in with redirect
-    React.useEffect(() => {
-        getRedirectResult(auth)
-            .then((result) => {
-                // The signed-in user info.
-                const user = result.user;
-                setDoc(doc(db, "users", user.uid), {
-                    displayName: user.name,
-                    email: user.email,
-                })
-                // IdP data available using getAdditionalUserInfo(result)
-                // ...
-            })
-    }, [])
 
     //auth/login state change
     React.useEffect(() => {
         const loginState = onAuthStateChanged(auth, (user) => {
             if (user) {
-                setDoc(doc(db, "users", user.uid), {
-                    displayName: user.displayName,
-                    email: user.email,
-                    profileURL: user.photoURL,
-                    userId: user.uid,
-                    createdAt: Timestamp.fromDate(new Date()),
-                    status: "online",
-                })
+                console.log(user)
+                // setDoc(doc(db, "users", user.uid), {
+                //     displayName: user.displayName,
+                //     email: user.email,
+                //     profileURL: user.photoURL,
+                //     userId: user.uid,
+                //     createdAt: Timestamp.fromDate(new Date()),
+                //     status: "online",
+                // })
 
                 setCurrentUser({ name: user.displayName, profileURL: user.photoURL, uid: user.uid, createdAt: user.metadata.creationTime, status: "online" })
 
 
                 //if user not in the storage, add to the local storage
-                if (!localStorage.getItem(`${user.uid}`)) {
-                    localStorage.setItem(`${user.uid}`, JSON.stringify([]));
-                } else {
-                    const defaultServer = JSON.parse(localStorage.getItem(`${user.uid}`))
-                    setCurrentServer({ ...currentServer, uid: defaultServer[1].currentServer })
-                    setCurrentChannel({ name: defaultServer[1].currentChannelName, uid: defaultServer[1].currentChannel })
-                }
+                // if (!localStorage.getItem(`${user.uid}`)) {
+                //     localStorage.setItem(`${user.uid}`, JSON.stringify([]));
+                // } else {
+                //     const defaultServer = JSON.parse(localStorage.getItem(`${user.uid}`))
+                //     setCurrentServer({ ...currentServer, uid: defaultServer[1].currentServer })
+                //     setCurrentChannel({ name: defaultServer[1].currentChannelName, uid: defaultServer[1].currentChannel })
+                // }
                 navigate('../channels')
             } else {
                 updateDoc(doc(db, "users", currentUser.uid), {
@@ -357,7 +415,6 @@ const App = () => {
 
     }, [])
 
-
     return (
         <ThemeProvider theme={theme}>
             {/* <CssBaseline /> */}
@@ -366,6 +423,9 @@ const App = () => {
                     element={
                         <LoginPage
                             googleSignIn={googleSignIn}
+                            facebookSignIn={facebookSignIn}
+                            twitterSignIn={twitterSignIn}
+                            githubSignIn={githubSignIn}
                         />
                     } />
                 <Route path="/reset"
@@ -389,6 +449,8 @@ const App = () => {
                                     setFile={setFile}
                                     serverURL={serverURL}
                                     setServerURL={setServerURL}
+                                    openCreate={openCreate}
+                                    setOpenCreate={setOpenCreate}
                                 />
                                 <Channel
                                     currentServer={currentServer}
