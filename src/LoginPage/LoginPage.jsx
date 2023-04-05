@@ -1,19 +1,19 @@
 import React from 'react'
-import { Box, Typography, FormHelperText, Button } from '@mui/material'
+import { Box, Typography, FormHelperText, Button, SvgIcon, FormLabel } from '@mui/material'
 
 import { auth, db } from '../firebase'
 import { doc, setDoc, updateDoc } from 'firebase/firestore'
 
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, createSearchParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth'
 
+import GoogleButton from "./google.svg"
+import FacebookButton from "./facebook.svg"
+import AppleButton from "./apple.svg"
+import TwitterButton from "./twitter.svg"
+import GithubButton from "./github.svg"
+
 import './LoginPage.scss'
-
-
-
-
-
-
 
 export function RegisterPage() {
     const navigate = useNavigate();
@@ -70,7 +70,7 @@ export function RegisterPage() {
                 <Box className="form-wrapper">
                     <Box className="form-center">
                         <Box className="primary-title">
-                            <Typography variant="h5">
+                            <Typography variant="h3">
                                 Create an account
                             </Typography>
                         </Box>
@@ -105,6 +105,7 @@ export function RegisterPage() {
 
 
 export function ResetPasswordPage() {
+    const [searchparams] = useSearchParams();
     const navigate = useNavigate();
 
     return (
@@ -113,12 +114,12 @@ export function ResetPasswordPage() {
                 <Box className="form-wrapper">
                     <Box className="form-center">
                         <Typography variant='h4'>
-                            A reset email has been sent to . Please check your email and follow the instructions to reset your password.
+                            {
+                                `A reset email has been sent to ${searchparams.get("email")}. Please check your email and follow the instructions to reset your password.`
+                            }
                         </Typography>
                         <Button onClick={() => navigate("/")}>
-                            <Link to="/">
-                                Sign In
-                            </Link>
+                            Sign In
                         </Button>
 
                     </Box>
@@ -130,7 +131,7 @@ export function ResetPasswordPage() {
 
 
 
-export default function LoginPage({ googleSignIn }) {
+export default function LoginPage({ googleSignIn, facebookSignIn, twitterSignIn, githubSignIn }) {
 
 
     const navigate = useNavigate();
@@ -143,21 +144,21 @@ export default function LoginPage({ googleSignIn }) {
         sendPasswordResetEmail(auth, emailSignInInfo.email)
             .then(() => {
                 // Password reset email sent!
-                navigate("../reset")
+                navigate({ pathname: "/reset", search: createSearchParams({ email: emailSignInInfo.email }).toString() })
             })
 
     }
 
-    const emailSignIn = () => {
-        signInWithEmailAndPassword(auth, emailSignInInfo.email, emailSignInInfo.password)
-            .then((userCredential) => {
-                // Signed in 
-                const user = userCredential.user;
-                setUserInfo({ name: user.displayName, profileURL: user.photoURL })
-                navigate("/channels")
-                // ...
+    const emailSignIn = async () => {
+        const result = await signInWithEmailAndPassword(auth, emailSignInInfo.email, emailSignInInfo.password)
 
-            })
+        // Signed in 
+        const user = result.user;
+        setUserInfo({ name: user.displayName, profileURL: user.photoURL })
+        navigate("/channels")
+        // ...
+
+
     }
 
 
@@ -172,8 +173,6 @@ export default function LoginPage({ googleSignIn }) {
         })
     }
 
-    React.useEffect(() => {
-    }, [emailSignInInfo])
 
     return (
         <Box component="main" className="login-page">
@@ -181,23 +180,23 @@ export default function LoginPage({ googleSignIn }) {
                 <Box className="form-wrapper">
                     <Box className="form-center">
                         <Box className="primary-title">
-                            <Typography variant="h5">
+                            <Typography variant="h3">
                                 Welcome back!
                             </Typography>
                         </Box>
                         <Box className="secondary-title">
-                            <Typography variant="h6">
+                            <Typography variant="h5">
                                 We're so excited to see you again!
                             </Typography>
                         </Box>
                         <Box className="input-position">
                             <Box className="form-group">
-                                <FormHelperText className="input-placeholder">Email</FormHelperText>
-                                <input name="email" className="form-style" style={{ marginBottom: "20px" }} onChange={e => handleEmailSignInForm(e)} />
+                                <FormLabel component="div" className="input-placeholder" required={true}>Email</FormLabel>
+                                <input required={true} name="email" className="form-style" style={{ marginBottom: "20px" }} onChange={e => handleEmailSignInForm(e)} />
                             </Box>
                             <Box className="form-group">
-                                <FormHelperText id="outlined-weight-helper-text" className="input-placeholder">Password</FormHelperText>
-                                <input name="password" className="form-style" onChange={e => handleEmailSignInForm(e)} />
+                                <FormLabel component="div" required={true} id="outlined-weight-helper-text" className="input-placeholder">Password</FormLabel>
+                                <input required={true} name="password" className="form-style" onChange={e => handleEmailSignInForm(e)} />
                             </Box>
                         </Box>
                         <Box className="password-container"><Button className="link" onClick={handleResetPassword}>Forgot your password?</Button></Box>
@@ -208,9 +207,10 @@ export default function LoginPage({ googleSignIn }) {
                     </Box>
                     <Box className="verticalSeparator"></Box>
                     <Box className="social-login">
-                        <Box className="google-button" component="img" src="./assets/google-sign-in/btn_google_signin_light_normal_web.png" type="button" onClick={googleSignIn} ></Box>
-                        <Box className="google-button" component="img" src="./assets/google-sign-in/btn_google_signin_light_normal_web.png" type="button" onClick={googleSignIn} ></Box>
-                        <Box className="google-button" component="img" src="./assets/google-sign-in/btn_google_signin_light_normal_web.png" type="button" onClick={googleSignIn} ></Box>
+                        <SvgIcon className="social-button" component={GoogleButton} inheritViewBox onClick={googleSignIn}></SvgIcon>
+                        <SvgIcon className="social-button" component={FacebookButton} inheritViewBox onClick={facebookSignIn}></SvgIcon>
+                        <SvgIcon className="social-button" component={TwitterButton} inheritViewBox onClick={twitterSignIn}></SvgIcon>
+                        <SvgIcon className="social-button" component={GithubButton} inheritViewBox onClick={githubSignIn}></SvgIcon>
                     </Box>
                 </Box>
             </Box>

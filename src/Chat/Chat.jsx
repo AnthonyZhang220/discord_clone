@@ -234,7 +234,7 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
             <ListItem className="message" sx={{ pl: 0, pr: 0 }}>
                 <ListItemButton sx={{ cursor: "default", m: 0 }}>
                     <ListItemAvatar>
-                        <Avatar alt="Profile Picture" src={avatar} />
+                        <Avatar alt={userName} src={avatar} />
                     </ListItemAvatar>
                     <ListItemText primary={
                         <React.Fragment>

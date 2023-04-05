@@ -47,6 +47,10 @@ module.exports = {
                 enforce: 'pre',
                 use: ['source-map-loader'],
             },
+            {
+                test: /\.svg$/,
+                use: ['@svgr/webpack'],
+            },
         ],
     },
     plugins: [

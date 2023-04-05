@@ -15,7 +15,7 @@ import { TextFieldProps } from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 
 import { db } from "../firebase";
-import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, getDocs } from 'firebase/firestore';
+import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, getDocs, doc } from 'firebase/firestore';
 
 
 import "./ServerList.scss"
@@ -51,7 +51,7 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 
 
 
-const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurrentServer, currentServer, setCurrentServer, setServerModal, serverModal, file, setFile, currentChannel, serverURL, setServerURL }) => {
+const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurrentServer, currentServer, setCurrentServer, setServerModal, serverModal, file, setFile, currentChannel, serverURL, setServerURL, openCreate, setOpenCreate }) => {
 
     const [serverList, setServerList] = React.useState([]);
 
@@ -83,7 +83,6 @@ const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurr
     }, [currentUser]);
 
     const [openJoin, setOpenJoin] = React.useState(false)
-    const [openCreate, setOpenCreate] = React.useState(false);
     const [serverID, setServerID] = React.useState("")
 
     const handleOpenJoin = () => {
@@ -127,6 +126,7 @@ const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurr
             </Dialog>
         )
     }, [serverModal])
+
 
     const CreateServerDialog = React.useMemo(() => {
         return (
@@ -181,11 +181,11 @@ const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurr
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: "#f2f3f5" }}>
                     <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => setOpenCreate(false)}>Back</Button>
-                    <Button variant='contained' onClick={handleAddServer}>Create</Button>
+                    <Button variant='contained' onClick={() => handleAddServer()}>Create</Button>
                 </DialogActions>
             </Dialog>
         )
-    }, [openCreate])
+    }, [openCreate, file])
 
     const JoinServerDialog = React.useMemo(() => {
         return (
