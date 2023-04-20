@@ -424,7 +424,7 @@ const App = () => {
                 updateDoc(doc(db, "users", currentUser.uid), {
                     status: "offline",
                 })
-                setCurrentUser({ name: "", profileURL: "", uid: null, status: null })
+                setCurrentUser({ name: null, profileURL: null, uid: null, status: null })
                 navigate('/')
 
             }
@@ -452,7 +452,7 @@ const App = () => {
                 setFriendIds(data)
             })
 
-            return unsub
+            // return unsub
         }
 
     }, [currentUser.uid])
@@ -475,7 +475,7 @@ const App = () => {
                 setFriendList(friendList)
             })
 
-            return unsubscribe
+            // return unsubscribe
         }
 
 
@@ -551,7 +551,7 @@ const App = () => {
             })
 
 
-            return unsub
+            // return unsub
         }
 
     }, [currentPrivateChannel])
