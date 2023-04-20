@@ -211,7 +211,7 @@ const App = () => {
             updateDoc(userRef, {
                 status: "offline"
             })
-            setCurrentUser(null)
+            setCurrentUser({ name: null, profileURL: null, uid: null, createdAt: null })
         }).then(() => {
             navigate("/", { replace: true })
         })
@@ -451,6 +451,8 @@ const App = () => {
                 })
                 setFriendIds(data)
             })
+
+            return unsub
         }
 
     }, [currentUser.uid])
@@ -472,7 +474,10 @@ const App = () => {
                 })
                 setFriendList(friendList)
             })
+
+            return unsubscribe
         }
+
 
     }, [friendIds])
 
@@ -544,6 +549,9 @@ const App = () => {
                 })
                 setPrviateMessages(privateMessages)
             })
+
+
+            return unsub
         }
 
     }, [currentPrivateChannel])
