@@ -2,7 +2,7 @@ import React from 'react'
 import { Box, Typography, FormHelperText, Button, SvgIcon, FormLabel } from '@mui/material'
 
 import { auth, db } from '../firebase'
-import { doc, setDoc, updateDoc } from 'firebase/firestore'
+import { doc, setDoc, updateDoc, getDoc, Timestamp } from 'firebase/firestore'
 
 import { Link, createSearchParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth'
@@ -15,7 +15,7 @@ import GithubButton from "./github.svg"
 
 import './LoginPage.scss'
 
-export function RegisterPage() {
+export function RegisterPage({ currentUser, setCurrentUser }) {
     const navigate = useNavigate();
 
     const [newUser, setNewUser] = React.useState(
@@ -42,19 +42,23 @@ export function RegisterPage() {
                 // Signed in 
 
                 const user = userCredential.user;
+
                 const userRef = doc(db, "users", user.uid);
+                
+
                 setDoc(userRef, {
+                    displayName: newUser.username,
                     email: newUser.email,
                     profileURL: "",
                     userId: user.uid,
                     createdAt: Timestamp.fromDate(new Date()),
-                    displayName: newUser.username,
+                    status: "online",
+                    friends: [],
+                }).then((doc) => {
+                    setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+
+                    navigate("../channels")
                 })
-
-
-                // ...
-            }).then(() => {
-                navigate("../channels")
             })
     }
 
@@ -131,7 +135,7 @@ export function ResetPasswordPage() {
 
 
 
-export default function LoginPage({ googleSignIn, facebookSignIn, twitterSignIn, githubSignIn }) {
+export default function LoginPage({ googleSignIn, facebookSignIn, twitterSignIn, githubSignIn, currentUser, setCurrentUser }) {
 
 
     const navigate = useNavigate();
@@ -152,10 +156,18 @@ export default function LoginPage({ googleSignIn, facebookSignIn, twitterSignIn,
     const emailSignIn = async () => {
         const result = await signInWithEmailAndPassword(auth, emailSignInInfo.email, emailSignInInfo.password)
 
-        // Signed in 
-        const user = result.user;
-        setUserInfo({ name: user.displayName, profileURL: user.photoURL })
-        navigate("/channels")
+
+        const userRef = doc(db, "users", result.user.uid);
+
+        getDoc(userRef).then((doc) => {
+            setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+            navigate("/channels")
+        })
+
+
+
+
+
         // ...
 
 
