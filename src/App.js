@@ -573,7 +573,6 @@ const App = () => {
                     </Box>
                 } >
                     <Route
-                        index
                         path="/channels"
                         element={
                             <React.Fragment>
