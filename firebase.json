@@ -1,6 +1,5 @@
 {
   "hosting": {
-    "site": "https://discordclone-95fc0.web.app/",
     "public": "dist",
     "ignore": [
       "firebase.json",
