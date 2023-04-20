@@ -142,71 +142,123 @@ const App = () => {
         signInWithRedirect(auth, GithubProvider)
     }
 
-    // const getResult = async () => {
-    //     const result = await getRedirectResult(auth)
-    //     const user = result.user;
+    // const signInWithMultipleProviders = () => {
+    //     signInWithRedirect(auth, GoogleProvider, FacebookProvider, TwitterProvider, GithubProvider);
+    // };
 
-    // }
+    React.useEffect(() => {
+
+        const handleRedirectResult = async () => {
+
+            const result = await getRedirectResult(auth);
+
+            if (result) {
+                // The signed-in user info.
+                const user = result.user;
+
+                const userRef = doc(db, "users", user.uid);
+
+                getDoc(userRef).then((doc) => {
+                    if (doc.exists()) {
+                        setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+                    } else {
+                        setDoc(doc(db, "users", user.uid), {
+                            displayName: user.displayName,
+                            email: user.email,
+                            profileURL: user.photoURL,
+                            userId: user.uid,
+                            createdAt: Timestamp.fromDate(new Date()),
+                            status: "online",
+                            friends: [],
+                        }).then((doc) => {
+                            setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+                        })
+                    }
+                })
+
+                //if user not in the storage, add to the local storage
+                if (!localStorage.getItem(`${user.uid}`)) {
+                    localStorage.setItem(`${user.uid}`, JSON.stringify({ defaultServer: "", defaultServerName: "", userDefault: [] }));
+                } else {
+                    const storage = JSON.parse(localStorage.getItem(`${user.uid}`))
+                    setCurrentServer({ name: storage.defaultServerName, uid: storage.defaultServer })
+                    setCurrentChannel({ name: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannelName, uid: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannel })
+                }
+                navigate('/channels')
+
+            } else {
+                updateDoc(doc(db, "users", currentUser.uid), {
+                    status: "offline",
+                })
+                setCurrentUser({ name: null, profileURL: null, uid: null, status: null })
+                navigate('/')
+            }
+        }
+
+        handleRedirectResult();
+
+    }, [auth])
+
+    React.useEffect(() => {
+        console.log(auth)
+    }, [auth])
+
+    //auth/login state change
+    React.useEffect(() => {
+        const loginState = auth.onAuthStateChanged((user) => {
+            if (user) {
+                const userRef = doc(db, "users", user.uid);
+
+                getDoc(userRef).then((doc) => {
+                    if (doc.exists()) {
+                        setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+                    } else {
+                        setDoc(doc(db, "users", user.uid), {
+                            displayName: user.displayName,
+                            email: user.email,
+                            profileURL: user.photoURL,
+                            userId: user.uid,
+                            createdAt: Timestamp.fromDate(new Date()),
+                            status: "online",
+                            friends: [],
+                        }).then((doc) => {
+                            setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+                        })
+                    }
+                })
 
 
+                //if user not in the storage, add to the local storage
+                if (!localStorage.getItem(`${user.uid}`)) {
+                    localStorage.setItem(`${user.uid}`, JSON.stringify({ defaultServer: "", defaultServerName: "", userDefault: [] }));
+                } else {
+                    const storage = JSON.parse(localStorage.getItem(`${user.uid}`))
+                    setCurrentServer({ name: storage.defaultServerName, uid: storage.defaultServer })
+                    setCurrentChannel({ name: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannelName, uid: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannel })
+                }
+                navigate('/channels')
+            } else {
+                updateDoc(doc(db, "users", currentUser.uid), {
+                    status: "offline",
+                })
+                setCurrentUser({ name: null, profileURL: null, uid: null, status: null })
+                navigate('/')
 
+            }
 
-    //google sign in with redirect
-    // React.useEffect(() => {
-    //     const unmount = async () => {
-    //         const result = await getRedirectResult(auth);
-    //         // The signed-in user info.
-    //         const user = result.user;
-    //         setDoc(doc(db, "users", user.uid), {
-    //             displayName: user.name,
-    //             email: user.email,
-    //         })
-    //         // IdP data available using getAdditionalUserInfo(result)
-    //         // ...
-    //     }
-    // }, [])
+        })
 
-    // React.useEffect(() => {
+        return () => {
+            loginState();
+        }
 
-    //     const unsubscribe = async () => {
-    //         const result = await getRedirectResult(auth);
+    }, [])
 
-    //         const credential = GithubAuthProvider.credentialFromResult(result);
-    //         if (credential) {
-    //             // This gives you a GitHub Access Token. You can use it to access the GitHub API.
-    //             const token = credential.accessToken;
-    //             // ...
-    //         }
-    //         // The signed-in user info.
-    //         const user = result.user;
-    //         setDoc(doc(db, "users", user.uid), {
-    //             displayName: user.displayName,
-    //             email: user.email,
-    //             profileURL: user.photoURL,
-    //             userId: user.uid,
-    //             createdAt: Timestamp.fromDate(new Date()),
-    //             status: "online",
-    //         })
-
-    //         setCurrentUser({ name: user.displayName, profileURL: user.photoURL, uid: user.uid, createdAt: user.metadata.creationTime, status: "online" })
-
-
-    //         //if user not in the storage, add to the local storage
-    //         if (!localStorage.getItem(`${user.uid}`)) {
-    //             localStorage.setItem(`${user.uid}`, JSON.stringify([]));
-    //         } else {
-    //             const defaultServer = JSON.parse(localStorage.getItem(`${user.uid}`))
-    //             setCurrentServer({ ...currentServer, uid: defaultServer[1].currentServer })
-    //             setCurrentChannel({ name: defaultServer[1].currentChannelName, uid: defaultServer[1].currentChannel })
-    //         }
-    //         navigate('../channels')
-    //     }
-
-    // }, [])
 
     //auth sign out function
     const signOut = () => {
         auth.signOut().then(() => {
+
             const userRef = doc(db, "users", currentUser.uid)
             updateDoc(userRef, {
                 status: "offline"
@@ -386,56 +438,6 @@ const App = () => {
 
 
 
-    //auth/login state change
-    React.useEffect(() => {
-        const loginState = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const userRef = doc(db, "users", user.uid);
-
-                getDoc(userRef).then((doc) => {
-                    if (doc.exists()) {
-                        setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
-                    } else {
-                        setDoc(doc(db, "users", user.uid), {
-                            displayName: user.displayName,
-                            email: user.email,
-                            profileURL: user.photoURL,
-                            userId: user.uid,
-                            createdAt: Timestamp.fromDate(new Date()),
-                            status: "online",
-                            friends: [],
-                        }).then((doc) => {
-                            setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
-                        })
-                    }
-                })
-
-
-                //if user not in the storage, add to the local storage
-                if (!localStorage.getItem(`${user.uid}`)) {
-                    localStorage.setItem(`${user.uid}`, JSON.stringify({ defaultServer: "", defaultServerName: "", userDefault: [] }));
-                } else {
-                    const storage = JSON.parse(localStorage.getItem(`${user.uid}`))
-                    setCurrentServer({ name: storage.defaultServerName, uid: storage.defaultServer })
-                    setCurrentChannel({ name: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannelName, uid: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannel })
-                }
-                navigate('/channels')
-            } else {
-                updateDoc(doc(db, "users", currentUser.uid), {
-                    status: "offline",
-                })
-                setCurrentUser({ name: null, profileURL: null, uid: null, status: null })
-                navigate('/')
-
-            }
-
-        })
-
-        return () => {
-            loginState();
-        }
-
-    }, [])
 
     const [friendIds, setFriendIds] = React.useState([]);
 
@@ -567,12 +569,13 @@ const App = () => {
                             facebookSignIn={facebookSignIn}
                             twitterSignIn={twitterSignIn}
                             githubSignIn={githubSignIn}
+                            setCurrentUser={setCurrentUser}
                         />
                     } />
                 <Route path="/reset"
                     element={<ResetPasswordPage />} />
                 <Route path="/register"
-                    element={<RegisterPage />} />
+                    element={<RegisterPage currentUser={currentUser} setCurrentUser={setCurrentUser} />} />
                 <Route element={
                     <Box className="app-mount">
                         <Box className="app-container" >
