@@ -1,9 +1,6 @@
 body {
 	width: 100vw;
 	height: 100vh;
-	background-image: url("../../public/assets/login-bg/Discovery\ Banner.png");
-	background-size: cover;
-	background-repeat: no-repeat;
 	font-family: "gg sans Normal", sans-serif;
 	text-rendering: optimizeLegibility;
 	user-select: none;
@@ -12,6 +9,9 @@ body {
 .reset-page,
 .login-page,
 .register-page {
+	background-image: url(../../public/assets/login-bg/DiscoveryBanner.png);
+	background-size: cover;
+	background-repeat: no-repeat;
 	position: absolute;
 	top: 0;
 	left: 0;
