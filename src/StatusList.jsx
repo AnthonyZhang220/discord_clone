@@ -12,6 +12,7 @@ const StatusList = ({ status, size, edge }) => {
         "idle": <DarkModeIcon edge={edge} sx={{ color: "#f0b132", fontSize: size }} />,
         "donotdisturb": <RemoveCircleIcon edge={edge} sx={{ color: "#f23f43", fontSize: size }} />,
         "invisible": <StopCircleIcon edge={edge} sx={{ color: "#80848e", fontSize: size }} />,
+        "offline": <StopCircleIcon edge={edge} sx={{ color: "#80848e", fontSize: size }} />,
     }
     return (
         list[status]

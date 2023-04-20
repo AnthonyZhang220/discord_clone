@@ -7,12 +7,9 @@ import { lighten } from '@mui/material/styles';
 import { doc, getDoc, where, query, collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../firebase';
 
+import { MemberListItemButton } from '../CustomUIComponents';
+
 import "./MemberStatus.scss"
-
-
-const StyledListItemButton = styled(ListItemButton)(() => ({
-    padding: "2px 2px 2px 2px",
-}));
 
 function MemberStatus({ currentServer }) {
 
@@ -55,7 +52,6 @@ function MemberStatus({ currentServer }) {
                     });
                 });
                 setMemberList(memberList);
-
             });
         }
     }, [memberId])
@@ -65,7 +61,7 @@ function MemberStatus({ currentServer }) {
     const handleOpenMemberDetail = async (memberId) => {
         const memberDoc = doc(db, "users", memberId)
         await getDoc(memberDoc).then((doc) => {
-            setMemberDetail({ name: doc.data().displayName, status: doc.data().status, profileURL: doc.data().profileURL, createdAt: doc.data().createdAt })
+            setMemberDetail({ name: doc.data().displayName, status: doc.data().status, profileURL: doc.data().profileURL, createdAt: doc.data().createdAt.seconds })
 
             setOpenMemberDetail(true);
         })
@@ -119,19 +115,19 @@ function MemberStatus({ currentServer }) {
                 </Box>
                 <Box className="member-detail-list" sx={{ backgroundColor: "#111214" }}>
                     <ListItem dense>
-                        <StyledListItemButton>
+                        <MemberListItemButton>
                             <ListItemText primary={memberDetail.name} primaryTypographyProps={{ variant: "h3" }} />
-                        </StyledListItemButton>
+                        </MemberListItemButton>
                     </ListItem>
                     <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
                     <ListItem dense>
-                        <StyledListItemButton>
-                            <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(memberDetail.createdAt).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
+                        <MemberListItemButton>
+                            <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(memberDetail.createdAt * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
                                 style: {
                                     color: "white"
                                 }
                             }} />
-                        </StyledListItemButton>
+                        </MemberListItemButton>
                     </ListItem>
                 </Box>
             </Popover>
