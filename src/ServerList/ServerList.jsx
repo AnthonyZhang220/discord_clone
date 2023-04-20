@@ -1,14 +1,11 @@
 import React from 'react'
-import { Stack } from '@mui/system'
-import { Avatar, Button, Modal, TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Typography, IconButton, ListItemButton, ListItemText } from '@mui/material'
+
+import { Avatar, Button, Modal, TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Typography, IconButton, ListItemButton, ListItemText, Divider } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import { TooltipProps } from '@mui/material';
 import { alpha, styled } from '@mui/material/styles';
 import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import Badge from '@mui/material/Badge';
 import ExploreIcon from '@mui/icons-material/Explore';
-import InputBase from '@mui/material/InputBase';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import { TextFieldProps } from '@mui/material/TextField';
@@ -17,43 +14,22 @@ import FormControl from '@mui/material/FormControl';
 import { db } from "../firebase";
 import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, getDocs, doc } from 'firebase/firestore';
 
+import { ServerNameTooltip, InfoInput } from '../CustomUIComponents';
+
 
 import "./ServerList.scss"
-import { Link } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { NavigateNext } from '@mui/icons-material';
-
-
-const BootstrapTooltip = styled(({ className, ...props }) => (
-    <Tooltip {...props} arrow classes={{ popper: className }} />
-))(({ theme }) => ({
-    [`& .${tooltipClasses.arrow}`]: {
-        color: "#1e2124",
-    },
-    [`& .${tooltipClasses.tooltip}`]: {
-        backgroundColor: "#1e2124",
-    },
-}));
-
-
-const BootstrapInput = styled(InputBase)(({ theme }) => ({
-    'label + &': {
-        marginTop: theme.spacing(3),
-    },
-    '& .MuiInputBase-input': {
-        borderRadius: 4,
-        position: 'relative',
-        backgroundColor: "#e3e5e8",
-        border: 'none',
-        fontSize: 16,
-        padding: '10px 12px',
-    },
-}));
+import LoadingButton from '@mui/lab/LoadingButton';
 
 
 
-const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurrentServer, currentServer, setCurrentServer, setServerModal, serverModal, file, setFile, currentChannel, serverURL, setServerURL, openCreate, setOpenCreate }) => {
+
+
+const ServerList = ({ currentUser, handleAddServer, handleCurrentServer, currentServer, setCurrentServer, setServerModal, serverModal, file, setFile, currentChannel, serverURL, setServerURL, openCreate, setOpenCreate, isLoading, newServerInfo, setNewServerInfo }) => {
 
     const [serverList, setServerList] = React.useState([]);
+    const navigate = useNavigate();
 
 
     //handle new server profile image before uploading
@@ -127,7 +103,6 @@ const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurr
         )
     }, [serverModal])
 
-
     const CreateServerDialog = React.useMemo(() => {
         return (
             <Dialog PaperProps={{
@@ -167,13 +142,13 @@ const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurr
                             }}>
                                 SERVER NAME
                             </InputLabel>
-                            <BootstrapInput
+                            <InfoInput
                                 id="name"
                                 type="name"
                                 name="name"
                                 variant="outlined"
                                 autoComplete='off'
-                                onChange={e => handleServerInfo(e)}
+                                onChange={e => setNewServerInfo({ ...newServerInfo, name: e.target.value })}
                                 placeholder={`${currentUser.name}'s Server`}
                             />
                         </FormControl>
@@ -181,11 +156,17 @@ const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurr
                 </DialogContent>
                 <DialogActions sx={{ backgroundColor: "#f2f3f5" }}>
                     <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => setOpenCreate(false)}>Back</Button>
-                    <Button variant='contained' onClick={() => handleAddServer()}>Create</Button>
+                    <LoadingButton
+                        onClick={handleAddServer}
+                        loading={isLoading}
+                        variant="contained"
+                    >
+                        <span>Create</span>
+                    </LoadingButton>
                 </DialogActions>
             </Dialog>
         )
-    }, [openCreate, file])
+    }, [openCreate, file, newServerInfo])
 
     const JoinServerDialog = React.useMemo(() => {
         return (
@@ -208,7 +189,7 @@ const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurr
                             }}>
                                 Invite ID
                             </InputLabel>
-                            <BootstrapInput
+                            <InfoInput
                                 id="name"
                                 type="name"
                                 name="name"
@@ -228,51 +209,81 @@ const ServerList = ({ currentUser, handleAddServer, handleServerInfo, handleCurr
         )
     }, [openJoin])
 
+    const [friendButton, setFriendButton] = React.useState(false);
+
+    const handleClickFriend = () => {
+        setFriendButton(true);
+        navigate("/channels/@me");
+    }
+
+    const [mouseDown, setMouseDown] = React.useState(false);
+
     return (
         <Box component='aside' className="servers">
             <Box className="servers-list">
-                <Box className="server focusable server-friends unread" role="button" aria-label="Discord Developers unread">
-                    <Avatar className="server-icon" src="https://cdn.discordapp.com/embed/avatars/0.png" />
+                <Box className={`server focusable server-friends ${friendButton ? "active" : ""}`} role="button" aria-label="Discord Friend" onClick={() => handleClickFriend()}>
+                    <ServerNameTooltip title={<React.Fragment>
+                        <Typography variant="body1" sx={{ m: 0.5 }} >Direct Messages</Typography>
+                    </React.Fragment>} placement="right">
+                        <Avatar className="server-icon" src="https://cdn.discordapp.com/embed/avatars/0.png" />
+                    </ServerNameTooltip>
                 </Box>
+                <Divider variant="fullWidth" flexItem sx={{ backgroundColor: "#35363c", m: "8px", borderRadius: "1px", height: "2px" }} />
                 {serverList.map(({ name, serverPic, uid }) => (
-                    <Box className={`server focusable ${uid === currentServer.uid ? "active" : ""}`} key={uid} onClick={() => handleCurrentServer(name, uid)}>
-                        <BootstrapTooltip title={
+                    <Box className={`server focusable ${uid === currentServer.uid && !friendButton ? "active" : ""} ${mouseDown ? "transformDown" : ""}`} role="button" key={uid} onMouseDown={() => setMouseDown(true)} onClick={() => {
+                        handleCurrentServer(name, uid);
+                        setFriendButton(false);
+                    }} >
+                        <ServerNameTooltip title={
                             <React.Fragment>
                                 <Typography variant="body1" sx={{ m: 0.5 }} >{name}</Typography>
                             </React.Fragment>
                         } placement="right">
                             <Avatar className="server-icon" src={serverPic} />
-                        </BootstrapTooltip>
+                        </ServerNameTooltip>
                     </Box>
 
                 ))
                 }
                 <Box className="server" >
-                    <BootstrapTooltip title={
+                    <ServerNameTooltip title={
                         <React.Fragment>
                             <Typography variant="body1" sx={{ m: 0.5 }} >Add a Server</Typography>
                         </React.Fragment>
                     } placement="right">
-                        <IconButton sx={{ fontSize: 15 }} onClick={() => setServerModal(true)} >
+                        <IconButton sx={{
+                            fontSize: 15, color: "#23a459", "&:hover": {
+                                color: "#ffffff"
+                            }
+                        }} onClick={() => setServerModal(true)} >
                             <AddIcon className="server-icon" />
                         </IconButton>
-                    </BootstrapTooltip>
+                    </ServerNameTooltip>
                     {ServerDialog}
                     {CreateServerDialog}
                     {JoinServerDialog}
                 </Box>
-                <BootstrapTooltip title={
+                <ServerNameTooltip title={
                     <React.Fragment>
                         <Typography variant="body1" sx={{ m: 0.5 }} >Explore Public Servers</Typography>
                     </React.Fragment>
                 } placement="right">
-                    <Box className="server">
-                        <IconButton sx={{ fontSize: 15 }} >
+                    <Box className="server" sx={{
+                        "&:hover": {
+                            backgroundColor: "#23a459"
+                        }
+                    }}>
+                        <IconButton sx={{
+                            fontSize: 15, color: "#23a459", "&:hover": {
+                                color: "#ffffff"
+                            }
+                        }} >
                             <ExploreIcon className="server-icon" />
                         </IconButton>
                     </Box>
-                </BootstrapTooltip>
+                </ServerNameTooltip>
             </Box>
+            {/* <Outlet /> */}
         </Box>
     )
 }

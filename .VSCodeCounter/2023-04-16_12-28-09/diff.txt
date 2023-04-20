@@ -1,0 +1,82 @@
+Date : 2023-04-16 12:28:09
+Directory : c:\Users\antho\Desktop\discord_clone
+Total : 39 files,  3765 codes, 430 comments, 342 blanks, all 4537 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |         17 |      1,763 |        405 |        232 |      2,400 |
+| JSON       |          2 |      1,008 |          0 |          0 |      1,008 |
+| SCSS       |         12 |        880 |         24 |        105 |      1,009 |
+| XML        |          7 |        114 |          0 |          5 |        119 |
+| HTML       |          1 |          0 |          1 |          0 |          1 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                    | files      | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                       |         39 |      3,765 |        430 |        342 |      4,537 |
+| . (Files)                                                               |          3 |      1,014 |          0 |          0 |      1,014 |
+| public                                                                  |          1 |          0 |          1 |          0 |          1 |
+| src                                                                     |         35 |      2,751 |        429 |        342 |      3,522 |
+| src (Files)                                                             |          5 |        239 |        279 |         50 |        568 |
+| src\Channel                                                             |          2 |         81 |         29 |          5 |        115 |
+| src\Chat                                                                |          2 |        152 |         27 |         21 |        200 |
+| src\FriendActive                                                        |          2 |         50 |          0 |          8 |         58 |
+| src\FriendBody                                                          |          4 |        406 |          3 |         51 |        460 |
+| src\FriendList                                                          |          2 |         95 |          1 |         12 |        108 |
+| src\FriendMenu                                                          |          3 |        212 |          9 |         33 |        254 |
+| src\LoginPage                                                           |          7 |        136 |         -1 |          7 |        142 |
+| src\MemberStatus                                                        |          2 |        284 |          0 |         31 |        315 |
+| src\PrivateChat                                                         |          2 |        568 |         69 |         87 |        724 |
+| src\ServerList                                                          |          2 |        117 |         11 |         -1 |        127 |
+| src\UserFooter                                                          |          2 |        411 |          2 |         38 |        451 |
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                | language   | code       | comment    | blank      | total      |
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\antho\Desktop\discord_clone\package-lock.json                  | JSON       |      1,004 |          0 |          0 |      1,004 |
+| c:\Users\antho\Desktop\discord_clone\package.json                       | JSON       |          4 |          0 |          0 |          4 |
+| c:\Users\antho\Desktop\discord_clone\public\index.html                  | HTML       |          0 |          1 |          0 |          1 |
+| c:\Users\antho\Desktop\discord_clone\src\App.js                         | JavaScript |        127 |        299 |         34 |        460 |
+| c:\Users\antho\Desktop\discord_clone\src\App.scss                       | SCSS       |         27 |        -15 |          0 |         12 |
+| c:\Users\antho\Desktop\discord_clone\src\Channel\Channel.jsx            | JavaScript |        147 |         14 |         17 |        178 |
+| c:\Users\antho\Desktop\discord_clone\src\Channel\Channel.scss           | SCSS       |        -66 |         15 |        -12 |        -63 |
+| c:\Users\antho\Desktop\discord_clone\src\Chat\Chat.jsx                  | JavaScript |        149 |         30 |         21 |        200 |
+| c:\Users\antho\Desktop\discord_clone\src\Chat\Chat.scss                 | SCSS       |          3 |         -3 |          0 |          0 |
+| c:\Users\antho\Desktop\discord_clone\src\CustomUIComponents.jsx         | JavaScript |         86 |          0 |         18 |        104 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendActive\FriendActive.jsx  | JavaScript |         23 |          0 |          4 |         27 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendActive\FriendActive.scss | SCSS       |         27 |          0 |          4 |         31 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendBody\FriendBody.jsx      | JavaScript |        146 |          0 |         20 |        166 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendBody\FriendBody.scss     | SCSS       |        245 |          3 |         31 |        279 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendBody\friend.svg          | XML        |         10 |          0 |          0 |         10 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendBody\groupdm.svg         | XML        |          5 |          0 |          0 |          5 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendList\FriendList.jsx      | JavaScript |         72 |          0 |          8 |         80 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendList\FriendList.scss     | SCSS       |         23 |          1 |          4 |         28 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendMenu\CreateDM.jsx        | JavaScript |          5 |          0 |          3 |          8 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendMenu\FriendMenu.jsx      | JavaScript |        111 |          0 |         14 |        125 |
+| c:\Users\antho\Desktop\discord_clone\src\FriendMenu\FriendMenu.scss     | SCSS       |         96 |          9 |         16 |        121 |
+| c:\Users\antho\Desktop\discord_clone\src\LoginPage\LoginPage.jsx        | JavaScript |        -10 |         -2 |         -1 |        -13 |
+| c:\Users\antho\Desktop\discord_clone\src\LoginPage\LoginPage.scss       | SCSS       |         47 |          1 |          3 |         51 |
+| c:\Users\antho\Desktop\discord_clone\src\LoginPage\apple.svg            | XML        |         19 |          0 |          1 |         20 |
+| c:\Users\antho\Desktop\discord_clone\src\LoginPage\facebook.svg         | XML        |         19 |          0 |          1 |         20 |
+| c:\Users\antho\Desktop\discord_clone\src\LoginPage\github.svg           | XML        |         20 |          0 |          1 |         21 |
+| c:\Users\antho\Desktop\discord_clone\src\LoginPage\google.svg           | XML        |         22 |          0 |          1 |         23 |
+| c:\Users\antho\Desktop\discord_clone\src\LoginPage\twitter.svg          | XML        |         19 |          0 |          1 |         20 |
+| c:\Users\antho\Desktop\discord_clone\src\MemberStatus\MemberStatus.jsx  | JavaScript |        184 |          0 |         21 |        205 |
+| c:\Users\antho\Desktop\discord_clone\src\MemberStatus\MemberStatus.scss | SCSS       |        100 |          0 |         10 |        110 |
+| c:\Users\antho\Desktop\discord_clone\src\PrivateChat\PrivateChat.jsx    | JavaScript |        306 |         69 |         53 |        428 |
+| c:\Users\antho\Desktop\discord_clone\src\PrivateChat\PrivateChat.scss   | SCSS       |        262 |          0 |         34 |        296 |
+| c:\Users\antho\Desktop\discord_clone\src\ServerList\ServerList.jsx      | JavaScript |        123 |         -2 |         -2 |        119 |
+| c:\Users\antho\Desktop\discord_clone\src\ServerList\ServerList.scss     | SCSS       |         -6 |         13 |          1 |          8 |
+| c:\Users\antho\Desktop\discord_clone\src\StatusList.jsx                 | JavaScript |         18 |          0 |          4 |         22 |
+| c:\Users\antho\Desktop\discord_clone\src\UserFooter\UserFooter.jsx      | JavaScript |        289 |          2 |         24 |        315 |
+| c:\Users\antho\Desktop\discord_clone\src\UserFooter\UserFooter.scss     | SCSS       |        122 |          0 |         14 |        136 |
+| c:\Users\antho\Desktop\discord_clone\src\firebase.js                    | JavaScript |        -19 |         -5 |         -6 |        -30 |
+| c:\Users\antho\Desktop\discord_clone\webpack.config.js                  | JavaScript |          6 |          0 |          0 |          6 |
+| Total                                                                   |            |      3,765 |        430 |        342 |      4,537 |
++-------------------------------------------------------------------------+------------+------------+------------+------------+------------+

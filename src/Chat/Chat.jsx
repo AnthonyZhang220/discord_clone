@@ -36,9 +36,6 @@ import { Divider } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { InputAdornment } from '@mui/material';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import { TooltipProps } from '@mui/material';
-import { styled } from '@mui/material/styles';
 import InputLabel from '@mui/material/InputLabel';
 import { TextFieldProps } from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
@@ -51,15 +48,9 @@ import { Alert } from '@mui/material';
 
 import './Chat.scss'
 
-
-
-const BootstrapTooltip = styled(({ className, ...props }) => (
-    <Tooltip {...props} classes={{ popper: className }} />
-))(({ theme }) => ({
-    [`& .${tooltipClasses.tooltip}`]: {
-        backgroundColor: "#1e2124",
-    },
-}));
+import { Outlet } from 'react-router-dom';
+import { FunctionTooltip } from '../CustomUIComponents';
+import { Message } from '@mui/icons-material';
 
 
 // const URL = 'http://localhost:3000';
@@ -166,6 +157,21 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
 
     }
 
+    const convertDateDivider = (date) => {
+        const newDate = new Date(date.seconds * 1000)
+        const formattedDate = newDate.toLocaleDateString('en-US', { month: "long", day: "numeric", year: "numeric" })
+        const now = new Date();
+        const timeDiff = Math.abs(now.getTime() - newDate.getTime())
+
+        const oneDay = 24 * 60 * 60 * 1000;
+
+        const millisecondsInCurrentDay = now.getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+
+        return formattedDate;
+
+    }
+
     const convertTime = (time) => {
         const newTime = new Date(time.seconds * 1000)
         const formattedTime = newTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
@@ -173,13 +179,11 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
         return formattedTime;
     }
 
-    React.useEffect(() => {
-        console.log(fileUpload)
-    }, [fileUpload])
-
     const GroupChatbyPeopleAndDate = () => {
 
     }
+
+    const [previousUserRef, setPreviousUserRef] = React.useState(null);
 
     React.useEffect(() => {
         if (currentChannel) {
@@ -192,8 +196,35 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
 
             const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
                 let chatList = [];
+                let previousUserRef = null;
+                let previousDate = null;
+
                 QuerySnapshot.forEach((doc) => {
-                    chatList.push({ ...doc.data(), id: doc.id });
+                    const chatMessage = doc.data()
+                    const currentDate = convertDateDivider(chatMessage.createdAt);
+
+                    if (previousDate === null || currentDate != previousDate) {
+                        chatList.push({ dividerDate: currentDate })
+                    }
+                    if (previousUserRef == null || currentDate != previousDate) {
+                        chatList.push(chatMessage);
+                    } else if (chatMessage.userRef === previousUserRef) {
+                        chatList.push({
+                            userName: null,
+                            avatar: null,
+                            createdAt: doc.data().createdAt,
+                            type: doc.data().type,
+                            fileName: null,
+                            content: doc.data().content,
+                            userRef: doc.data().userRef,
+                            id: doc.id
+                        });
+                    } else {
+                        chatList.push(chatMessage);
+                    }
+
+                    previousUserRef = chatMessage.userRef
+                    previousDate = convertDateDivider(chatMessage.createdAt)
                 });
 
                 setChatList(chatList);
@@ -201,11 +232,17 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
             });
         }
 
-        chatScroller.current.scrollIntoView({ behavior: "smooth" });
+        // chatScroller.current.scrollIntoView({ behavior: "smooth" });
 
     }, [currentChannel]);
 
-    const ChatItem = ({ content, userName, avatar, createdAt, type, fileName }) => {
+
+
+    React.useEffect(() => {
+        console.log(chatList)
+    }, [chatList])
+
+    const ChatItem = ({ content, userName, avatar, createdAt, type, fileName, dividerDate }) => {
 
         const FormatChat = () => {
 
@@ -214,13 +251,19 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
             } else if (type.indexOf("audio/") != -1) {
                 return (
                     <React.Fragment>
-                        <Typography component="div" variant='p'>{fileName}</Typography>
-                        <audio controls src={content} />
+                        <Box sx={{ display: "flex", flexDirection: "column" }}>
+                            <Box>
+                                <Typography variant='p'>{fileName}</Typography>
+                            </Box>
+                            <Box>
+                                <audio controls src={content} preload='metadata' />
+                            </Box>
+                        </Box>
                     </React.Fragment>
                 )
             } else if (type.indexOf("video/") != -1) {
                 return (
-                    <video controls width="400" >
+                    <video controls width="400" preload='metadata' >
                         <source src={content} type={type} />
                     </video>
                 )
@@ -229,67 +272,103 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
             }
         }
 
+        const [hover, setHover] = React.useState(false)
+
 
         return (
-            <ListItem className="message" sx={{ pl: 0, pr: 0 }}>
-                <ListItemButton sx={{ cursor: "default", m: 0 }}>
-                    <ListItemAvatar>
-                        <Avatar alt={userName} src={avatar} />
-                    </ListItemAvatar>
-                    <ListItemText primary={
-                        <React.Fragment>
-                            {userName}
-                            <Typography
-                                sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
-                                component="span"
-                                variant="p"
-                                color="text.primary"
-                                marginLeft="10px"
-                            >
-                                {convertDate(createdAt)}
-                            </Typography>
-                            &nbsp;
-                            <Typography
-                                sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
-                                component="span"
-                                variant="p"
-                                color="text.primary"
-                            >
-                                {convertTime(createdAt)}
-                            </Typography>
-                        </React.Fragment>
-                    }
-                        secondary={<React.Fragment>
-                            <FormatChat />
-                        </React.Fragment>
-                        } primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2", color: "white" }} />
-                </ListItemButton>
-            </ListItem>
+            <React.Fragment>
+                {
+                    dividerDate ?
+                        <Divider sx={{ m: 2, fontSize: 12, color: "#b5bac1" }} variant='middle'>{dividerDate}</Divider>
+                        :
+                        avatar ?
+                            <ListItem className="message" sx={{ p: 0, m: 0 }}>
+                                <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
+                                    <ListItemAvatar>
+                                        <Avatar alt={userName} src={avatar} />
+                                    </ListItemAvatar>
+                                    <ListItemText primary={
+                                        <React.Fragment>
+                                            {userName}
+                                            <Typography
+                                                sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
+                                                component="span"
+                                                variant="p"
+                                                color="text.primary"
+                                                marginLeft="10px"
+                                            >
+                                                {convertDate(createdAt)}
+                                            </Typography>
+                                            &nbsp;
+                                            <Typography
+                                                sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
+                                                component="span"
+                                                variant="p"
+                                                color="text.primary"
+                                            >
+                                                {convertTime(createdAt)}
+                                            </Typography>
+                                        </React.Fragment>
+                                    }
+                                        secondary={<React.Fragment>
+                                            <FormatChat />
+                                        </React.Fragment>
+                                        } primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2", color: "white" }} />
+                                </ListItemButton>
+                            </ListItem>
+                            :
+                            <ListItem className="message" sx={{ p: 0, m: 0 }}>
+                                <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
+                                    <ListItemAvatar>
+                                        <Typography variant='body2' sx={{ display: hover ? "block" : "none", fontSize: 12, color: "#b5bac1" }}>
+                                            {convertTime(createdAt)}
+                                        </Typography>
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                        secondary={<React.Fragment>
+                                            <FormatChat />
+                                        </React.Fragment>
+                                        } primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2", color: "white" }} />
+                                </ListItemButton>
+                            </ListItem>
+                }
+            </React.Fragment>
         )
     }
 
-    const ChatList = () => {
 
-        React.useEffect(() => {
-            chatList.forEach((message) => {
-                if (!chatList[message.uid]) {
-                    chatList[message.uid] = [];
-                }
-                chatList[message.uid].push(message)
-            })
-        }, [chatList])
+    const ChatList = React.useMemo(() => {
 
-
+        // React.useEffect(() => {
+        //     chatList.forEach((message) => {
+        //         if (!chatList[message.uid]) {
+        //             chatList[message.uid] = [];
+        //         }
+        //         chatList[message.uid].push(message)
+        //     })
+        // }, [chatList])
         return (
             <List component="ol" className="scrollerInner">
-                {chatList.map(({ content, userName, avatar, createdAt, type, fileName }, index) => (
-                    <ChatItem className="message" content={content} userName={userName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} />
-                ))}
-                {/* <Divider>CENTER</Divider> */}
+                <ListItem>
+                    <IconButton sx={{ color: "#ffffff" }}>
+                        <NumbersIcon sx={{ fontSize: 50 }} />
+                    </IconButton>
+                </ListItem>
+                <ListItem>
+                    <Typography variant='h3'>Welcome to #{currentChannel.name}!</Typography>
+                </ListItem>
+                <ListItem>
+                    <Typography variant="body2">This is the start of the #{currentChannel.name} channel.</Typography>
+                </ListItem>
+                {
+                    chatList?.map(({ content, userName, avatar, createdAt, type, fileName, dividerDate }, index) => (
+                        <ChatItem className="message" content={content} userName={userName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} dividerDate={dividerDate} />
+                    ))
+                }
                 <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
             </List>
         )
-    }
+    }, [chatList])
 
     return (
         <Box className="chat-container">
@@ -302,12 +381,12 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                     </Box>
                 </Box>
                 <Box className="chat-header-feature">
-                    <BootstrapTooltip title={
+                    <FunctionTooltip title={
                         <React.Fragment>
                             <Typography variant="body1" sx={{ m: 0.5 }} >{openMember ? "Hide Member List" : "Show Member List"}</Typography>
                         </React.Fragment>} placement="bottom">
                         <PeopleAltIcon color="white" onClick={() => handleShowMemberList()} />
-                    </BootstrapTooltip>
+                    </FunctionTooltip>
                 </Box>
             </Box>
             <Box className="content">
@@ -315,20 +394,7 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                     <Box className="messageWrapper">
                         <Box component="div" className="scroller">
                             <Box className="scroll-content">
-                                <List>
-                                    <ListItem>
-                                        <IconButton sx={{ color: "#ffffff" }}>
-                                            <NumbersIcon sx={{ fontSize: 50 }} />
-                                        </IconButton>
-                                    </ListItem>
-                                    <ListItem>
-                                        <Typography variant='h3'>Welcome to #{currentChannel.name}!</Typography>
-                                    </ListItem>
-                                    <ListItem>
-                                        <Typography variant="body2">This is the start of the #{currentChannel.name} channel.</Typography>
-                                    </ListItem>
-                                </List>
-                                <ChatList />
+                                {ChatList}
                             </Box>
                         </Box>
                     </Box>
@@ -359,7 +425,7 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                                 startAdornment={
                                     <ClickAwayListener onClickAway={() => setOpenUpload(false)}>
                                         <InputAdornment position="start">
-                                            <BootstrapTooltip
+                                            <FunctionTooltip
                                                 onClose={() => setOpenUpload(false)}
                                                 open={openUpload}
                                                 disableFocusListener
@@ -383,7 +449,7 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                                                 <IconButton onClick={() => handleUploadOpen()}>
                                                     <AddCircleIcon />
                                                 </IconButton>
-                                            </BootstrapTooltip>
+                                            </FunctionTooltip>
                                         </InputAdornment>
                                     </ClickAwayListener>
                                 }
@@ -404,12 +470,13 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                         :
                         null
                 }
-                <Snackbar open={fileError} autoHideDuration={3000} onClose={() => setFileError(false)} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
+                <Snackbar open={fileError} autoHideDuration={3000} onClose={() => setFileError(false)} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
                     <Alert onClose={() => setFileError(false)} severity="error" sx={{ width: '100%', fontWeight: "bold" }}>
                         {fileErrorMessage}
                     </Alert>
                 </Snackbar>
             </Box>
+            {/* <Outlet /> */}
         </Box>
     )
 }
