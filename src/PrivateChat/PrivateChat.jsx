@@ -49,7 +49,7 @@ import './PrivateChat.scss'
 import { Outlet } from 'react-router-dom';
 import { FunctionTooltip } from '../CustomUIComponents';
 
-export default function PrivateChat({ currentPrivateChannel, currentUser, currentMessage, userSideBar, privateMessages }) {
+export default function PrivateChat({ currentUser, userSideBar, currentPrivateMessage, currentPrivateChannel, privateMessages, handlePrivateChatInfo, handleAddPrivateMessage }) {
     const formRef = React.useRef();
     const chatScroller = React.useRef();
     const [openMember, setOpenMember] = React.useState(true);
@@ -153,31 +153,7 @@ export default function PrivateChat({ currentPrivateChannel, currentUser, curren
         return formattedTime;
     }
 
-    // React.useEffect(() => {
-    //     if (currentPrivateChannel) {
-    //         const q = query(
-    //             collection(db, "messages"),
-    //             where("channelRef", "==", currentPrivateChannel.uid || ""),
-    //             orderBy("createdAt"),
-    //             limitToLast(20)
-    //         );
-
-    //         const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-    //             let privateMessages = [];
-    //             QuerySnapshot.forEach((doc) => {
-    //                 privateMessages.push({ ...doc.data(), id: doc.id });
-    //             });
-
-    //             setChatList(privateMessages);
-    //             //scroll new message
-    //         });
-    //     }
-
-    //     chatScroller.current.scrollIntoView({ behavior: "smooth" });
-
-    // }, [currentPrivateChannel]);
-
-    const ChatItem = ({ content, userName, avatar, createdAt, type, fileName }) => {
+    const ChatItem = ({ content, userName, avatar, createdAt, type, fileName, dividerDate }) => {
 
         const FormatChat = () => {
 
@@ -191,14 +167,14 @@ export default function PrivateChat({ currentPrivateChannel, currentUser, curren
                                 <Typography variant='p'>{fileName}</Typography>
                             </Box>
                             <Box>
-                                <audio controls src={content} />
+                                <audio controls src={content} preload='none' />
                             </Box>
                         </Box>
                     </React.Fragment>
                 )
             } else if (type.indexOf("video/") != -1) {
                 return (
-                    <video controls width="400" >
+                    <video controls width="400" preload='none'>
                         <source src={content} type={type} />
                     </video>
                 )
@@ -207,57 +183,71 @@ export default function PrivateChat({ currentPrivateChannel, currentUser, curren
             }
         }
 
+        const [hover, setHover] = React.useState(false)
+
 
         return (
-            <ListItem className="message" sx={{ pl: 0, pr: 0 }}>
-                <ListItemButton sx={{ cursor: "default", m: 0 }}>
-                    <ListItemAvatar>
-                        <Avatar alt={userName} src={avatar} />
-                    </ListItemAvatar>
-                    <ListItemText primary={
-                        <React.Fragment>
-                            {userName}
-                            <Typography
-                                sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
-                                component="span"
-                                variant="p"
-                                color="text.primary"
-                                marginLeft="10px"
-                            >
-                                {convertDate(createdAt)}
-                            </Typography>
-                            &nbsp;
-                            <Typography
-                                sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
-                                component="span"
-                                variant="p"
-                                color="text.primary"
-                            >
-                                {convertTime(createdAt)}
-                            </Typography>
-                        </React.Fragment>
-                    }
-                        secondary={<React.Fragment>
-                            <FormatChat />
-                        </React.Fragment>
-                        } primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2", color: "white" }} />
-                </ListItemButton>
-            </ListItem>
+            <React.Fragment>
+                {
+                    dividerDate ?
+                        <Divider sx={{ m: 2, fontSize: 12, color: "#b5bac1" }} variant='middle'>{dividerDate}</Divider>
+                        :
+                        avatar ?
+                            <ListItem className="message" sx={{ p: 0, m: 0 }}>
+                                <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
+                                    <ListItemAvatar>
+                                        <Avatar alt={userName} src={avatar} />
+                                    </ListItemAvatar>
+                                    <ListItemText primary={
+                                        <React.Fragment>
+                                            {userName}
+                                            <Typography
+                                                sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
+                                                component="span"
+                                                variant="p"
+                                                color="text.primary"
+                                                marginLeft="10px"
+                                            >
+                                                {convertDate(createdAt)}
+                                            </Typography>
+                                            &nbsp;
+                                            <Typography
+                                                sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
+                                                component="span"
+                                                variant="p"
+                                                color="text.primary"
+                                            >
+                                                {convertTime(createdAt)}
+                                            </Typography>
+                                        </React.Fragment>
+                                    }
+                                        secondary={<React.Fragment>
+                                            <FormatChat />
+                                        </React.Fragment>
+                                        } primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2", color: "white" }} />
+                                </ListItemButton>
+                            </ListItem>
+                            :
+                            <ListItem className="message" sx={{ p: 0, m: 0 }}>
+                                <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
+                                    <ListItemAvatar>
+                                        <Typography variant='body2' sx={{ display: hover ? "block" : "none", fontSize: 12, color: "#b5bac1" }}>
+                                            {convertTime(createdAt)}
+                                        </Typography>
+                                    </ListItemAvatar>
+                                    <ListItemText
+                                        secondary={<React.Fragment>
+                                            <FormatChat />
+                                        </React.Fragment>
+                                        } primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2", color: "white" }} />
+                                </ListItemButton>
+                            </ListItem>
+                }
+            </React.Fragment>
         )
     }
 
-    const ChatList = () => {
-
-        React.useEffect(() => {
-            privateMessages.forEach((message) => {
-                if (!privateMessages[message.uid]) {
-                    privateMessages[message.uid] = [];
-                }
-                privateMessages[message.uid].push(message)
-            })
-        }, [privateMessages])
-
-
+    const ChatList = React.useMemo(() => {
 
         return (
             <List component="ol" className="scrollerInner">
@@ -274,14 +264,14 @@ export default function PrivateChat({ currentPrivateChannel, currentUser, curren
                         .
                     </Typography>
                 </ListItem>
-                {privateMessages.map(({ content, userName, avatar, createdAt, type, fileName }, index) => (
-                    <ChatItem className="message" content={content} userName={userName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} />
+                {privateMessages.map(({ content, userName, avatar, createdAt, type, fileName, dividerDate }, index) => (
+                    <ChatItem className="message" content={content} userName={userName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} dividerDate={dividerDate} />
                 ))}
                 {/* <Divider>CENTER</Divider> */}
                 <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
             </List>
         )
-    }
+    }, [privateMessages])
 
 
     const UserSideBar = () => {
@@ -341,11 +331,11 @@ export default function PrivateChat({ currentPrivateChannel, currentUser, curren
                 <Box className="messageWrapper">
                     <Box component="div" className="scroller">
                         <Box className="scroll-content">
-                            <ChatList />
+                            {ChatList}
                         </Box>
                     </Box>
                 </Box>
-                <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleAddMessage(e)} sx={{
+                <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleAddPrivateMessage(e)} sx={{
                     position: "relative",
                     msFlexPositive: "false",
                     flexShrink: "0",
@@ -404,8 +394,8 @@ export default function PrivateChat({ currentPrivateChannel, currentUser, curren
                             name="message"
                             autoComplete='off'
                             variant="outlined"
-                            onChange={(e) => handleChatInfo(e)}
-                            value={currentMessage}
+                            onChange={(e) => handlePrivateChatInfo(e)}
+                            value={currentPrivateMessage}
                             placeholder={`Message @${currentPrivateChannel.name}`}
                         />
                     </FormControl>

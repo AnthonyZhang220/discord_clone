@@ -1,8 +1,5 @@
 import React from 'react'
 
-
-
-
 import { Box, List, SvgIcon, Button, Divider, Typography, ListItemButton, ListItemText, ListItem, } from '@mui/material';
 
 import FriendIcon from "./friend.svg"
@@ -28,7 +25,7 @@ import AddFriend from '../AddFriend/AddFriend';
 import StatusList from '../StatusList';
 
 
-const FriendBody = ({ currentUser, friendList, currentMessage, currentPrivateChannel, handleCurrentPrivateChannel, privateMessages }) => {
+const FriendBody = ({ currentPrivateChannel, currentUser, privateMessages, handlePrivateChatInfo, handleCurrentPrivateChannel, friendList, handleAddPrivateMessage, currentPrivateMessage }) => {
 
 
     const [userSideBar, setUserSideBar] = React.useState(true)
@@ -163,7 +160,7 @@ const FriendBody = ({ currentUser, friendList, currentMessage, currentPrivateCha
             }
             {
                 currentPrivateChannel.uid ?
-                    <PrivateChat currentPrivateChannel={currentPrivateChannel} currentUser={currentUser} currentMessage={currentMessage} userSideBar={userSideBar} privateMessages={privateMessages} />
+                    <PrivateChat currentPrivateChannel={currentPrivateChannel} currentUser={currentUser} userSideBar={userSideBar} privateMessages={privateMessages} currentPrivateMessage={currentPrivateMessage} handlePrivateChatInfo={handlePrivateChatInfo} handleAddPrivateMessage={handleAddPrivateMessage} />
                     :
                     category === "addfriend" ?
                         <AddFriend handleSearch={handleSearch} friendList={friendList} noActive={noActive} currentUser={currentUser} /> :

@@ -236,12 +236,6 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
 
     }, [currentChannel]);
 
-
-
-    React.useEffect(() => {
-        console.log(chatList)
-    }, [chatList])
-
     const ChatItem = ({ content, userName, avatar, createdAt, type, fileName, dividerDate }) => {
 
         const FormatChat = () => {

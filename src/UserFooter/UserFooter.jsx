@@ -31,6 +31,8 @@ import {
 } from "../CustomUIComponents";
 import "./UserFooter.scss";
 
+import { mute, unmute } from "../WebSocket";
+
 //Change the format of status text
 const statusFormat = (status) => {
     if (status === "online") {
@@ -245,6 +247,10 @@ const UserFooter = ({ currentUser, signOut, setCurrentUser }) => {
         setOpenUserDetails(false);
     }
 
+    const handleOpenMic = async () => {
+        localStream
+    }
+
     const changeStatus = async (status) => {
         const userObj = JSON.parse(localStorage.getItem(`${currentUser.uid}`))
 
@@ -281,13 +287,19 @@ const UserFooter = ({ currentUser, signOut, setCurrentUser }) => {
                 {
                     muted ?
                         <Tooltip title="Unmute" placement='top'>
-                            <IconButton className="user-footer-button" aria-label="Mute" color="error" onClick={() => setMuted(!muted)}>
+                            <IconButton className="user-footer-button" aria-label="Mute" color="error" onClick={() => {
+                                setMuted(!muted)
+                                unmute()
+                            }}>
                                 <MicOffIcon sx={{ fontSize: 20 }} />
                             </IconButton>
                         </Tooltip>
                         :
                         <Tooltip title="Mute" placement='top'>
-                            <IconButton className="user-footer-button" aria-label="Mute" color="success" onClick={() => setMuted(!muted)} >
+                            <IconButton className="user-footer-button" aria-label="Mute" color="success" onClick={() => {
+                                setMuted(!muted)
+                                mute()
+                            }} >
                                 <MicIcon sx={{ fontSize: 20 }} />
                             </IconButton>
                         </Tooltip>

@@ -142,80 +142,21 @@ const App = () => {
         signInWithRedirect(auth, GithubProvider)
     }
 
-    // const signInWithMultipleProviders = () => {
-    //     signInWithRedirect(auth, GoogleProvider, FacebookProvider, TwitterProvider, GithubProvider);
-    // };
-
-    React.useEffect(() => {
-
-        const handleRedirectResult = async () => {
-
-            const result = await getRedirectResult(auth);
-
-            if (result) {
-                // The signed-in user info.
-                const user = result.user;
-
-                const userRef = doc(db, "users", user.uid);
-
-                getDoc(userRef).then((doc) => {
-                    if (doc.exists()) {
-                        setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
-                    } else {
-                        setDoc(doc(db, "users", user.uid), {
-                            displayName: user.displayName,
-                            email: user.email,
-                            profileURL: user.photoURL,
-                            userId: user.uid,
-                            createdAt: Timestamp.fromDate(new Date()),
-                            status: "online",
-                            friends: [],
-                        }).then((doc) => {
-                            setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
-                        })
-                    }
-                })
-
-                //if user not in the storage, add to the local storage
-                if (!localStorage.getItem(`${user.uid}`)) {
-                    localStorage.setItem(`${user.uid}`, JSON.stringify({ defaultServer: "", defaultServerName: "", userDefault: [] }));
-                } else {
-                    const storage = JSON.parse(localStorage.getItem(`${user.uid}`))
-                    setCurrentServer({ name: storage.defaultServerName, uid: storage.defaultServer })
-                    setCurrentChannel({ name: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannelName, uid: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannel })
-                }
-                navigate('/channels')
-
-            } else {
-                updateDoc(doc(db, "users", currentUser.uid), {
-                    status: "offline",
-                })
-                setCurrentUser({ name: null, profileURL: null, uid: null, status: null })
-                navigate('/')
-            }
-        }
-
-        handleRedirectResult();
-
-    }, [auth])
-
-    React.useEffect(() => {
-        console.log(auth)
-    }, [auth])
-
     //auth/login state change
     React.useEffect(() => {
-        const loginState = auth.onAuthStateChanged((user) => {
+        const loginState = onAuthStateChanged(auth, (user) => {
+            console.log(user)
             if (user) {
                 const userRef = doc(db, "users", user.uid);
 
                 getDoc(userRef).then((doc) => {
-                    if (doc.exists()) {
+                    const has = doc.exists();
+                    if (has) {
                         setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
                     } else {
-                        setDoc(doc(db, "users", user.uid), {
+                        setDoc(userRef, {
                             displayName: user.displayName,
-                            email: user.email,
+                            email: user.email ? user.email : "",
                             profileURL: user.photoURL,
                             userId: user.uid,
                             createdAt: Timestamp.fromDate(new Date()),
@@ -234,7 +175,7 @@ const App = () => {
                 } else {
                     const storage = JSON.parse(localStorage.getItem(`${user.uid}`))
                     setCurrentServer({ name: storage.defaultServerName, uid: storage.defaultServer })
-                    setCurrentChannel({ name: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannelName, uid: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannel })
+                    setCurrentChannel({ name: storage.userDefault.lengh == 0 ? "" : storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannelName, uid: storage.userDefault.find(x => x.currentServer == storage.defaultServer).currentChannel })
                 }
                 navigate('/channels')
             } else {
@@ -252,7 +193,7 @@ const App = () => {
             loginState();
         }
 
-    }, [])
+    }, [auth])
 
 
     //auth sign out function
@@ -288,11 +229,13 @@ const App = () => {
 
             localStorage.setItem(`${currentUser.uid}`, JSON.stringify({ ...userItem, userDefault: userArray }))
         } else {
-            userArray.forEach((obj) => {
-                if (obj.currentServer === serverUid) {
-                    setCurrentChannel({ name: obj.currentChannelName, uid: obj.currentChannel })
-                }
-            })
+            if (userArray.length !== 0) {
+                userArray.forEach((obj) => {
+                    if (obj.currentServer === serverUid) {
+                        setCurrentChannel({ name: obj.currentChannelName, uid: obj.currentChannel })
+                    }
+                })
+            }
         }
 
 
@@ -307,14 +250,15 @@ const App = () => {
 
         const userItem = JSON.parse(localStorage.getItem(`${currentUser.uid}`))
         const userArray = userItem.userDefault;
-        userArray.forEach((obj) => {
-            if (obj.currentServer === currentServer.uid) {
-                obj.currentChannel = channelUid;
-                obj.currentChannelName = channelName;
-            }
-        })
+        if (userArray.length !== 0) {
+            userArray.forEach((obj) => {
+                if (obj.currentServer === currentServer.uid) {
+                    obj.currentChannel = channelUid;
+                    obj.currentChannelName = channelName;
+                }
+            })
+        }
 
-        // setCurrentChannel({ ...currentChannel, uid: obj.currentChannel })
         localStorage.setItem(`${currentUser.uid}`, JSON.stringify({ ...userItem, userDefault: userArray }))
 
         setCurrentChannel({ name: channelName, uid: channelUid })
@@ -387,12 +331,17 @@ const App = () => {
 
     }
 
+    const [currentPrivateMessage, setCurrentPrivateMessage] = React.useState("")
+
     const handleChannelInfo = (e) => {
         setNewChannel(e.target.value)
     }
 
     const handleChatInfo = (e) => {
         setCurrentMessage(e.target.value);
+    }
+    const handlePrivateChatInfo = (e) => {
+        setCurrentPrivateMessage(e.target.value);
     }
 
 
@@ -411,6 +360,30 @@ const App = () => {
 
     }
 
+    //add new message to db
+    const handleAddPrivateMessage = async (e) => {
+        e.preventDefault();
+
+        if (currentPrivateMessage.trim() == "") {
+            return;
+        }
+
+        const { uid, displayName, photoURL } = auth.currentUser;
+
+        await addDoc(collection(db, "messages"), {
+            type: "text",
+            content: currentPrivateMessage,
+            fileName: "",
+            userName: displayName,
+            avatar: photoURL,
+            createdAt: Timestamp.fromDate(new Date()),
+            channelRef: currentPrivateChannel.uid,
+            serverRef: currentServer.uid,
+            userRef: uid,
+        }).then(() => {
+            setCurrentMessage("")
+        })
+    }
     //add new message to db
     const handleAddMessage = async (e) => {
         e.preventDefault();
@@ -485,7 +458,7 @@ const App = () => {
 
     const [currentPrivateChannel, setCurrentPrivateChannel] = React.useState({ uid: null, name: null, status: null, avatar: null });
     const [channelRef, setChannelRef] = React.useState("")
-    const [privateMessages, setPrviateMessages] = React.useState([])
+    const [privateMessages, setPrivateMessages] = React.useState([])
 
     const handleCurrentPrivateChannel = async (channelId) => {
 
@@ -528,35 +501,73 @@ const App = () => {
         })
     }
 
+
+    const convertDateDivider = (date) => {
+        const newDate = new Date(date.seconds * 1000)
+        const formattedDate = newDate.toLocaleDateString('en-US', { month: "long", day: "numeric", year: "numeric" })
+        const now = new Date();
+        const timeDiff = Math.abs(now.getTime() - newDate.getTime())
+
+        const oneDay = 24 * 60 * 60 * 1000;
+
+        const millisecondsInCurrentDay = now.getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+
+        return formattedDate;
+
+    }
+
+
     React.useEffect(() => {
         if (currentPrivateChannel) {
             const q = query(
                 collection(db, "messages"),
-                where("channelRef", "==", channelRef),
+                where("channelRef", "==", currentPrivateChannel.uid || ""),
                 orderBy("createdAt"),
                 limitToLast(20)
             );
 
-            const unsub = onSnapshot(q, (snapshot) => {
-                const privateMessages = [];
-                snapshot.forEach((doc) => {
-                    privateMessages.push({
-                        userName: doc.data().userName,
-                        avatar: doc.data().avatar,
-                        fileName: doc.data().fileName,
-                        content: doc.data().content,
-                        createdAt: doc.data().createdAt,
-                        type: doc.data().type
-                    })
-                })
-                setPrviateMessages(privateMessages)
-            })
+            const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+                let chatList = [];
+                let previousUserRef = null;
+                let previousDate = null;
 
+                QuerySnapshot.forEach((doc) => {
+                    const chatMessage = doc.data()
+                    const currentDate = convertDateDivider(chatMessage.createdAt);
 
-            // return unsub
+                    if (previousDate === null || currentDate != previousDate) {
+                        chatList.push({ dividerDate: currentDate })
+                    }
+                    if (previousUserRef == null || currentDate != previousDate) {
+                        chatList.push(chatMessage);
+                    } else if (chatMessage.userRef === previousUserRef) {
+                        chatList.push({
+                            userName: null,
+                            avatar: null,
+                            createdAt: doc.data().createdAt,
+                            type: doc.data().type,
+                            fileName: null,
+                            content: doc.data().content,
+                            userRef: doc.data().userRef,
+                            id: doc.id
+                        });
+                    } else {
+                        chatList.push(chatMessage);
+                    }
+
+                    previousUserRef = chatMessage.userRef
+                    previousDate = convertDateDivider(chatMessage.createdAt)
+                });
+
+                setPrivateMessages(chatList);
+                //scroll new message
+            });
         }
 
-    }, [currentPrivateChannel])
+        // chatScroller.current.scrollIntoView({ behavior: "smooth" });
+
+    }, [currentPrivateChannel]);
 
     return (
         <ThemeProvider theme={theme}>
@@ -642,7 +653,7 @@ const App = () => {
                             element={
                                 <React.Fragment>
                                     <FriendMenu friendList={friendList} currentUser={currentUser} friendIds={friendIds} signOut={signOut} setCurrentUser={setCurrentUser} currentPrivateChannel={currentPrivateChannel} handleOpenFriend={handleOpenFriend} handleCurrentPrivateChannel={handleCurrentPrivateChannel} />
-                                    <FriendBody friendList={friendList} currentUser={currentUser} friendIds={friendIds} currentPrivateChannel={currentPrivateChannel} handleCurrentPrivateChannel={handleCurrentPrivateChannel} channelRef={channelRef} privateMessages={privateMessages} />
+                                    <FriendBody friendList={friendList} currentUser={currentUser} friendIds={friendIds} currentPrivateChannel={currentPrivateChannel} handleCurrentPrivateChannel={handleCurrentPrivateChannel} channelRef={channelRef} privateMessages={privateMessages} currentPrivateMessage={currentPrivateMessage} handlePrivateChatInfo={handlePrivateChatInfo} handleAddPrivateMessage={handleAddPrivateMessage} />
                                 </React.Fragment>
                             } />
 

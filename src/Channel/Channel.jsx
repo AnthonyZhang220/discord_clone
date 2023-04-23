@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useId } from 'react'
 import { auth } from '../firebase';
 import { db } from "../firebase";
-import { onSnapshot, query, where, addDoc, collection, deleteDoc, doc, updateDoc, getDocs } from 'firebase/firestore';
+import { onSnapshot, query, where, addDoc, collection, deleteDoc, doc, updateDoc, getDocs, QuerySnapshot, getDoc } from 'firebase/firestore';
 
 
-import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, ListItemText, ListItem, ListItemIcon, Paper, Badge, ClickAwayListener, List, ListItemButton, Popover, InputAdornment } from '@mui/material'
+import { TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, ListItemText, ListItem, ListItemIcon, Paper, Badge, ClickAwayListener, List, ListItemButton, Popover, InputAdornment, ListItemAvatar } from '@mui/material'
 import { Stack } from '@mui/system'
 import { Avatar, Typography } from '@mui/material'
 import { Box } from '@mui/system'
@@ -26,14 +26,18 @@ import InputLabel from '@mui/material/InputLabel';
 import { TextFieldProps } from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import InputBase from '@mui/material/InputBase';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 
 
 import "./Channel.scss"
 
 import { Outlet } from 'react-router-dom';
 import UserFooter from '../UserFooter/UserFooter';
+import VoiceControl from '../VoiceControl/VoiceControl';
 
 import { FunctionTooltip } from '../CustomUIComponents';
+
+import { joinVoiceChatRoom } from '../WebSocket';
 
 
 
@@ -60,51 +64,81 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
 
 
     const [channelList, setChannelList] = React.useState([])
+    const [voiceChannelList, setVoiceChannelList] = React.useState([])
+    const [voiceChannelIdList, setVoiceChannelIdList] = React.useState([])
+    const [currentVoiceChannel, setCurrentVoiceChannel] = React.useState({ name: null, uid: null })
+    const [liveList, setLiveList] = React.useState([])
 
-    //get channel list
+    const [connected, setConnected] = React.useState(true);
+
+    // const getUserList = async () => {
+    //     const listRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+
+    //     const userList = await getDoc(listRef)
+    //     const list = userList.data().liveUser;
+    //     setVoiceChannelIdList(list)
+    // }
+
+    // React.useEffect(() => {
+    //     const q = query(collection(db, "voicechannels"), where("channelRef", "==", currentVoiceChannel.uid))
+    //     const unsub = onSnapshot(q, (QuerySnapshot) => {
+    //         QuerySnapshot.forEach((doc) => {
+    //             setVoiceChannelIdList(doc.data().liveUser)
+    //         })
+    //     })
+
+    //     // getUserList()
+    // }, [currentServer])
+
+    // React.useEffect(() => {
+    //     if (voiceChannelIdList.length > 0) {
+    //         const q = query(collection(db, "users"), where("userId", "in", voiceChannelIdList))
+    //         const unsub = onSnapshot(q, (QuerySnapshot) => {
+    //             let list = []
+    //             QuerySnapshot.forEach((doc) => {
+    //                 list.push({ ...doc.data(), id: doc.id })
+    //             })
+
+    //             setLiveList(list)
+    //         })
+    //     }
+    // }, [currentServer, voiceChannelIdList])
+
+    React.useEffect(() => {
+        console.log(voiceChannelIdList)
+    }, [voiceChannelIdList])
+    React.useEffect(() => {
+        console.log(liveList)
+    }, [liveList])
+
+    //get channel list by server UID
     React.useEffect(() => {
         if (currentServer) {
             const q = query(collection(db, "channels"), where("serverRef", "==", currentServer.uid));
             const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-                let channelList = [];
+                let list = [];
                 QuerySnapshot.forEach((doc) => {
-                    channelList.push({ ...doc.data(), id: doc.id });
+                    list.push({ ...doc.data(), id: doc.id });
                 })
-                setChannelList(channelList)
+                setChannelList(list)
             })
         }
     }, [currentServer])
 
+    //get all the voice channels by server UID
     React.useEffect(() => {
+        if (currentServer) {
+            const q = query(collection(db, "voicechannels"), where("serverRef", "==", currentServer.uid));
+            const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+                let list = [];
+                QuerySnapshot.forEach((doc) => {
+                    list.push({ ...doc.data(), id: doc.id });
+                })
+                setVoiceChannelList(list)
+            })
+        }
 
-        // const channelList = document.querySelectorAll(".channel-text");
-        // const selected = document.querySelector(`#${currentChannel.uid}`)
-
-        // channelList.forEach(el => {
-        //     el.addEventListener("click", () => {
-        //         channelList.forEach((ele) => {
-        //             ele.classList.remove("active")
-        //         })
-        //         selected.classList.add("active");
-        //     });
-        // })
-
-        // // focus/blur on channel header click
-        // $(".channel-header")[0].addEventListener("click", e => {
-        //     e.preventDefault();
-
-        //     const focused = document.activeElement === e.target;
-        //     focused ? e.target.blur() : e.target.focus();
-        // });
-
-        // $(".focusable, .button").forEach(el => {
-        //     // blur only on mouse click
-        //     // for accessibility, keep focus when keyboard focused
-        //     el.addEventListener("mousedown", e => e.preventDefault());
-        //     el.setAttribute("tabindex", "0");
-        // });
-
-    }, [])
+    }, [currentServer])
 
 
     const channelHeaderRef = React.useRef(null);
@@ -355,7 +389,8 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                 </Box>
                 <Box component="ul" className="channel-list-text">
                     {channelList.map(({ name, id }) => (
-                        <Box key={id} id={id} component="li" className={`channel channel-text ${id === currentChannel.uid ? "active" : ""}`} onClick={() => handleCurrentChannel(name, id)}>
+                        <Box key={id} id={id} component="li" className={`channel channel-text ${id === currentChannel.uid ? "active" : ""}`}
+                            onClick={() => handleCurrentChannel(name, id)}>
                             <NumbersIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />
                             <Box component="span" className="channel-name">{name}</Box>
                             <IconButton aria-label="settings" className="button">
@@ -365,9 +400,44 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                     ))}
                 </Box>
                 <Box component="header" className="channel-list-header focusable">
-                    <Typography component="h6" variant="h6">Voice Channels</Typography>
+                    <Box>
+                        <Typography component="h6" variant="h6">Voice Channels</Typography>
+                    </Box>
+                </Box>
+                <Box component="ul" className="channel-list-text">
+                    {voiceChannelList.map(({ name, id, liveUser }) => (
+                        <React.Fragment key={id}>
+                            <Box key={id} id={id} component="li" className={`channel channel-text ${id === currentVoiceChannel.uid ? "active" : ""}`} onClick={() => {
+                                joinVoiceChatRoom(id, currentUser)
+                                setCurrentVoiceChannel({ name: name, uid: id })
+                            }}>
+                                <VolumeUpIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />
+                                <Box component="span" className="channel-name">{name}</Box>
+                                <IconButton aria-label="settings" className="button">
+                                    <SettingsIcon />
+                                </IconButton>
+                            </Box>
+                            {
+                                liveUser.map(({ profileURL, displayName, uid }) => (
+                                    <ListItem key={uid} id={uid} disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
+                                        <ListItemButton>
+                                            <ListItemAvatar sx={{ minWidth: "0", mr: 1, ml: "auto" }}>
+                                                <Avatar alt={displayName} src={profileURL} sx={{ width: 20, height: 20 }} />
+                                            </ListItemAvatar>
+                                            <ListItemText primary={displayName} />
+                                        </ListItemButton>
+                                    </ListItem>
+                                ))
+                            }
+                        </React.Fragment>
+                    ))}
                 </Box>
             </Box>
+            {connected ?
+                <VoiceControl currentVoiceChannel={currentVoiceChannel} currentUser={currentUser} connected={connected} setConnected={setConnected} />
+                :
+                null
+            }
             <UserFooter className="user-footer-container" currentUser={currentUser} signOut={signOut} setCurrentUser={setCurrentUser} />
             <InviteDialog />
             {/* <Outlet /> */}

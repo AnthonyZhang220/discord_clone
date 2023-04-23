@@ -159,6 +159,34 @@
 	}
 }
 
+.livelist-container {
+	font-weight: 500;
+	overflow: hidden;
+	cursor: pointer;
+	position: relative;
+	max-width: 224px;
+	display: block;
+	border-radius: 4px;
+	-webkit-transition: none;
+	transition: none;
+	display: flex;
+	justify-content: end;
+	align-items: end;
+
+	.livelist-item {
+		-webkit-box-shadow: none;
+		box-shadow: none;
+		border-radius: 4px;
+		border-color: transparent;
+		margin: 1px 0 1px 0;
+
+		&:hover {
+			background-color: #3d3f44;
+			border-radius: 4px;
+		}
+	}
+}
+
 // .hash-before::before {
 // 	content: "#";
 // 	margin-right: 10px;
