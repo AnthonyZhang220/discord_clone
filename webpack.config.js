@@ -1,5 +1,6 @@
 const DotenvWebpackPlugin = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const path = require('path');
 
 module.exports = {
@@ -23,6 +24,14 @@ module.exports = {
     },
     resolve: {
         extensions: ['.js', '.jsx', '.json'],
+        fallback: {
+            "crypto": require.resolve("crypto-browserify"),
+            "zlib": require.resolve("browserify-zlib"),
+            "stream": require.resolve("stream-browserify")
+        },
+        alias: {
+            stream: 'stream-browserify'
+        }
     },
     module: {
         rules: [
@@ -59,5 +68,6 @@ module.exports = {
             template: path.join(__dirname, 'public', 'index.html')
         }),
         new DotenvWebpackPlugin(),
+        new NodePolyfillPlugin(),
     ]
 };
