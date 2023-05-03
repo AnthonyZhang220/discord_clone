@@ -1,10 +1,8 @@
-import React from "react";
+import React, { createRef, useEffect, useRef, useState } from "react";
 
 import { onSnapshot, query, where, addDoc, collection, deleteDoc, doc, updateDoc, getDocs } from 'firebase/firestore';
 import { auth } from '../firebase';
 import { db } from "../firebase";
-
-
 
 import { Box, ListItemText, ListItem, Badge, ListItemButton, Popover, Avatar, Divider, ClickAwayListener, Tooltip } from '@mui/material'
 
@@ -23,6 +21,7 @@ import SwapVertIcon from '@mui/icons-material/SwapVert';
 import IconButton from '@mui/material/IconButton';
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import ColorThief from "colorthief"
 
 
 import StatusList from '../StatusList';
@@ -31,7 +30,7 @@ import {
 } from "../CustomUIComponents";
 import "./UserFooter.scss";
 
-import { mute, unmute } from "../WebSocket";
+// import { mute, unmute } from "../WebSocket";
 
 //Change the format of status text
 const statusFormat = (status) => {
@@ -55,6 +54,22 @@ const statusFormat = (status) => {
 
 //user avatar click
 const UserDetail = ({ currentUser, changeStatus, openUserDetail, handleUserDetailClose, userAvatarRef, signOut }) => {
+
+    const profileRef = useRef(null);
+    const [bannerColor, setBannerColor] = useState("")
+
+    useEffect(() => {
+        if (profileRef.current) {
+            const colorthief = new ColorThief();
+            const banner = colorthief.getColor(profileRef.current)
+            const rgbColor = `rgb(${banner.join(", ")})`
+            setBannerColor(rgbColor)
+            console.log(banner)
+        }
+
+    }, [profileRef.current, openUserDetail])
+
+
 
     return (
         <Popover
@@ -89,6 +104,8 @@ const UserDetail = ({ currentUser, changeStatus, openUserDetail, handleUserDetai
                             <circle></circle>
                         </mask>
                         <foreignObject className="user-detail-object">
+                            <Box sx={{ backgroundColor: bannerColor, height: "60px", width: "100%", transition: "background-color 0.1s" }}>
+                            </Box>
                         </foreignObject>
                     </svg>
                     <Badge
@@ -99,7 +116,7 @@ const UserDetail = ({ currentUser, changeStatus, openUserDetail, handleUserDetai
                             <StatusList status={currentUser.status} />
                         }
                     >
-                        <Avatar alt={currentUser.name} sx={{ width: "75px", height: "75px" }} src={currentUser.profileURL} />
+                        <Avatar alt={currentUser.name} sx={{ width: "80px", height: "80px" }} src={currentUser.profileURL} imgProps={{ ref: profileRef, crossOrigin: "Anonymous" }} />
                     </Badge>
                 </Box>
                 <Box className="user-detail-list" sx={{ backgroundColor: "#111214" }}>
@@ -222,14 +239,11 @@ const UserDetail = ({ currentUser, changeStatus, openUserDetail, handleUserDetai
     )
 }
 
-const UserFooter = ({ currentUser, signOut, setCurrentUser }) => {
+const UserFooter = ({ currentUser, signOut, setCurrentUser, handleLeaveRoom, muted, defen, handleDefen, handleMuted }) => {
 
     const userAvatarRef = React.useRef(null);
     const [openUserDetail, setOpenUserDetails] = React.useState(false);
     const [openStatus, setOpenStatus] = React.useState(false);
-
-    const [muted, setMuted] = React.useState(true);
-    const [defen, setDefen] = React.useState(false);
 
     const handleStatusOpen = () => {
         setOpenStatus(true);
@@ -288,39 +302,37 @@ const UserFooter = ({ currentUser, signOut, setCurrentUser }) => {
                     muted ?
                         <Tooltip title="Unmute" placement='top'>
                             <IconButton className="user-footer-button" aria-label="Mute" color="error" onClick={() => {
-                                setMuted(!muted)
-                                unmute()
+                                handleMuted()
                             }}>
-                                <MicOffIcon sx={{ fontSize: 20 }} />
+                                <MicOffIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
                         </Tooltip>
                         :
                         <Tooltip title="Mute" placement='top'>
                             <IconButton className="user-footer-button" aria-label="Mute" color="success" onClick={() => {
-                                setMuted(!muted)
-                                mute()
+                                handleMuted()
                             }} >
-                                <MicIcon sx={{ fontSize: 20 }} />
+                                <MicIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
                         </Tooltip>
                 }
                 {
                     defen ?
                         <Tooltip title="Undefen" placement='top'>
-                            <IconButton className="user-footer-button" aria-label="Defen" color="error" onClick={() => setDefen(!defen)}>
-                                <HeadsetOffIcon sx={{ fontSize: 20 }} />
+                            <IconButton className="user-footer-button" aria-label="Defen" color="error" onClick={() => handleDefen()} >
+                                <HeadsetOffIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
                         </Tooltip>
                         :
                         <Tooltip title="Defen" placement='top'>
-                            <IconButton className="user-footer-button" aria-label="Defen" color="success" onClick={() => setDefen(!defen)}>
-                                <HeadsetIcon sx={{ fontSize: 20 }} />
+                            <IconButton className="user-footer-button" aria-label="Defen" color="success" onClick={() => handleDefen()}>
+                                <HeadsetIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
                         </Tooltip>
                 }
                 <Tooltip title="Settings" >
                     <IconButton className="user-footer-button" aria-label="Settings" >
-                        <SettingsIcon sx={{ fontSize: 20 }} />
+                        <SettingsIcon sx={{ height: 20, width: 20 }} />
                     </IconButton>
                 </Tooltip>
             </Box>

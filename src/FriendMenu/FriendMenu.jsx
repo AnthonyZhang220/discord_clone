@@ -17,7 +17,7 @@ import { QuerySnapshot, onSnapshot, query, collection, where } from "firebase/fi
 import { db } from "../firebase";
 
 
-const FriendMenu = ({ currentUser, changeStatus, signOut, setCurrentUser, handleOpenFriend, handleCurrentPrivateChannel, currentPrivateChannel }) => {
+const FriendMenu = ({ currentUser, changeStatus, signOut, setCurrentUser, handleOpenFriend, handleCurrentPrivateChannel, currentPrivateChannel, muted, defen, handleDefen, handleMuted }) => {
 
     const [privateChannelList, setPrivateChannelList] = React.useState([]);
     const [privateChannelId, setPrivateChannelId] = React.useState([]);
@@ -118,7 +118,9 @@ const FriendMenu = ({ currentUser, changeStatus, signOut, setCurrentUser, handle
                     ))}
                 </Box>
             </Box>
-            <UserFooter currentUser={currentUser} changeStatus={changeStatus} signOut={signOut} setCurrentUser={setCurrentUser} />
+            <UserFooter currentUser={currentUser} changeStatus={changeStatus} signOut={signOut} setCurrentUser={setCurrentUser} muted={muted} handleDefen={handleDefen}
+                handleMuted={handleMuted}
+                defen={defen} />
         </Box>
     )
 }

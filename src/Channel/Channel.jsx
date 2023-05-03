@@ -60,13 +60,12 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 
 
 
-const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handleCurrentChannel, channelModal, setChannelModal, handleChannelInfo, currentChannel, setCurrentUser, setCurrentServer, newChannel }) => {
+const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handleCurrentChannel, channelModal, setChannelModal, handleChannelInfo, currentChannel, setCurrentUser, setCurrentServer, newChannel, voiceChat, setVoiceChat, currentVoiceChannel, setCurrentVoiceChannel, handleJoinRoom, handleLeaveRoom, muted, defen, handleDefen, handleMuted }) => {
 
 
     const [channelList, setChannelList] = React.useState([])
     const [voiceChannelList, setVoiceChannelList] = React.useState([])
     const [voiceChannelIdList, setVoiceChannelIdList] = React.useState([])
-    const [currentVoiceChannel, setCurrentVoiceChannel] = React.useState({ name: null, uid: null })
     const [liveList, setLiveList] = React.useState([])
 
     const [connected, setConnected] = React.useState(true);
@@ -102,14 +101,7 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
     //             setLiveList(list)
     //         })
     //     }
-    // }, [currentServer, voiceChannelIdList])
-
-    React.useEffect(() => {
-        console.log(voiceChannelIdList)
-    }, [voiceChannelIdList])
-    React.useEffect(() => {
-        console.log(liveList)
-    }, [liveList])
+    // }, [currentServer, voiceChannelIdList]
 
     //get channel list by server UID
     React.useEffect(() => {
@@ -321,6 +313,7 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
         )
     }
 
+
     return (
         <Box component="aside" className='channel-container'>
             <Box component="header" className="channel-header focusable" onClick={handleServerSettingsOpen} ref={channelHeaderRef}>
@@ -338,7 +331,7 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                         </IconButton>
                 }
             </Box>
-            <ServerMenu handleServerSettingsClose={handleServerSettingsClose} openSettings={openSettings} channelHeaderRef={channelHeaderRef} handleDeleteServer={handleDeleteServer} />
+            <ServerMenu handleServerSettingsClose={handleServerSettingsClose} openSettings={openSettings} handleDeleteServer={handleDeleteServer} />
             <Box component="section" className="channel-list-container">
                 <Box component="header" className="channel-list-header focusable">
                     <Box>
@@ -390,7 +383,11 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                 <Box component="ul" className="channel-list-text">
                     {channelList.map(({ name, id }) => (
                         <Box key={id} id={id} component="li" className={`channel channel-text ${id === currentChannel.uid ? "active" : ""}`}
-                            onClick={() => handleCurrentChannel(name, id)}>
+                            onClick={() => {
+                                handleCurrentChannel(name, id)
+                                setVoiceChat(false)
+                            }}
+                        >
                             <NumbersIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />
                             <Box component="span" className="channel-name">{name}</Box>
                             <IconButton aria-label="settings" className="button">
@@ -406,10 +403,12 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                 </Box>
                 <Box component="ul" className="channel-list-text">
                     {voiceChannelList.map(({ name, id, liveUser }) => (
-                        <React.Fragment key={id}>
+                        <Box key={id}>
                             <Box key={id} id={id} component="li" className={`channel channel-text ${id === currentVoiceChannel.uid ? "active" : ""}`} onClick={() => {
-                                joinVoiceChatRoom(id, currentUser)
                                 setCurrentVoiceChannel({ name: name, uid: id })
+                                setVoiceChat(true)
+                                handleJoinRoom(id, currentUser.uid)
+                                setConnected(true)
                             }}>
                                 <VolumeUpIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />
                                 <Box component="span" className="channel-name">{name}</Box>
@@ -418,8 +417,8 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                                 </IconButton>
                             </Box>
                             {
-                                liveUser.map(({ profileURL, displayName, uid }) => (
-                                    <ListItem key={uid} id={uid} disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
+                                liveUser.map(({ profileURL, displayName, userId }, index) => (
+                                    <ListItem key={userId + index} id={userId} disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
                                         <ListItemButton>
                                             <ListItemAvatar sx={{ minWidth: "0", mr: 1, ml: "auto" }}>
                                                 <Avatar alt={displayName} src={profileURL} sx={{ width: 20, height: 20 }} />
@@ -429,16 +428,18 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                                     </ListItem>
                                 ))
                             }
-                        </React.Fragment>
+                        </Box>
                     ))}
                 </Box>
             </Box>
             {connected ?
-                <VoiceControl currentVoiceChannel={currentVoiceChannel} currentUser={currentUser} connected={connected} setConnected={setConnected} />
+                <VoiceControl currentVoiceChannel={currentVoiceChannel} currentUser={currentUser} handleLeaveRoom={handleLeaveRoom} setConnected={setConnected} />
                 :
                 null
             }
-            <UserFooter className="user-footer-container" currentUser={currentUser} signOut={signOut} setCurrentUser={setCurrentUser} />
+            <UserFooter className="user-footer-container" currentUser={currentUser} signOut={signOut} setCurrentUser={setCurrentUser} handleLeaveRoom={handleLeaveRoom} muted={muted}
+                defen={defen} handleDefen={handleDefen}
+                handleMuted={handleMuted} />
             <InviteDialog />
             {/* <Outlet /> */}
         </Box>
