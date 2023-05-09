@@ -239,7 +239,7 @@ const UserDetail = ({ currentUser, changeStatus, openUserDetail, handleUserDetai
     )
 }
 
-const UserFooter = ({ currentUser, signOut, setCurrentUser, handleLeaveRoom, muted, defen, handleDefen, handleMuted }) => {
+const UserFooter = ({ currentUser, signOut, setCurrentUser, handleLeaveRoom, muted, defen, handleDefen, handleVoiceMuted }) => {
 
     const userAvatarRef = React.useRef(null);
     const [openUserDetail, setOpenUserDetails] = React.useState(false);
@@ -302,7 +302,7 @@ const UserFooter = ({ currentUser, signOut, setCurrentUser, handleLeaveRoom, mut
                     muted ?
                         <Tooltip title="Unmute" placement='top'>
                             <IconButton className="user-footer-button" aria-label="Mute" color="error" onClick={() => {
-                                handleMuted()
+                                handleVoiceMuted()
                             }}>
                                 <MicOffIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
@@ -310,7 +310,7 @@ const UserFooter = ({ currentUser, signOut, setCurrentUser, handleLeaveRoom, mut
                         :
                         <Tooltip title="Mute" placement='top'>
                             <IconButton className="user-footer-button" aria-label="Mute" color="success" onClick={() => {
-                                handleMuted()
+                                handleVoiceMuted()
                             }} >
                                 <MicIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
