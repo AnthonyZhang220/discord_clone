@@ -1,13 +1,10 @@
 import React, { useEffect, useRef, useState, forwardRef } from 'react'
-import { Box } from '@mui/material'
+import { Box, Avatar, Grid } from '@mui/material'
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-// import { LocalVideo, RemoteVideo } from '../WebSocket';
 import "./VoiceChat.scss"
-import { rtcProps } from '../AgoraConfig';
+import VideoPlayer from '../VideoPlayer/VideoPlayer';
 
-const VoiceChat = forwardRef(({ currentVoiceChannel, options }, ref) => {
-
-    const { localPlayerRef, remotePlayerRef } = ref;
+const VoiceChat = forwardRef(({ currentVoiceChannel, isMutedVideo, currentUser, liveUsers }, ref) => {
 
     return (
         <Box className="voicechat-container">
@@ -18,16 +15,21 @@ const VoiceChat = forwardRef(({ currentVoiceChannel, options }, ref) => {
                 </Box>
             </Box>
             <Box className="voicechat-content">
-                <Box className="voicechat-list">
+                <Box className="voicechat-wrapper">
+                    <Grid className="voicechat-list">
+                        {liveUsers?.map((liveUser) => (
+                            <VideoPlayer liveUser={liveUser} key={liveUser.uid} />
+                        ))}
+                        <Box className="voicechat-row">
+                            <Box className="voicechat-tile">
+                                <video style={{ position: "relative", opacity: 1, left: 0, top: 0 }} />
+                            </Box>
+                        </Box>
+                    </Grid>
                 </Box>
             </Box>
             <Box className="voicechat-footer">
-                <Box sx={{ display: "flex", width: "100%", height: "100%" }}>
-                    <video ref={localPlayerRef} autoPlay id={options.id ? options.id : ""} style={{ width: "640px", height: "480px", padding: "15px 5px 5px 5px" }} ></video>
-                    <video ref={remotePlayerRef} style={{ width: "640px", height: "480px", padding: "15px 5px 5px 5px" }} ></video>
-                </Box>
             </Box>
-
         </Box>
     )
 })

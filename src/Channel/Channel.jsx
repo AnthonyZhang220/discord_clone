@@ -37,8 +37,6 @@ import VoiceControl from '../VoiceControl/VoiceControl';
 
 import { FunctionTooltip } from '../CustomUIComponents';
 
-import { joinVoiceChatRoom } from '../WebSocket';
-
 
 
 
@@ -60,7 +58,7 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 
 
 
-const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handleCurrentChannel, channelModal, setChannelModal, handleChannelInfo, currentChannel, setCurrentUser, setCurrentServer, newChannel, voiceChat, setVoiceChat, currentVoiceChannel, setCurrentVoiceChannel, handleJoinRoom, handleLeaveRoom, muted, defen, handleDefen, handleMuted }) => {
+const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handleCurrentChannel, channelModal, setChannelModal, handleChannelInfo, currentChannel, setCurrentUser, setCurrentServer, newChannel, setVoiceChat, currentVoiceChannel, setCurrentVoiceChannel, handleUserJoined, handleUserLeft, muted, defen, handleDefen, handleVideoMuted, voiceConnected, isSharingEnabled, isMutedVideo, screenShareToggle, handleVoiceMuted, stats }) => {
 
 
     const [channelList, setChannelList] = React.useState([])
@@ -68,40 +66,6 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
     const [voiceChannelIdList, setVoiceChannelIdList] = React.useState([])
     const [liveList, setLiveList] = React.useState([])
 
-    const [connected, setConnected] = React.useState(true);
-
-    // const getUserList = async () => {
-    //     const listRef = doc(db, "voicechannels", currentVoiceChannel.uid)
-
-    //     const userList = await getDoc(listRef)
-    //     const list = userList.data().liveUser;
-    //     setVoiceChannelIdList(list)
-    // }
-
-    // React.useEffect(() => {
-    //     const q = query(collection(db, "voicechannels"), where("channelRef", "==", currentVoiceChannel.uid))
-    //     const unsub = onSnapshot(q, (QuerySnapshot) => {
-    //         QuerySnapshot.forEach((doc) => {
-    //             setVoiceChannelIdList(doc.data().liveUser)
-    //         })
-    //     })
-
-    //     // getUserList()
-    // }, [currentServer])
-
-    // React.useEffect(() => {
-    //     if (voiceChannelIdList.length > 0) {
-    //         const q = query(collection(db, "users"), where("userId", "in", voiceChannelIdList))
-    //         const unsub = onSnapshot(q, (QuerySnapshot) => {
-    //             let list = []
-    //             QuerySnapshot.forEach((doc) => {
-    //                 list.push({ ...doc.data(), id: doc.id })
-    //             })
-
-    //             setLiveList(list)
-    //         })
-    //     }
-    // }, [currentServer, voiceChannelIdList]
 
     //get channel list by server UID
     React.useEffect(() => {
@@ -407,8 +371,6 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                             <Box key={id} id={id} component="li" className={`channel channel-text ${id === currentVoiceChannel.uid ? "active" : ""}`} onClick={() => {
                                 setCurrentVoiceChannel({ name: name, uid: id })
                                 setVoiceChat(true)
-                                handleJoinRoom(id, currentUser.uid)
-                                setConnected(true)
                             }}>
                                 <VolumeUpIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />
                                 <Box component="span" className="channel-name">{name}</Box>
@@ -432,14 +394,15 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                     ))}
                 </Box>
             </Box>
-            {connected ?
-                <VoiceControl currentVoiceChannel={currentVoiceChannel} currentUser={currentUser} handleLeaveRoom={handleLeaveRoom} setConnected={setConnected} />
+            {voiceConnected ?
+                <VoiceControl currentVoiceChannel={currentVoiceChannel} currentUser={currentUser} handleUserLeft={handleUserLeft} voiceConnected={voiceConnected} currentServer={currentServer} isSharingEnabled={isSharingEnabled}
+                    isMutedVideo={isMutedVideo} screenShareToggle={screenShareToggle} handleVideoMuted={handleVideoMuted} stats={stats} />
                 :
                 null
             }
-            <UserFooter className="user-footer-container" currentUser={currentUser} signOut={signOut} setCurrentUser={setCurrentUser} handleLeaveRoom={handleLeaveRoom} muted={muted}
+            <UserFooter className="user-footer-container" currentUser={currentUser} signOut={signOut} setCurrentUser={setCurrentUser} handleUserLeft={handleUserLeft} muted={muted}
                 defen={defen} handleDefen={handleDefen}
-                handleMuted={handleMuted} />
+                handleVoiceMuted={handleVoiceMuted} />
             <InviteDialog />
             {/* <Outlet /> */}
         </Box>

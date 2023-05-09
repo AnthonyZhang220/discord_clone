@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import Chat from './Chat/Chat'
 import ServerList from './ServerList/ServerList'
 import Channel from './Channel/Channel'
@@ -24,7 +24,9 @@ import { Outlet } from 'react-router-dom'
 import FriendBody from './FriendBody/FriendBody'
 
 import AgoraRTC from 'agora-rtc-sdk-ng';
-import { RtcRole, RtcTokenBuilder, RtmTokenBuilder } from 'agora-token'
+import { AgoraClient, AgoraConfig } from './Agora'
+// import { RtcRole } from "agora-token"
+import axios from "axios"
 
 import "./App.scss";
 
@@ -90,7 +92,6 @@ let theme = createTheme({
 theme = responsiveFontSizes(theme);
 
 //google signin
-import { useAuthState } from 'react-firebase-hooks/auth';
 import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from 'firebase/auth';
 import VoiceChat from './VoiceChat/VoiceChat'
 
@@ -517,13 +518,11 @@ const App = () => {
 
         const millisecondsInCurrentDay = now.getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
-
         return formattedDate;
-
     }
 
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (currentPrivateChannel) {
             const q = query(
                 collection(db, "messages"),
@@ -574,195 +573,268 @@ const App = () => {
 
     }, [currentPrivateChannel]);
 
-
     const [voiceChat, setVoiceChat] = React.useState(false);
-    const [currentVoiceChannel, setCurrentVoiceChannel] = React.useState({ name: "", uid: "" })
+    const [currentVoiceChannel, setCurrentVoiceChannel] = React.useState({ name: null, uid: null })
 
 
-    const [options, setOptions] = useState({
-        // Pass your App ID here.
-        appId: process.env.REACT_APP_AGORA_APP_ID,
-        // Set the channel name.
-        channel: currentVoiceChannel.uid,
-        // Pass your temp token here.
-        token: '',
-        // Set the user ID.
-        uid: currentUser.uid,
-    })
+    const [config, setConfig] = useState(AgoraConfig)
 
-    const [channelParameters, setChannelParameters] = useState({
-        // A variable to hold a local audio track.
-        localAudioTrack: null,
-        // A variable to hold a local video track.
-        localVideoTrack: null,
-        // A variable to hold a remote audio track.
-        remoteAudioTrack: null,
-        // A variable to hold a remote video track.
-        remoteVideoTrack: null,
-        // A variable to hold the remote user id.s
-        remoteUid: null,
-    })
+    const [isSharingEnabled, setIsSharingEnabled] = useState(false)
+    const [isMutedVideo, setIsMutedVideo] = useState(true)
+    const [agoraEngine, setAgoraEngine] = useState(AgoraClient);
+    const screenShareRef = useRef(null)
+    const [voiceConnected, setVoiceConnected] = useState(false);
+    const [liveUsers, setLiveUsers] = useState([]);
+    const [localTracks, setLocalTracks] = useState(null)
+    const [currentAgoraUID, setCurrentAgoraUID] = useState(null)
+    const [screenTrack, setScreenTrack] = useState(null);
 
-    const getVoiceChannelName = async () => {
-        return new Promise((resolve, reject) => {
-            if (currentVoiceChannel.uid !== null) {
-                resolve(currentVoiceChannel.uid)
-            } else {
-                reject(console.log(currentVoiceChannel.uid))
+    const FetchToken = async () => {
+        return new Promise(function (resolve) {
+            if (config.channel) {
+                axios.get(config.serverUrl + '/rtc/' + config.channel + '/1/uid/' + "0" + '/?expiry=' + config.ExpireTime)
+                    .then(
+                        response => {
+                            console.log(response.data.rtcToken);
+                            resolve(response.data.rtcToken);
+                        })
+                    .catch(error => {
+                        console.log(error);
+                    });
             }
-        })
-    }
-
-
-    const [agoraEngine, setAgoraEngine] = useState(null);
-    const localPlayerRef = useRef(null)
-    const remotePlayerRef = useRef(null)
-    const [remotePlayerContainer, setRemotePlayerContainer] = useState(null);
-    const [localPlayerContainer, setLocalPlayerContainer] = useState(null);
-
-    const generateRtcToken = () => {
-        // Rtc Examples
-        const appId = process.env.REACT_APP_AGORA_APP_ID;
-        const appCertificate = process.env.REACT_APP_AGORA_APP_CERTIFI;
-        const channelName = currentVoiceChannel.uid;
-        // const uid;
-        const userAccount = currentUser.uid;
-        const role = RtcRole.PUBLISHER;
-        console.log(role)
-
-        const expirationTimeInSeconds = 3600
-
-        const currentTimestamp = Math.floor(Date.now() / 1000)
-
-        const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
-
-        // IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
-
-        // Build token with uid
-        // const tokenA = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, channelName, uid, role, privilegeExpiredTs);
-        // console.log("Token With Integer Number Uid: " + tokenA);
-
-        // Build token with user account
-        const tokenB = RtcTokenBuilder.buildTokenWithUserAccount(appId, appCertificate, channelName, userAccount, role, privilegeExpiredTs);
-        console.log("Token With UserAccount: " + tokenB);
-        setOptions({ ...options, token: tokenB })
-        return new Promise((resolve, reject) => {
-            if (typeof (tokenB) == "string") {
-                resolve(tokenB)
-            } else {
-                reject(console.log("tokenB", tokenB))
-            }
-        })
+        });
     }
 
 
     useEffect(() => {
-        const agoraEngine = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
-        setAgoraEngine(agoraEngine);
+        setConfig({ ...config, channel: currentVoiceChannel.uid })
+    }, [currentVoiceChannel.uid])
 
-        const remotePlayerContainer = document.createElement("div");
-        setRemotePlayerContainer(remotePlayerContainer);
+    useEffect(() => {
 
-        const localPlayerContainer = document.createElement('div');
-        localPlayerContainer.id = options.uid;
-        localPlayerContainer.textContent = "Local user " + options.uid;
+        agoraEngine.on("token-privilege-will-expire", async function () {
+            const token = await FetchToken();
+            setConfig({ ...config, token: token })
+            await agoraEngine.renewToken(config.token);
+        });
 
+        agoraEngine.enableAudioVolumeIndicator();
 
-
-        setLocalPlayerContainer(localPlayerContainer);
+        agoraEngine.on("volume-indicator", volumes => {
+            setLiveUsers((previousUsers) => {
+                return previousUsers.map(user => {
+                    const volume = volumes.find(v => v.uid === user.uid);
+                    if (volume) {
+                        return { ...user, volume: volume.level };
+                    }
+                    return user;
+                });
+            });
+        })
 
         agoraEngine.on("user-published", async (user, mediaType) => {
-            await agoraEngine.subscribe(user, mediaType);
-            console.log("subscribe success");
+            await agoraEngine.subscribe(user, mediaType)
 
             if (mediaType == "video") {
-                setChannelParameters({
-                    ...channelParameters,
-                    // A variable to hold a remote audio track.
-                    remoteAudioTrack: user.audioTrack,
-                    // A variable to hold a remote video track.
-                    remoteVideoTrack: user.videoTrack,
-                    // A variable to hold the remote user id.s
-                    remoteUid: user.uid.toString(),
-                })
-
-                // remotePlayerContainer.id = user.uid.toString();
-                remotePlayerRef.current.id = user.uid.toString();
-                // remotePlayerContainer.textContent = "Remote user " + user.uid.toString();
-                remotePlayerRef.current.textContent = "Remote user " + user.uid.toString();
-                const remoteStream = new MediaStream()
-                remoteStream.addTrack(user.videoTrack.getMediaStreamTrack())
-                remotePlayerRef.current.srcObject = remoteStream
-                remotePlayerRef.current.play();
-
-                channelParameters.remoteVideoTrack.play(remotePlayerRef.current);
+                setLiveUsers((previousUsers) => [...previousUsers, user])
             }
 
             if (mediaType == "audio") {
-                channelParameters.remoteAudioTrack = user.audioTrack;
-                channelParameters.remoteAudioTrack.play();
+
             }
 
-            agoraEngine.on("user-unpublished", user => {
-                console.log(user.uid + "has left the channel");
-            });
+            setVoiceChat(true)
+            handleUserJoined(user, mediaType)
+
         });
 
+        agoraEngine.on("user-joined", async (user) => {
+
+        })
+
+        agoraEngine.on("user-left", async (user) => {
+
+        })
+
+
+        agoraEngine.on("user-unpublished", async (user, mediaType) => {
+            console.log(user.uid + "has left the channel");
+            setLiveUsers((previousUsers) =>
+                previousUsers.filter((obj) => obj.uid != user.uid)
+            );
+
+        });
+
+        // agoraEngine.on("user-left", async (user, mediaType) => {
+        //     await handleUserLeft(user, mediaType)
+        // })
+
         return () => {
+            for (const localTrack of localTracks) {
+                localTrack.stop();
+                localTrack.close();
+            }
+            agoraEngine.off("user-published", handleUserJoined)
+            agoraEngine.off("user-left", handleUserLeft)
+            agoraEngine.unpublish(tracks).then(() => agoraEngine.leave())
             agoraEngine?.destroy();
-            removeVideoDiv(remotePlayerRef.current?.id);
-            removeVideoDiv(remotePlayerRef.current?.id);
         }
+
     }, []);
 
-    const removeVideoDiv = (elementId) => {
-        console.log("Removing " + elementId + "Div");
-        let Div = document.getElementById(elementId);
-        if (Div) {
-            Div.remove();
+    useEffect(() => {
+
+        const fetch = async () => {
+            const token = await FetchToken()
+
+            return new Promise((resolve, reject) => {
+                resolve(token)
+            })
         }
-    };
+
+        if (config.channel) {
+
+            fetch().then((token) => {
+                setVoiceChat(true)
+                agoraEngine.join(config.appId, config.channel, token, null)
+                    .then((uid) => {
+                        return Promise.all([AgoraRTC.createMicrophoneAndCameraTracks(), uid])
+                    }).then(([tracks, uid]) => {
+                        setCurrentAgoraUID(uid)
+
+                        addLiveUser(uid)
+
+                        const [audioTrack, videoTrack] = tracks;
+
+                        setLiveUsers((previousUsers) => [...previousUsers, {
+                            firebaseUID: currentUser.uid,
+                            uid,
+                            videoTrack,
+                            audioTrack
+                        }])
+
+                        videoTrack.setEnabled(false);
+                        audioTrack.setMuted(true);
+                        setLocalTracks(tracks)
+                        agoraEngine.publish(tracks)
+                        console.log("Tracks successfully published!")
+                        setVoiceConnected(true)
+                    })
+
+            });
+
+        }
+
+    }, [config.channel])
+
+    const addLiveUser = (uid) => {
+        const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+        getDoc(userRef).then((doc) => {
+            if (doc.exists()) {
+                const arr = doc.data().liveUser;
+                if (!arr.find(x => x.userId === currentUser.uid)) {
+                    updateDoc(userRef, {
+                        liveUser: arrayUnion({ displayName: currentUser.name, profileURL: currentUser.profileURL, userId: currentUser.uid, agoraUID: uid })
+                    })
+                }
+            }
+        })
+    }
+
+    const removeLiveUser = () => {
+        if (currentVoiceChannel.uid) {
+            const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+            getDoc(userRef).then((doc) => {
+                if (doc.exists()) {
+                    const arr = doc.data().liveUser;
+                    if (arr.find(x => x.userId === currentUser.uid)) {
+                        updateDoc(userRef, {
+                            liveUser: arrayRemove({ displayName: currentUser.name, profileURL: currentUser.profileURL, userId: currentUser.uid, agoraUID: currentAgoraUID })
+                        })
+                    }
+                }
+            })
+        }
+    }
+
+
+    const [stats, setStats] = useState(0)
+
+    const getStats = () => {
+        const stats = agoraEngine.getRTCStats()
+        setStats(stats.RTT)
+    }
 
     useEffect(() => {
-        if (currentVoiceChannel.uid) {
-            handleJoinRoom();
+        const interval = setInterval(getStats, 5000)
+        return () => clearInterval(interval);
+    }, [agoraEngine])
+
+
+    const screenShareToggle = async () => {
+        const screenTrack = await AgoraRTC.createScreenVideoTrack({ displaySurface: "browser" }, "auto");
+        const [video, audio] = screenTrack;
+
+        if (isSharingEnabled == false) {
+            // Create a screen track for screen sharing.
+            // Replace the video track with the screen track.
+            await agoraEngine.publish([video, audio])
+            // Update the screen sharing state.
+            setIsSharingEnabled(true);
+        } else {
+            // Replace the screen track with the local video track.
+            await agoraEngine.unpublish([video, audio])
+            setIsSharingEnabled(false);
         }
-    }, [currentVoiceChannel.uid])
+    }
 
-    const handleJoinRoom = async () => {
-        // const token = await generateRtcToken()
-        setOptions({ ...options, channel: currentVoiceChannel.uid })
-        // const channelName = await getVoiceChannelName()
-        console.log("channel", options.channel)
-        await agoraEngine.join(options.appId, options.channel, "007eJxTYHj22Laq57vQzqi9hxwbToRu9/wYN0HpZ+vUFM51IS0r+pwVGExTjQzTjC0sjCyMTE2STc0tklKMkoySUpISk1ItkpMtW2YFpTQEMjJwPXdgYWSAQBBfhMHAMts929DTr9DQMyTZ2Sw709XUjYEBAARPJS0=", options.uid);
-        const localAudioTrack = await AgoraRTC.createMicrophoneAudioTrack();
-        const localVideoTrack = await AgoraRTC.createCameraVideoTrack();
-        await agoraEngine.publish([localAudioTrack, localVideoTrack]);
-        console.log("localVideoTrack", localVideoTrack)
-        const localStream = new MediaStream()
-        localStream.addTrack(localVideoTrack.getMediaStreamTrack())
-        localPlayerRef.current.srcObject = localStream
-        localPlayerRef.current.play();
-        console.log("publish success!");
-    };
+    const handleUserJoined = () => {
 
-    const handleLeaveRoom = async () => {
-        channelParameters.localAudioTrack?.close();
-        channelParameters.localVideoTrack?.close();
-        removeVideoDiv(remotePlayerRef.current?.id);
-        removeVideoDiv(localPlayerRef.current?.id);
+    }
+
+    const handleUserLeft = async (user) => {
+
+        removeLiveUser()
+
         await agoraEngine?.leave();
-        const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
-        await updateDoc(userRef, {
-            liveUser: arrayRemove({ displayName: currentUser.name, profileURL: currentUser.profileURL, userId: currentUser.uid })
-        })
+        setVoiceConnected(false)
         console.log("You left the channel");
     }
+
+
     const handleDefen = () => {
         setDefen(!defen)
+        document.getElementsByTagName("video").muted = defen
     }
-    const handleMuted = () => {
-        setMuted(!muted)
+
+    const handleVideoMuted = async () => {
+
+        const [audio, video] = localTracks
+
+        if (isMutedVideo == false) {
+            // Mute the local video.
+            await video.setEnbled(true);
+            setIsMutedVideo(true)
+        } else {
+            // Unmute the local video.
+            await video.setEnbled(false);
+            setIsMutedVideo(false)
+        }
+    }
+
+    const handleVoiceMuted = async () => {
+        const [audio, video] = localTracks
+
+        if (muted == false) {
+            // Mute the local video. 
+            await audio.setMuted(true);
+            setMuted(true)
+        } else {
+            // Unmute the local video.
+            await audio.setMuted(false);
+            setMuted(false)
+        }
+
     }
 
     const [muted, setMuted] = React.useState(true);
@@ -839,22 +911,28 @@ const App = () => {
                                         setVoiceChat={setVoiceChat}
                                         currentVoiceChannel={currentVoiceChannel}
                                         setCurrentVoiceChannel={setCurrentVoiceChannel}
-                                        handleJoinRoom={handleJoinRoom}
-                                        handleLeaveRoom={handleLeaveRoom}
+                                        handleUserJoined={handleUserJoined}
+                                        handleUserLeft={handleUserLeft}
                                         muted={muted}
                                         defen={defen}
                                         handleDefen={handleDefen}
-                                        handleMuted={handleMuted}
+                                        handleVideoMuted={handleVideoMuted}
+                                        handleVoiceMuted={handleVoiceMuted}
+                                        voiceConnected={voiceConnected}
+                                        isSharingEnabled={isSharingEnabled}
+                                        isMutedVideo={isMutedVideo}
+                                        screenShareToggle={screenShareToggle}
+                                        stats={stats}
                                     />
                                     {
                                         voiceChat ?
                                             <VoiceChat
                                                 voiceChat={voiceChat}
                                                 currentVoiceChannel={currentVoiceChannel}
-                                                localPlayerRef={localPlayerRef}
-                                                remotePlayerRef={remotePlayerRef}
-                                                options={options}
-                                                ref={{ localPlayerRef: localPlayerRef, remotePlayerRef: remotePlayerRef }}
+                                                config={config}
+                                                currentUser={currentUser}
+                                                isMutedVideo={isMutedVideo}
+                                                liveUsers={liveUsers}
                                             />
                                             :
                                             <Chat
@@ -876,7 +954,7 @@ const App = () => {
                                 <React.Fragment>
                                     <FriendMenu friendList={friendList} currentUser={currentUser} friendIds={friendIds} signOut={signOut} setCurrentUser={setCurrentUser} currentPrivateChannel={currentPrivateChannel} handleOpenFriend={handleOpenFriend} handleCurrentPrivateChannel={handleCurrentPrivateChannel} muted={muted}
                                         defen={defen} handleDefen={handleDefen}
-                                        handleMuted={handleMuted} />
+                                        handleVideoMuted={handleVideoMuted} />
                                     <FriendBody friendList={friendList} currentUser={currentUser} friendIds={friendIds} currentPrivateChannel={currentPrivateChannel} handleCurrentPrivateChannel={handleCurrentPrivateChannel} channelRef={channelRef} privateMessages={privateMessages} currentPrivateMessage={currentPrivateMessage} handlePrivateChatInfo={handlePrivateChatInfo} handleAddPrivateMessage={handleAddPrivateMessage} />
                                 </React.Fragment>
                             } />
