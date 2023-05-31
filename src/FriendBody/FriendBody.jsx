@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo, useState, useMemo } from 'react'
 
 import { Box, List, SvgIcon, Button, Divider, Typography, ListItemButton, ListItemText, ListItem, } from '@mui/material';
 
@@ -28,7 +28,7 @@ import StatusList from '../StatusList';
 const FriendBody = ({ currentPrivateChannel, currentUser, privateMessages, handlePrivateChatInfo, handleCurrentPrivateChannel, friendList, handleAddPrivateMessage, currentPrivateMessage }) => {
 
 
-    const [userSideBar, setUserSideBar] = React.useState(true)
+    const [userSideBar, setUserSideBar] = useState(true)
     const handleShowUserDetail = () => {
         setUserSideBar(true)
     }
@@ -39,14 +39,10 @@ const FriendBody = ({ currentPrivateChannel, currentUser, privateMessages, handl
         const searchTerm = e.target.value;
     }
 
-    React.useEffect(() => {
-        console.log(currentUser)
-    }, [currentUser])
+    const [category, setCategory] = useState("online");
+    const [noActive, setNoActive] = useState(true);
 
-    const [category, setCategory] = React.useState("online");
-    const [noActive, setNoActive] = React.useState(true);
-
-    const FriendContent = () => {
+    const FriendContent = useMemo(() => () => {
         return (
             <Box className="content">
                 <Box className="friend-main-content" component="main">
@@ -68,11 +64,10 @@ const FriendBody = ({ currentPrivateChannel, currentUser, privateMessages, handl
                 <FriendActive firendList={friendList} noActive={noActive} />
             </Box>
         )
-    }
+    }, [])
 
-    const FriendHeader = () => {
+    const FriendHeader = useMemo(() => () => {
 
-        const [active, setActive] = React.useState(false);
 
         return (
             <Box className="friend-main-header" component="section">
@@ -124,9 +119,9 @@ const FriendBody = ({ currentPrivateChannel, currentUser, privateMessages, handl
                 </Box>
             </Box>
         )
-    }
+    }, [category])
 
-    const PrivateChannelHeader = () => {
+    const PrivateChannelHeader = useMemo(() => () => {
         return (
             <Box className="friend-main-header" component="section">
                 <Box className="friend-main-header-name">
@@ -148,7 +143,7 @@ const FriendBody = ({ currentPrivateChannel, currentUser, privateMessages, handl
                 </Box>
             </Box>
         )
-    }
+    }, [userSideBar, currentPrivateChannel.uid])
 
     return (
         <Box className="friend-main-container">

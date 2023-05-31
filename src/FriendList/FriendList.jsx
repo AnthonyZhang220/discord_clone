@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Box, FormControl, InputBase, FormHelperText, List, ListItemButton, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton, Typography, Divider, Badge } from '@mui/material'
 import ChatIcon from '@mui/icons-material/Chat';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -10,11 +10,7 @@ import "./FriendList.scss"
 
 export default function FriendList({ category, friendList, handleCurrentPrivateChannel }) {
 
-    React.useEffect(() => {
-        console.log(category)
-    }, [category])
-
-    const FriendItem = ({ displayName, profileURL, status, userId }) => {
+    const FriendItem = useMemo(() => ({ displayName, profileURL, status, userId }) => {
         return (
             <>
                 <Divider variant="fullWidth" flexItem sx={{ backgroundColor: "#3d3f44" }} />
@@ -57,8 +53,7 @@ export default function FriendList({ category, friendList, handleCurrentPrivateC
                 </ListItem>
             </>
         )
-    }
-
+    }, [friendList.length])
 
     return (
         <Box className="friend-list-container">

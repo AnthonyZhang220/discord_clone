@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useRef, useEffect, useMemo, memo } from 'react'
 import MemberStatus from '../MemberStatus/MemberStatus';
 //socket-io-client
 import { io } from 'socket.io-client'
@@ -48,15 +48,16 @@ import './PrivateChat.scss'
 
 import { Outlet } from 'react-router-dom';
 import { FunctionTooltip } from '../CustomUIComponents';
+import ColorThief from "colorthief"
 
 export default function PrivateChat({ currentUser, userSideBar, currentPrivateMessage, currentPrivateChannel, privateMessages, handlePrivateChatInfo, handleAddPrivateMessage }) {
-    const formRef = React.useRef();
-    const chatScroller = React.useRef();
-    const [openMember, setOpenMember] = React.useState(true);
-    const [openUpload, setOpenUpload] = React.useState(false);
-    const [fileUpload, setFileUpload] = React.useState(null);
-    const [fileError, setFileError] = React.useState(false);
-    const [fileErrorMessage, setFileErrorMessage] = React.useState("");
+    const formRef = useRef();
+    const chatScroller = useRef();
+    const [openMember, setOpenMember] = useState(true);
+    const [openUpload, setOpenUpload] = useState(false);
+    const [fileUpload, setFileUpload] = useState(null);
+    const [fileError, setFileError] = useState(false);
+    const [fileErrorMessage, setFileErrorMessage] = useState("");
 
     const handleShowMemberList = () => {
         setOpenMember(!openMember)
@@ -183,7 +184,7 @@ export default function PrivateChat({ currentUser, userSideBar, currentPrivateMe
             }
         }
 
-        const [hover, setHover] = React.useState(false)
+        const [hover, setHover] = useState(false)
 
 
         return (
@@ -247,12 +248,12 @@ export default function PrivateChat({ currentUser, userSideBar, currentPrivateMe
         )
     }
 
-    const ChatList = React.useMemo(() => {
+    const ChatList = useMemo(() => {
 
         return (
             <List component="ol" className="scrollerInner">
                 <ListItem>
-                    <img src={currentPrivateChannel.avatar} style={{ borderRadius: "50%", width: "80px", height: "80px" }}></img>
+                    <Avatar alt={currentPrivateChannel.name} src={currentPrivateChannel.avatar} style={{ borderRadius: "50%", width: "80px", height: "80px" }} />
                 </ListItem>
                 <ListItem>
                     <Typography variant='h3'>{currentPrivateChannel.name}</Typography>
@@ -273,12 +274,27 @@ export default function PrivateChat({ currentUser, userSideBar, currentPrivateMe
         )
     }, [privateMessages])
 
+    const profileRef = useRef(null);
+    const [bannerColor, setBannerColor] = useState("")
 
-    const UserSideBar = () => {
+    useEffect(() => {
+        if (profileRef.current.complete && userSideBar) {
+            const colorthief = new ColorThief();
+            const banner = colorthief.getColor(profileRef.current)
+            const rgbColor = `rgb(${banner.join(", ")})`
+            setBannerColor(rgbColor)
+            console.log(banner)
+        }
+
+    }, [profileRef, userSideBar])
+
+    const UserSideBar = useMemo(() => {
+
+
         return (
             <Box className="userSidebar-container">
-                <Box component="aside" className="userSidebar-memberlist-wrapper">
-                    <Box className="userSidebar-memberlist">
+                <Box component="aside" className="userSidebar-memberlist-wrapper" sx={{ backgroundColor: bannerColor, width: "100%", transition: "background-color 0.1s" }}>
+                    <Box className="userSidebar-memberlist" >
                         <Box>
                             <Box className="userSidebar-detail-top">
                                 <svg className="userSidebar-detail-banner">
@@ -297,7 +313,7 @@ export default function PrivateChat({ currentUser, userSideBar, currentPrivateMe
                                         <StatusList status={currentPrivateChannel.status} />
                                     }
                                 >
-                                    <Avatar alt={currentPrivateChannel.name} sx={{ width: "75px", height: "75px" }} src={currentPrivateChannel.avatar} />
+                                    <Avatar alt={currentPrivateChannel.name} sx={{ width: "80px", height: "80px" }} src={currentPrivateChannel.avatar} imgProps={{ ref: profileRef, crossOrigin: "Anonymous" }} />
                                 </Badge>
                             </Box>
                             <Box className="userSidebar-detail-list">
@@ -323,7 +339,7 @@ export default function PrivateChat({ currentUser, userSideBar, currentPrivateMe
                 </Box>
             </Box>
         )
-    }
+    }, [currentPrivateChannel.avatar])
 
     return (
         <Box className="content">
@@ -403,7 +419,7 @@ export default function PrivateChat({ currentUser, userSideBar, currentPrivateMe
             </Box>
             {
                 userSideBar ?
-                    <UserSideBar />
+                    UserSideBar
                     :
                     null
             }

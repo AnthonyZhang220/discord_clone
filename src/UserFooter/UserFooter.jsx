@@ -261,9 +261,6 @@ const UserFooter = ({ currentUser, signOut, setCurrentUser, handleLeaveRoom, mut
         setOpenUserDetails(false);
     }
 
-    const handleOpenMic = async () => {
-        localStream
-    }
 
     const changeStatus = async (status) => {
         const userObj = JSON.parse(localStorage.getItem(`${currentUser.uid}`))
