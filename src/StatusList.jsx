@@ -1,4 +1,4 @@
-import React from "react"
+import React, { memo } from "react"
 
 import CircleIcon from '@mui/icons-material/Circle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
@@ -14,9 +14,10 @@ const StatusList = ({ status, size, edge }) => {
         "invisible": <StopCircleIcon edge={edge} sx={{ color: "#80848e", fontSize: size }} />,
         "offline": <StopCircleIcon edge={edge} sx={{ color: "#80848e", fontSize: size }} />,
     }
+
     return (
         list[status]
     )
 }
 
-export default StatusList;
+export default memo(StatusList);

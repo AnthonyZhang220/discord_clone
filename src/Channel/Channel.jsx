@@ -97,6 +97,11 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
     }, [currentServer])
 
 
+    React.useEffect(()=>{
+        console.log(currentServer.uid)
+    },[currentServer])
+
+
     const channelHeaderRef = React.useRef(null);
     const [openSettings, setOpenSettings] = React.useState(false);
     const [deleteLoading, setDeleteLoading] = React.useState(false);
@@ -379,13 +384,13 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                                 </IconButton>
                             </Box>
                             {
-                                liveUser.map(({ profileURL, displayName, userId }, index) => (
-                                    <ListItem key={userId + index} id={userId} disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
+                                liveUser.map(({ avatar, name, uid }, index) => (
+                                    <ListItem key={uid + index} id={uid} disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
                                         <ListItemButton>
                                             <ListItemAvatar sx={{ minWidth: "0", mr: 1, ml: "auto" }}>
-                                                <Avatar alt={displayName} src={profileURL} sx={{ width: 20, height: 20 }} />
+                                                <Avatar alt={name} src={avatar} sx={{ width: 20, height: 20 }} />
                                             </ListItemAvatar>
-                                            <ListItemText primary={displayName} />
+                                            <ListItemText primary={name} />
                                         </ListItemButton>
                                     </ListItem>
                                 ))

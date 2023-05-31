@@ -94,6 +94,7 @@ theme = responsiveFontSizes(theme);
 //google signin
 import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from 'firebase/auth';
 import VoiceChat from './VoiceChat/VoiceChat'
+import { FormatListBulletedOutlined } from '@mui/icons-material'
 
 
 
@@ -595,7 +596,6 @@ const App = () => {
                 axios.get(config.serverUrl + '/rtc/' + config.channel + '/1/uid/' + "0" + '/?expiry=' + config.ExpireTime)
                     .then(
                         response => {
-                            console.log(response.data.rtcToken);
                             resolve(response.data.rtcToken);
                         })
                     .catch(error => {
@@ -604,6 +604,10 @@ const App = () => {
             }
         });
     }
+    
+    useEffect(()=>{
+        
+    })
 
 
     useEffect(() => {
@@ -622,52 +626,94 @@ const App = () => {
 
         agoraEngine.on("volume-indicator", volumes => {
             setLiveUsers((previousUsers) => {
-                return previousUsers.map(user => {
-                    const volume = volumes.find(v => v.uid === user.uid);
-                    if (volume) {
-                        return { ...user, volume: volume.level };
-                    }
-                    return user;
-                });
+                if (previousUsers) {
+                    return previousUsers.map(user => {
+                        if (user) {
+                            const volume = volumes.find(v => v.uid == user.uid);
+                            if (volume) {
+                                return { ...user, volume: volume.level };
+                            }
+                            return user;
+                        }
+                    });
+                }
             });
         })
 
         agoraEngine.on("user-published", async (user, mediaType) => {
             await agoraEngine.subscribe(user, mediaType)
+            console.log("639", user)
 
-            if (mediaType == "video") {
-                setLiveUsers((previousUsers) => [...previousUsers, user])
-            }
+            setLiveUsers((previousUsers) => {
+                return (previousUsers.map((User) => {
+                    if (User) {
+                        if (User.uid == user.uid) {
+                            if (mediaType == "video") {
+                                return { ...User, hasVideo: user.hasVideo, videoTrack: user.videoTrack, uid: user.uid }
+                            }
 
-            if (mediaType == "audio") {
-
-            }
-
-            setVoiceChat(true)
-            handleUserJoined(user, mediaType)
+                            if (mediaType == "audio") {
+                                return { ...User, hasAudio: user.hasAudio, audioTrack: user.audioTrack, uid: user.uid }
+                            }
+                        }
+                        return User
+                    }
+                }))
+            })
 
         });
 
         agoraEngine.on("user-joined", async (user) => {
-
+            // const channelDoc = doc(db, "voicechannels", currentVoiceChannel.uid)
+            // getDoc(channelDoc).then((doc) => {
+            //     const arr = doc.data().liveUser;
+            //     console.log("668", arr)
+            //     const obj = arr.filter(x => x.uid == user.uid)
+            // })
+            setLiveUsers((previousUsers) => {
+                return [...previousUsers, { uid: user.uid, hasAudio: user.hasAudio, audioTrack: user.audioTrack, hasVideo: user.hasVideo, videoTrack: user.videoTrack }]
+            })
         })
 
         agoraEngine.on("user-left", async (user) => {
-
+            setLiveUsers((previousUsers) => {
+                previousUsers.filter((User) => User.uid == user.uid)
+            })
         })
 
 
         agoraEngine.on("user-unpublished", async (user, mediaType) => {
             console.log(user.uid + "has left the channel");
-            setLiveUsers((previousUsers) =>
-                previousUsers.filter((obj) => obj.uid != user.uid)
-            );
+
+            if (mediaType === "audio") {
+                setLiveUsers((previousUsers) => {
+                    return (previousUsers.map((User) => {
+                        if (User) {
+                            if (User.uid == user.uid) {
+                                return { ...User, hasAudio: false, audioTrack: null, uid: user.uid }
+                            } else {
+                                return User
+                            }
+                        }
+                    }))
+                });
+            }
+            if (mediaType === "video") {
+                setLiveUsers((previousUsers) => {
+                    return (previousUsers.map((User) => {
+                        if (User) {
+                            if (User.uid == user.uid) {
+                                return { ...User, hasVideo: false, videoTrack: null, uid: user.uid }
+                            } else {
+                                return User
+                            }
+                        }
+                    }))
+                });
+            }
+
 
         });
-
-        // agoraEngine.on("user-left", async (user, mediaType) => {
-        //     await handleUserLeft(user, mediaType)
-        // })
 
         return () => {
             for (const localTrack of localTracks) {
@@ -695,30 +741,64 @@ const App = () => {
         if (config.channel) {
 
             fetch().then((token) => {
-                setVoiceChat(true)
                 agoraEngine.join(config.appId, config.channel, token, null)
                     .then((uid) => {
                         return Promise.all([AgoraRTC.createMicrophoneAndCameraTracks(), uid])
                     }).then(([tracks, uid]) => {
-                        setCurrentAgoraUID(uid)
 
-                        addLiveUser(uid)
 
                         const [audioTrack, videoTrack] = tracks;
 
-                        setLiveUsers((previousUsers) => [...previousUsers, {
-                            firebaseUID: currentUser.uid,
-                            uid,
-                            videoTrack,
-                            audioTrack
-                        }])
-
                         videoTrack.setEnabled(false);
-                        audioTrack.setMuted(true);
-                        setLocalTracks(tracks)
-                        agoraEngine.publish(tracks)
-                        console.log("Tracks successfully published!")
-                        setVoiceConnected(true)
+                        audioTrack.setEnabled(false);
+
+                        let data = {
+                            firebaseUID: null,
+                            uid: null,
+                            name: null,
+                            avatar: null
+                        };
+
+                        let userData = {}
+                        const userDoc = doc(db, "users", currentUser.uid)
+                        getDoc(userDoc).then((doc) => {
+                            if (doc.exists()) {
+                                data = {
+                                    firebaseUID: doc.data().userId,
+                                    uid: uid,
+                                    name: doc.data().displayName,
+                                    avatar: doc.data().profileURL,
+                                    hasAudio: false,
+                                    hasVideo: false,
+                                }
+
+                                addLiveUser(data)
+
+                                userData = {
+                                    firebaseUID: currentUser.uid,
+                                    name: data.name,
+                                    avatar: data.avatar,
+                                    uid,
+                                    videoTrack,
+                                    audioTrack,
+                                    hasVideo: false,
+                                    hasAudio: false
+                                }
+
+                                setCurrentAgoraUID(uid)
+                                setLiveUsers((previousUsers) => [...previousUsers, userData])
+
+
+                                setLocalTracks(tracks)
+                                agoraEngine.publish(tracks)
+                                console.log("Tracks successfully published!")
+                                setVoiceConnected(true)
+                                setVoiceChat(true)
+                            }
+                        })
+
+
+
                     })
 
             });
@@ -727,14 +807,14 @@ const App = () => {
 
     }, [config.channel])
 
-    const addLiveUser = (uid) => {
+    const addLiveUser = (userData) => {
         const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
         getDoc(userRef).then((doc) => {
             if (doc.exists()) {
                 const arr = doc.data().liveUser;
-                if (!arr.find(x => x.userId === currentUser.uid)) {
+                if (!arr.find(x => x.firebaseUID == currentUser.uid)) {
                     updateDoc(userRef, {
-                        liveUser: arrayUnion({ displayName: currentUser.name, profileURL: currentUser.profileURL, userId: currentUser.uid, agoraUID: uid })
+                        liveUser: arrayUnion(userData)
                     })
                 }
             }
@@ -747,11 +827,12 @@ const App = () => {
             getDoc(userRef).then((doc) => {
                 if (doc.exists()) {
                     const arr = doc.data().liveUser;
-                    if (arr.find(x => x.userId === currentUser.uid)) {
-                        updateDoc(userRef, {
-                            liveUser: arrayRemove({ displayName: currentUser.name, profileURL: currentUser.profileURL, userId: currentUser.uid, agoraUID: currentAgoraUID })
-                        })
-                    }
+                    console.log("853", arr)
+                    const obj = arr.filter(x => x.firebaseUID == currentUser.uid)
+                    console.log("855", obj)
+                    updateDoc(userRef, {
+                        liveUser: arrayRemove(obj[0])
+                    })
                 }
             })
         }
@@ -772,18 +853,27 @@ const App = () => {
 
 
     const screenShareToggle = async () => {
-        const screenTrack = await AgoraRTC.createScreenVideoTrack({ displaySurface: "browser" }, "auto");
-        const [video, audio] = screenTrack;
+        console.log(localTracks)
 
         if (isSharingEnabled == false) {
+            const screenTrack = await AgoraRTC.createScreenVideoTrack({ displaySurface: "browser", encoderConfig: "720p_2", optimizationMode: "motion" }, "auto");
+            const [video, audio] = screenTrack
+            // const newScreenTrack = screenTrack.getMediaStreamTrack()
+            await agoraEngine.unpublish(localTracks)
+            // await localTracks.replaceTrack(video, true)
             // Create a screen track for screen sharing.
             // Replace the video track with the screen track.
             await agoraEngine.publish([video, audio])
+            console.log([video, audio])
             // Update the screen sharing state.
             setIsSharingEnabled(true);
         } else {
+            const videoTrack = await AgoraRTC.createMicrophoneAndCameraTracks();
+            const [video, audio] = videoTrack
+            // await screenTrack.replaceTrack(videoTrack, true)
+            await agoraEngine.unpublish(screenTrack)
+            await agoraEngine.publish([video, audio])
             // Replace the screen track with the local video track.
-            await agoraEngine.unpublish([video, audio])
             setIsSharingEnabled(false);
         }
     }
@@ -796,7 +886,8 @@ const App = () => {
 
         removeLiveUser()
 
-        await agoraEngine?.leave();
+        await agoraEngine.leave()
+        setVoiceChat(false)
         setVoiceConnected(false)
         console.log("You left the channel");
     }
@@ -813,11 +904,11 @@ const App = () => {
 
         if (isMutedVideo == false) {
             // Mute the local video.
-            await video.setEnbled(true);
-            setIsMutedVideo(true)
+            agoraEngine && await video.setEnabled(false);
+            setIsMutedVideo(true);
         } else {
             // Unmute the local video.
-            await video.setEnbled(false);
+            agoraEngine && await video.setEnabled(true);
             setIsMutedVideo(false)
         }
     }
@@ -827,11 +918,11 @@ const App = () => {
 
         if (muted == false) {
             // Mute the local video. 
-            await audio.setMuted(true);
+            agoraEngine && await audio.setEnabled(false);
             setMuted(true)
         } else {
             // Unmute the local video.
-            await audio.setMuted(false);
+            agoraEngine && await audio.setEnabled(true);
             setMuted(false)
         }
 
@@ -841,6 +932,7 @@ const App = () => {
     const [defen, setDefen] = React.useState(false);
 
     return (
+
         <ThemeProvider theme={theme}>
             {/* <CssBaseline /> */}
             <Routes>
@@ -933,6 +1025,8 @@ const App = () => {
                                                 currentUser={currentUser}
                                                 isMutedVideo={isMutedVideo}
                                                 liveUsers={liveUsers}
+                                                setLiveUsers={setLiveUsers}
+                                                currentAgoraUID={currentAgoraUID}
                                             />
                                             :
                                             <Chat

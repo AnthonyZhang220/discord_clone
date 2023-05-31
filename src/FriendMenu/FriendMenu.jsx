@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo, useEffect, useState, Fragment } from "react";
 
 import { Box, IconButton, Input, Typography, SvgIcon, List, ListItem, ListItemButton, ListItemText, ListItemAvatar, Badge, Avatar } from "@mui/material";
 
@@ -19,11 +19,11 @@ import { db } from "../firebase";
 
 const FriendMenu = ({ currentUser, changeStatus, signOut, setCurrentUser, handleOpenFriend, handleCurrentPrivateChannel, currentPrivateChannel, muted, defen, handleDefen, handleMuted }) => {
 
-    const [privateChannelList, setPrivateChannelList] = React.useState([]);
-    const [privateChannelId, setPrivateChannelId] = React.useState([]);
+    const [privateChannelList, setPrivateChannelList] = useState([]);
+    const [privateChannelId, setPrivateChannelId] = useState([]);
 
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (currentUser) {
             const q = query(collection(db, "privatechannels"), where("memberRef", "array-contains", currentUser.uid))
             const unsub = onSnapshot(q, (QuerySnapshot) => {
@@ -42,7 +42,7 @@ const FriendMenu = ({ currentUser, changeStatus, signOut, setCurrentUser, handle
 
     }, [currentUser])
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (privateChannelId.length > 0) {
             const q = query(collection(db, "users"), where("userId", "in", privateChannelId))
             const unsub = onSnapshot(q, (QuerySnapshot) => {
@@ -60,11 +60,9 @@ const FriendMenu = ({ currentUser, changeStatus, signOut, setCurrentUser, handle
         }
     }, [privateChannelId])
 
-    React.useEffect(() => {
-        console.log(privateChannelList)
-    }, [privateChannelList])
 
-    const PrivateChannelList = ({ userId, status, name, avatar }) => {
+    const PrivateChannelList = useMemo(() => ({ userId, status, name, avatar }) => {
+
         return (
             <ListItem id={userId} disablePadding sx={{ p: 0, m: 0, backgroundColor: currentPrivateChannel.uid === userId ? lighten("#313338", 0.1) : "inherit" }} className="friend-conversation-item">
                 <ListItemButton onClick={() => handleCurrentPrivateChannel(userId)}>
@@ -83,7 +81,7 @@ const FriendMenu = ({ currentUser, changeStatus, signOut, setCurrentUser, handle
                 </ListItemButton>
             </ListItem>
         )
-    }
+    },[privateChannelList])
 
     return (
         <Box component="aside" className='friend-container'>
@@ -105,9 +103,9 @@ const FriendMenu = ({ currentUser, changeStatus, signOut, setCurrentUser, handle
                     </Box>
                     <Box sx={{ marginLeft: "auto", fontSize: 12 }}>
                         <FunctionTooltip title={
-                            <React.Fragment>
+                            <Fragment>
                                 <Typography variant="body1" sx={{ m: 0.5 }} >Create DM</Typography>
-                            </React.Fragment>} placement="top">
+                            </Fragment>} placement="top">
                             <AddIcon />
                         </FunctionTooltip>
                     </Box>
