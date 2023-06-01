@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { Fragment, useMemo, useEffect } from 'react'
 import { Box, FormControl, InputBase, FormHelperText, List, ListItemButton, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton, Typography, Divider, Badge } from '@mui/material'
 import ChatIcon from '@mui/icons-material/Chat';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -7,6 +7,7 @@ import StatusList from '../StatusList';
 
 
 import "./FriendList.scss"
+import { TypeSpecimenOutlined } from '@mui/icons-material';
 
 export default function FriendList({ category, friendList, handleCurrentPrivateChannel }) {
 
@@ -53,20 +54,39 @@ export default function FriendList({ category, friendList, handleCurrentPrivateC
                 </ListItem>
             </>
         )
-    }, [friendList.length])
+    }, [friendList.length, category])
+
 
     return (
         <Box className="friend-list-container">
             <List dense>
                 {
                     category == "all" ?
-                        friendList.map(({ displayName, status, profileURL, userId }) => (
-                            <FriendItem displayName={displayName} profileURL={profileURL} status={status} key={userId} />
-                        ))
+                        <Fragment>
+                            <Box sx={{ p: 1 }}>
+                                <Typography variant="h6">
+                                    All - {friendList.length}
+                                </Typography>
+                            </Box>
+                            {
+                                friendList.map(({ displayName, status, profileURL, userId }) => (
+                                    <FriendItem displayName={displayName} profileURL={profileURL} status={status} key={userId} />
+                                ))
+                            }
+                        </Fragment>
                         :
-                        friendList.filter(property => property.status !== "offline").map(({ displayName, status, profileURL, userId }) => (
-                            <FriendItem displayName={displayName} profileURL={profileURL} status={status} key={userId} />
-                        ))
+                        <Fragment>
+                            <Box sx={{ p: 1 }}>
+                                <Typography variant="h6">
+                                    Online - {friendList.filter(property => property.status !== "offline").length}
+                                </Typography>
+                            </Box>
+                            {
+                                friendList.filter(property => property.status !== "offline").map(({ displayName, status, profileURL, userId }) => (
+                                    <FriendItem displayName={displayName} profileURL={profileURL} status={status} key={userId} />
+                                ))
+                            }
+                        </Fragment>
                 }
             </List>
         </Box>

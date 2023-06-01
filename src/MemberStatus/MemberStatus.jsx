@@ -182,7 +182,7 @@ function MemberStatus({ currentServer }) {
                             memberList.find(member => online(member.status) === true) ?
                                 <List subheader={
                                     <ListSubheader component="div" sx={{ backgroundColor: "#2b2d31", color: "white" }}>
-                                        Online
+                                        Online - {memberList?.filter(member => online(member.status) === true).length}
                                     </ListSubheader>
                                 }>
                                     {
@@ -211,7 +211,7 @@ function MemberStatus({ currentServer }) {
                             memberList.find(member => online(member.status) === false) ?
                                 <List subheader={
                                     <ListSubheader component="div" sx={{ backgroundColor: "#2b2d31", color: "white" }}>
-                                        Offline
+                                        Offline - {memberList?.filter(member => online(member.status) === false).length}
                                     </ListSubheader>
                                 }>
                                     {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect, useMemo, Fragment, useRef } from 'react'
 import MemberStatus from '../MemberStatus/MemberStatus';
 //socket-io-client
 import { io } from 'socket.io-client'
@@ -45,8 +45,8 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import Snackbar from '@mui/material/Snackbar';
 import { Alert } from '@mui/material';
-
 import './Chat.scss'
+
 
 import { Outlet } from 'react-router-dom';
 import { FunctionTooltip } from '../CustomUIComponents';
@@ -59,14 +59,14 @@ import { Message } from '@mui/icons-material';
 export default function Chat({ currentUser, currentMessage, currentChannel, handleAddMessage, handleChatInfo, currentServer }) {
 
 
-    const formRef = React.useRef();
-    const chatScroller = React.useRef();
-    const [chatList, setChatList] = React.useState([]);
-    const [openMember, setOpenMember] = React.useState(true);
-    const [openUpload, setOpenUpload] = React.useState(false);
-    const [fileUpload, setFileUpload] = React.useState(null);
-    const [fileError, setFileError] = React.useState(false);
-    const [fileErrorMessage, setFileErrorMessage] = React.useState("");
+    const formRef = useRef();
+    const chatScroller = useRef();
+    const [chatList, setChatList] = useState([]);
+    const [openMember, setOpenMember] = useState(true);
+    const [openUpload, setOpenUpload] = useState(false);
+    const [fileUpload, setFileUpload] = useState(null);
+    const [fileError, setFileError] = useState(false);
+    const [fileErrorMessage, setFileErrorMessage] = useState("");
 
     const handleShowMemberList = () => {
         setOpenMember(!openMember)
@@ -183,9 +183,9 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
 
     }
 
-    const [previousUserRef, setPreviousUserRef] = React.useState(null);
+    const [previousUserRef, setPreviousUserRef] = useState(null);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (currentChannel) {
             const q = query(
                 collection(db, "messages"),
@@ -236,7 +236,7 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
 
     }, [currentChannel]);
 
-    const ChatItem = ({ content, userName, avatar, createdAt, type, fileName, dividerDate }) => {
+    const ChatItem = useMemo(() => ({ content, userName, avatar, createdAt, type, fileName, dividerDate }) => {
 
         const FormatChat = () => {
 
@@ -244,7 +244,7 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                 return <img alt={content} src={content} style={{ maxHeight: "350px", aspectRatio: "auto", borderRadius: "8px", maxWidth: "550px" }} />
             } else if (type.indexOf("audio/") != -1) {
                 return (
-                    <React.Fragment>
+                    <Fragment>
                         <Box sx={{ display: "flex", flexDirection: "column" }}>
                             <Box>
                                 <Typography variant='p'>{fileName}</Typography>
@@ -253,7 +253,7 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                                 <audio controls src={content} preload='metadata' />
                             </Box>
                         </Box>
-                    </React.Fragment>
+                    </Fragment>
                 )
             } else if (type.indexOf("video/") != -1) {
                 return (
@@ -266,11 +266,9 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
             }
         }
 
-        const [hover, setHover] = React.useState(false)
-
 
         return (
-            <React.Fragment>
+            <Fragment>
                 {
                     dividerDate ?
                         <Divider sx={{ m: 2, fontSize: 12, color: "#b5bac1" }} variant='middle'>{dividerDate}</Divider>
@@ -282,7 +280,7 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                                         <Avatar alt={userName} src={avatar} />
                                     </ListItemAvatar>
                                     <ListItemText primary={
-                                        <React.Fragment>
+                                        <Fragment>
                                             {userName}
                                             <Typography
                                                 sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
@@ -302,38 +300,46 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                                             >
                                                 {convertTime(createdAt)}
                                             </Typography>
-                                        </React.Fragment>
+                                        </Fragment>
                                     }
-                                        secondary={<React.Fragment>
+                                        secondary={<Fragment>
                                             <FormatChat />
-                                        </React.Fragment>
+                                        </Fragment>
                                         } primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2", color: "white" }} />
                                 </ListItemButton>
                             </ListItem>
                             :
-                            <ListItem className="message" sx={{ p: 0, m: 0 }}>
-                                <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
+                            <ListItem className="message" sx={{
+                                p: 0, m: 0, "&:hover": {
+                                    ".timeblock": {
+                                        display: "block"
+                                    }
+                                }
+                            }}>
+                                <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
                                     <ListItemAvatar>
-                                        <Typography variant='body2' sx={{ display: hover ? "block" : "none", fontSize: 12, color: "#b5bac1" }}>
+                                        <Typography variant='body2' className="timeblock" sx={{
+                                            display: "none", fontSize: 12, color: "#b5bac1"
+                                        }}>
                                             {convertTime(createdAt)}
                                         </Typography>
                                     </ListItemAvatar>
                                     <ListItemText
-                                        secondary={<React.Fragment>
+                                        secondary={<Fragment>
                                             <FormatChat />
-                                        </React.Fragment>
+                                        </Fragment>
                                         } primaryTypographyProps={{ variant: "body1" }} secondaryTypographyProps={{ variant: "body2", color: "white" }} />
                                 </ListItemButton>
                             </ListItem>
                 }
-            </React.Fragment>
+            </Fragment >
         )
-    }
+    }, [chatList])
 
 
-    const ChatList = React.useMemo(() => {
+    const ChatList = useMemo(() => {
 
-        // React.useEffect(() => {
+        // useEffect(() => {
         //     chatList.forEach((message) => {
         //         if (!chatList[message.uid]) {
         //             chatList[message.uid] = [];
@@ -376,9 +382,9 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                 </Box>
                 <Box className="chat-header-feature">
                     <FunctionTooltip title={
-                        <React.Fragment>
+                        <Fragment>
                             <Typography variant="body1" sx={{ m: 0.5 }} >{openMember ? "Hide Member List" : "Show Member List"}</Typography>
-                        </React.Fragment>} placement="bottom">
+                        </Fragment>} placement="bottom">
                         <PeopleAltIcon color="white" onClick={() => handleShowMemberList()} />
                     </FunctionTooltip>
                 </Box>

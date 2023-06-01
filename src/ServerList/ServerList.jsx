@@ -10,6 +10,7 @@ import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import { TextFieldProps } from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
+import PublicIcon from '@mui/icons-material/Public';
 
 import { db } from "../firebase";
 import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, getDocs, doc } from 'firebase/firestore';
@@ -86,8 +87,9 @@ const ServerList = ({ currentUser, handleAddServer, handleCurrentServer, current
                     <DialogContentText variant='h5'>
                         Your server is where you and your friends hang out. Make yours and start talking.
                     </DialogContentText>
-                    <ListItemButton sx={{ borderRadius: "8px" }} onClick={() => setOpenCreate(true)}>
-                        <ListItemText variant="h5" sx={{ color: "black" }}>
+                    <ListItemButton sx={{ borderRadius: "8px", border: "solid 1px #121314" }} onClick={() => setOpenCreate(true)}>
+                        <PublicIcon />
+                        <ListItemText variant="h5" primaryTypographyProps={{ color: "#121314", ml: 1 }}>
                             Create My Own
                         </ListItemText>
                         <NavigateNext edge="end" />

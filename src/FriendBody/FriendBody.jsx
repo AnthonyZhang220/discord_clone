@@ -1,4 +1,4 @@
-import React, { memo, useState, useMemo } from 'react'
+import React, { memo, useState, useMemo, useEffect } from 'react'
 
 import { Box, List, SvgIcon, Button, Divider, Typography, ListItemButton, ListItemText, ListItem, } from '@mui/material';
 
@@ -64,10 +64,13 @@ const FriendBody = ({ currentPrivateChannel, currentUser, privateMessages, handl
                 <FriendActive firendList={friendList} noActive={noActive} />
             </Box>
         )
-    }, [])
+    }, [category])
+
+    useEffect(()=>{
+        console.log(category)
+    },[category])
 
     const FriendHeader = useMemo(() => () => {
-
 
         return (
             <Box className="friend-main-header" component="section">
