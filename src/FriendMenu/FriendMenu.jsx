@@ -64,8 +64,10 @@ const FriendMenu = ({ currentUser, changeStatus, signOut, setCurrentUser, handle
     const PrivateChannelList = useMemo(() => ({ userId, status, name, avatar }) => {
 
         return (
-            <ListItem id={userId} disablePadding sx={{ p: 0, m: 0, backgroundColor: currentPrivateChannel.uid === userId ? lighten("#313338", 0.1) : "inherit" }} className="friend-conversation-item">
-                <ListItemButton onClick={() => handleCurrentPrivateChannel(userId)}>
+            <ListItem id={userId} disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
+                <ListItemButton onClick={() => handleCurrentPrivateChannel(userId)} sx={{
+                    backgroundColor: currentPrivateChannel.uid == userId ? lighten("#313338", 0.1) : "inherit",
+                }}>
                     <ListItemAvatar sx={{ minWidth: "0", mr: 1 }}>
                         <Badge
                             overlap="circular"
@@ -81,7 +83,7 @@ const FriendMenu = ({ currentUser, changeStatus, signOut, setCurrentUser, handle
                 </ListItemButton>
             </ListItem>
         )
-    },[privateChannelList])
+    }, [privateChannelList])
 
     return (
         <Box component="aside" className='friend-container'>
