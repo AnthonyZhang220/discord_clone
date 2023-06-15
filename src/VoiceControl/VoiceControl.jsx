@@ -12,14 +12,14 @@ import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import "./VoiceControl.scss"
 
 
-export default function VoiceControl({ currentVoiceChannel, currentUser, voiceConnected, handleUserLeft, currentServer, isSharingEnabled, isMutedVideo, screenShareToggle, handleVideoMuted, stats }) {
+export default function VoiceControl({ currentVoiceChannel, currentUser, handleLocalUserLeftAgora, currentServer, isSharingEnabled, isMutedVideo, screenShareToggle, handleVideoMuted, stats, connectionState }) {
 
     return (
         <Box component="footer" className="voice-control-container">
             <Box className="voice-control-upper">
                 <Box className="voice-control-details" sx={{ marginRight: "auto" }}>
-                    <Box className="voice-control-status" sx={{ color: voiceConnected ? "#23a459" : "white" }}>
-                        <Tooltip arrow sx={{ backgroundColor: "#23a459", color: "whitesmoke" }} title={
+                    <Box className="voice-control-status" sx={{ color: connectionState.state !== "DISCONNECTED" ? "#23a459" : "white" }}>
+                        <Tooltip arrow sx={{ background: stats < 100 ? "#23a55a" : stats < 300 ? "#f0b132" : "#f23f42", color: "whitesmoke" }} title={
                             <React.Fragment>
                                 <Typography variant='body2'>
                                     {stats} ms
@@ -30,23 +30,23 @@ export default function VoiceControl({ currentVoiceChannel, currentUser, voiceCo
                                 <SvgIcon component={LatencyIcon} sx={{ height: 20, width: 20, marginRight: "2px" }} />
                             </span>
                         </Tooltip>
-                        <Link underline="hover" variant='body1' sx={{ color: voiceConnected ? "#23a459" : "white" }}>
-                            Voice Connected
+                        <Link underline="hover" variant='body1' sx={{ color: connectionState.state !== "DISCONNECTED" ? "#23a459" : "white" }}>
+                            {connectionState.state}
                         </Link>
                     </Box>
                     <Breadcrumbs aria-label="breadcrumb" separator="/" style={{ color: "whitesmoke" }}>
                         <Link underline="hover" variant='body2'>
-                            {voiceConnected ? currentVoiceChannel.name : "Loading"}
+                            {connectionState.state !== "DISCONNECTED" ? currentVoiceChannel.name : connectionState.state}
                         </Link>
                         <Link underline="hover" variant='body2'>
-                            {voiceConnected ? currentServer.name : "Loading"}
+                            {connectionState.state !== "DISCONNECTED" ? currentServer.name : connectionState.state}
                         </Link>
                     </Breadcrumbs>
                 </Box>
                 <Box className="voice-control-controls button-group" sx={{ ml: "auto" }}>
                     <Tooltip title="Disconnect" placement='top'>
                         <IconButton className="voice-control-button" aria-label="Defen" onClick={() => {
-                            handleUserLeft()
+                            handleLocalUserLeftAgora()
                         }}
                         >
                             <SvgIcon component={DisconnectIcon} sx={{ height: 20, width: 20 }} />

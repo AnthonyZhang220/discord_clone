@@ -1,4 +1,4 @@
-import React, { useId } from 'react'
+import React, { useId, useMemo, useEffect, useState, Fragment, useRef } from 'react'
 import { auth } from '../firebase';
 import { db } from "../firebase";
 import { onSnapshot, query, where, addDoc, collection, deleteDoc, doc, updateDoc, getDocs, QuerySnapshot, getDoc } from 'firebase/firestore';
@@ -58,17 +58,17 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
 
 
 
-const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handleCurrentChannel, channelModal, setChannelModal, handleChannelInfo, currentChannel, setCurrentUser, setCurrentServer, newChannel, setVoiceChat, currentVoiceChannel, setCurrentVoiceChannel, handleUserJoined, handleUserLeft, muted, defen, handleDefen, handleVideoMuted, voiceConnected, isSharingEnabled, isMutedVideo, screenShareToggle, handleVoiceMuted, stats }) => {
+const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handleCurrentChannel, channelModal, setChannelModal, handleChannelInfo, currentChannel, setCurrentUser, setCurrentServer, newChannel, setVoiceChat, currentVoiceChannel, setCurrentVoiceChannel, handleUserJoinedAgora, handleLocalUserLeftAgora, muted, defen, handleDefen, handleVideoMuted, voiceConnected, isSharingEnabled, isMutedVideo, screenShareToggle, handleVoiceMuted, stats, connectionState }) => {
 
 
-    const [channelList, setChannelList] = React.useState([])
-    const [voiceChannelList, setVoiceChannelList] = React.useState([])
-    const [voiceChannelIdList, setVoiceChannelIdList] = React.useState([])
-    const [liveList, setLiveList] = React.useState([])
+    const [channelList, setChannelList] = useState([])
+    const [voiceChannelList, setVoiceChannelList] = useState([])
+    const [voiceChannelIdList, setVoiceChannelIdList] = useState([])
+    const [liveList, setLiveList] = useState([])
 
 
     //get channel list by server UID
-    React.useEffect(() => {
+    useEffect(() => {
         if (currentServer) {
             const q = query(collection(db, "channels"), where("serverRef", "==", currentServer.uid));
             const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
@@ -82,7 +82,7 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
     }, [currentServer])
 
     //get all the voice channels by server UID
-    React.useEffect(() => {
+    useEffect(() => {
         if (currentServer) {
             const q = query(collection(db, "voicechannels"), where("serverRef", "==", currentServer.uid));
             const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
@@ -97,14 +97,14 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
     }, [currentServer])
 
 
-    React.useEffect(()=>{
+    useEffect(() => {
         console.log(currentServer.uid)
-    },[currentServer])
+    }, [currentServer])
 
 
-    const channelHeaderRef = React.useRef(null);
-    const [openSettings, setOpenSettings] = React.useState(false);
-    const [deleteLoading, setDeleteLoading] = React.useState(false);
+    const channelHeaderRef = useRef(null);
+    const [openSettings, setOpenSettings] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
 
     const handleServerSettingsOpen = () => {
         setOpenSettings(true)
@@ -159,8 +159,8 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
         setInviteDialog(true)
     }
 
-    const [inviteDialog, setInviteDialog] = React.useState(false);
-    const [copyed, setCopyed] = React.useState(false);
+    const [inviteDialog, setInviteDialog] = useState(false);
+    const [copyed, setCopyed] = useState(false);
 
     const copyToClip = () => {
         navigator.clipboard.writeText(currentServer.uid).then(() => {
@@ -169,7 +169,7 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
     }
 
     //invite people
-    const InviteDialog = () => {
+    const InviteDialog = useMemo(() => () => {
         return (
             <Dialog className="Create-Channel-Modal" open={inviteDialog} onClose={() => setInviteDialog(false)} PaperProps={{
                 style: {
@@ -205,10 +205,10 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                 </DialogContent>
             </Dialog>
         )
-    }
+    }, [inviteDialog])
 
     //server settings menu
-    const ServerMenu = () => {
+    const ServerMenu = useMemo(() => () => {
 
         return (
             <Popover
@@ -280,7 +280,11 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                 </ListItem>
             </Popover>
         )
-    }
+    }, [openSettings])
+
+    useEffect(() => {
+        console.log(connectionState)
+    }, [connectionState])
 
 
     return (
@@ -310,9 +314,9 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                     </Box>
                     <Box sx={{ marginLeft: "auto", fontSize: 12 }}>
                         <FunctionTooltip title={
-                            <React.Fragment>
+                            <Fragment>
                                 <Typography variant="body1" sx={{ m: 0.5 }} >Create Channel</Typography>
-                            </React.Fragment>} placement="top">
+                            </Fragment>} placement="top">
                             <AddIcon onClick={(() => setChannelModal(true))} />
                         </FunctionTooltip>
                     </Box>
@@ -323,7 +327,7 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                             width: "440px"
                         }
                     }}>
-                        <DialogTitle sx={{ color: "#ffffff" }} variant='h3'>Create Channel</DialogTitle>
+                        <DialogTitle sx={{ color: "#ffffff" }} variant='h3'>Create Text Channel</DialogTitle>
                         <DialogContent>
                             <Box component="form">
                                 <FormControl variant="standard" required fullWidth>
@@ -369,6 +373,14 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                     <Box>
                         <Typography component="h6" variant="h6">Voice Channels</Typography>
                     </Box>
+                    <Box sx={{ marginLeft: "auto", fontSize: 12 }}>
+                        <FunctionTooltip title={
+                            <Fragment>
+                                <Typography variant="body1" sx={{ m: 0.5 }} >Create Voice Channel</Typography>
+                            </Fragment>} placement="top">
+                            <AddIcon onClick={(() => setChannelModal(true))} />
+                        </FunctionTooltip>
+                    </Box>
                 </Box>
                 <Box component="ul" className="channel-list-text">
                     {voiceChannelList.map(({ name, id, liveUser }) => (
@@ -399,13 +411,13 @@ const Channel = ({ currentServer, signOut, currentUser, handleAddChannel, handle
                     ))}
                 </Box>
             </Box>
-            {voiceConnected ?
-                <VoiceControl currentVoiceChannel={currentVoiceChannel} currentUser={currentUser} handleUserLeft={handleUserLeft} voiceConnected={voiceConnected} currentServer={currentServer} isSharingEnabled={isSharingEnabled}
-                    isMutedVideo={isMutedVideo} screenShareToggle={screenShareToggle} handleVideoMuted={handleVideoMuted} stats={stats} />
+            {connectionState.state != "DISCONNECTED" && typeof (connectionState.state) == "string" ?
+                <VoiceControl currentVoiceChannel={currentVoiceChannel} currentUser={currentUser} handleLocalUserLeftAgora={handleLocalUserLeftAgora} voiceConnected={voiceConnected} currentServer={currentServer} isSharingEnabled={isSharingEnabled}
+                    isMutedVideo={isMutedVideo} screenShareToggle={screenShareToggle} handleVideoMuted={handleVideoMuted} stats={stats} connectionState={connectionState} />
                 :
                 null
             }
-            <UserFooter className="user-footer-container" currentUser={currentUser} signOut={signOut} setCurrentUser={setCurrentUser} handleUserLeft={handleUserLeft} muted={muted}
+            <UserFooter className="user-footer-container" currentUser={currentUser} signOut={signOut} setCurrentUser={setCurrentUser} muted={muted}
                 defen={defen} handleDefen={handleDefen}
                 handleVoiceMuted={handleVoiceMuted} />
             <InviteDialog />
