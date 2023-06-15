@@ -13,13 +13,13 @@ import ColorThief from "colorthief"
 
 
 
-const VoiceChat = ({ currentVoiceChannel, isMutedVideo, currentUser, liveUsers, setLiveUsers, currentAgoraUID }) => {
+const VoiceChat = ({ currentVoiceChannel, isMutedVideo, currentUser, remoteUsers, setRemoteUsers, currentAgoraUID }) => {
 
     const profileRef = useRef(null);
     const [bannerColor, setBannerColor] = useState("")
 
     // useEffect(() => {
-    //     if (liveUsers && profileRef.current) {
+    //     if (remoteUsers && profileRef.current) {
     //         const colorthief = new ColorThief();
     //         const banner = colorthief.getColor(profileRef.current)
     //         const rgbColor = `rgb(${banner.join(", ")})`
@@ -27,7 +27,7 @@ const VoiceChat = ({ currentVoiceChannel, isMutedVideo, currentUser, liveUsers, 
     //         console.log(banner)
     //     }
 
-    // }, [liveUsers])
+    // }, [remoteUsers])
 
     return (
         <Box className="voicechat-container">
@@ -40,35 +40,30 @@ const VoiceChat = ({ currentVoiceChannel, isMutedVideo, currentUser, liveUsers, 
             <Box className="voicechat-content">
                 <Box className="voicechat-wrapper">
                     <Box className="voicechat-list">
-                        {liveUsers !== null && liveUsers?.length != 0 && liveUsers?.map((liveUser) =>
-                        (
-                            liveUser ?
-                                <Box key={liveUser.uid} className="voicechat-tile" sx={{ backgroundColor: bannerColor, transition: "background-color 0.1s" }}>
-                                    <VideoPlayer liveUser={liveUser} currentAgoraUID={currentAgoraUID} />
-                                    <Button sx={{ position: "absolute", left: 5, bottom: 5, color: liveUser.volume > 50 ? "green" : "white" }} variant="outlined" startIcon={
-                                        liveUser.videoTrack?.enabled
-                                            ?
-                                            <VideocamIcon />
-                                            :
-                                            <VideocamOffIcon />
-                                    }>
-                                        <Typography variant='h5'>
-                                            {liveUser.name}
-                                        </Typography>
-                                    </Button>
-                                    {liveUser.audioTrack?.enabled ? null : (
-                                        <IconButton sx={{ color: "white", position: "absolute", right: 5, bottom: 5, border: "solid 1px" }} >
-                                            <MicOffIcon />
-                                        </IconButton>
-                                    )}
-                                    {liveUser.videoTrack?.enabled ?
-                                        null :
-                                        <Avatar src={liveUser.avatar} alt={liveUser.name} sx={{ position: "absolute", left: "50%", top: "50%", width: 100, height: 100, mt: "-50px", ml: "-50px" }} imgProps={{ ref: profileRef, crossOrigin: "Anonymous" }} />
-                                    }
-                                </Box>
-                                :
-                                null
-                        )
+                        {remoteUsers !== null && remoteUsers?.length != 0 && remoteUsers?.map((remoteUser) =>
+                            <Box key={remoteUser.uid} className="voicechat-tile" sx={{ backgroundColor: bannerColor, transition: "background-color 0.1s" }}>
+                                <VideoPlayer remoteUser={remoteUser} currentAgoraUID={currentAgoraUID} />
+                                <Button sx={{ position: "absolute", left: 5, bottom: 5, color: remoteUser.volume > 50 ? "green" : "white" }} variant="outlined" startIcon={
+                                    remoteUser.hasVideo ?
+                                        <VideocamIcon />
+                                        :
+                                        <VideocamOffIcon />
+                                }>
+                                    <Typography variant='h5'>
+                                        {remoteUser.name}
+                                    </Typography>
+                                </Button>
+                                {remoteUser.hasAudio ? null : (
+                                    <IconButton sx={{ color: "white", position: "absolute", right: 5, bottom: 5, border: "solid 1px" }} >
+                                        <MicOffIcon />
+                                    </IconButton>
+                                )}
+                                {remoteUser.hasVideo ?
+                                    null :
+                                    <Avatar src={remoteUser.avatar} alt={remoteUser.name} sx={{ position: "absolute", left: "50%", top: "50%", width: 100, height: 100, mt: "-50px", ml: "-50px" }} imgProps={{ ref: profileRef, crossOrigin: "Anonymous" }} />
+                                }
+                            </Box>
+
                         )}
                     </Box>
                 </Box>

@@ -3,24 +3,24 @@ import { Box, Avatar, Button } from '@mui/material'
 import "./VideoPlayer.scss"
 
 
-function VideoPlayer({ liveUser, currentAgoraUID }) {
+function VideoPlayer({ remoteUser, currentAgoraUID }) {
     const videoRef = useRef()
     const audioRef = useRef()
 
 
     useEffect(() => {
-        if (liveUser.videoTrack) {
-            liveUser.videoTrack?.play(videoRef.current)
+        if (remoteUser.videoTrack) {
+            remoteUser.videoTrack?.play(videoRef.current)
         }
 
-        if (liveUser.audioTrack) {
-            if (liveUser.uid !== currentAgoraUID) {
-                liveUser.audioTrack?.play(audioRef.current)
+        if (remoteUser.audioTrack) {
+            if (remoteUser.uid !== currentAgoraUID) {
+                remoteUser.audioTrack?.play(audioRef.current)
             }
         }
 
 
-    }, [liveUser.videoTrack])
+    }, [remoteUser.videoTrack])
 
 
     return (

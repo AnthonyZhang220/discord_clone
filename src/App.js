@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react'
+import React, { useEffect, useState, useRef, useCallback, Fragment } from 'react'
 import Chat from './Chat/Chat'
 import ServerList from './ServerList/ServerList'
 import Channel from './Channel/Channel'
@@ -94,7 +94,7 @@ theme = responsiveFontSizes(theme);
 //google signin
 import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from 'firebase/auth';
 import VoiceChat from './VoiceChat/VoiceChat'
-import { FormatListBulletedOutlined } from '@mui/icons-material'
+import { ElevatorSharp, FormatListBulletedOutlined } from '@mui/icons-material'
 
 
 
@@ -107,27 +107,27 @@ const App = () => {
     const GithubProvider = new GithubAuthProvider();
 
     //show modal for new server/channel
-    const [channelModal, setChannelModal] = React.useState(false);
-    const [serverModal, setServerModal] = React.useState(false);
+    const [channelModal, setChannelModal] = useState(false);
+    const [serverModal, setServerModal] = useState(false);
 
     //store server/channel list for UI render
 
     //add new server/channel
-    const [newChannel, setNewChannel] = React.useState("")
-    const [newServerInfo, setNewServerInfo] = React.useState({ name: "", serverPic: "" });
-    const [serverURL, setServerURL] = React.useState(null);
-    const [file, setFile] = React.useState(null);
+    const [newChannel, setNewChannel] = useState("")
+    const [newServerInfo, setNewServerInfo] = useState({ name: "", serverPic: "" });
+    const [serverURL, setServerURL] = useState(null);
+    const [file, setFile] = useState(null);
 
     //current Login USER/SERVER/CHANNEL
-    const [currentUser, setCurrentUser] = React.useState({ name: null, profileURL: null, uid: null, createdAt: null });
-    const [currentServer, setCurrentServer] = React.useState({ name: "", uid: null });
-    const [currentChannel, setCurrentChannel] = React.useState({ name: "", uid: null });
-    const [currentMessage, setCurrentMessage] = React.useState("");
+    const [currentUser, setCurrentUser] = useState({ name: null, profileURL: null, uid: null, createdAt: null });
+    const [currentServer, setCurrentServer] = useState({ name: "", uid: null });
+    const [currentChannel, setCurrentChannel] = useState({ name: "", uid: null });
+    const [currentMessage, setCurrentMessage] = useState("");
 
-    const [imageDir, setImageDir] = React.useState("")
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [imageDir, setImageDir] = useState("")
+    const [isLoading, setIsLoading] = useState(false);
 
-    const [friendList, setFriendList] = React.useState([])
+    const [friendList, setFriendList] = useState([])
 
 
 
@@ -150,7 +150,7 @@ const App = () => {
     }
 
     //auth/login state change
-    React.useEffect(() => {
+    useEffect(() => {
         const loginState = onAuthStateChanged(auth, (user) => {
             console.log(user)
             if (user) {
@@ -287,7 +287,7 @@ const App = () => {
 
 
 
-    const [openCreate, setOpenCreate] = React.useState(false);
+    const [openCreate, setOpenCreate] = useState(false);
     //add new Server with handleUploadServerImage();
     const handleAddServer = async () => {
         setIsLoading(true)
@@ -338,7 +338,7 @@ const App = () => {
 
     }
 
-    const [currentPrivateMessage, setCurrentPrivateMessage] = React.useState("")
+    const [currentPrivateMessage, setCurrentPrivateMessage] = useState("")
 
     const handleChannelInfo = (e) => {
         setNewChannel(e.target.value)
@@ -419,9 +419,9 @@ const App = () => {
 
 
 
-    const [friendIds, setFriendIds] = React.useState([]);
+    const [friendIds, setFriendIds] = useState([]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (currentUser.uid) {
             // const docRef = doc(collectionRef, currentUser.uid)
             const docRef = query(collection(db, "users"), where("userId", "==", currentUser.uid))
@@ -440,7 +440,7 @@ const App = () => {
     }, [currentUser.uid])
 
     //get user's friend list
-    React.useEffect(() => {
+    useEffect(() => {
 
         if (friendIds.length > 0) {
             const q = query(collection(db, "users"), where("userId", "in", friendIds))
@@ -463,9 +463,9 @@ const App = () => {
 
     }, [friendIds])
 
-    const [currentPrivateChannel, setCurrentPrivateChannel] = React.useState({ uid: null, name: null, status: null, avatar: null });
-    const [channelRef, setChannelRef] = React.useState("")
-    const [privateMessages, setPrivateMessages] = React.useState([])
+    const [currentPrivateChannel, setCurrentPrivateChannel] = useState({ uid: null, name: null, status: null, avatar: null });
+    const [channelRef, setChannelRef] = useState("")
+    const [privateMessages, setPrivateMessages] = useState([])
 
     const handleCurrentPrivateChannel = async (channelId) => {
 
@@ -574,8 +574,8 @@ const App = () => {
 
     }, [currentPrivateChannel]);
 
-    const [voiceChat, setVoiceChat] = React.useState(false);
-    const [currentVoiceChannel, setCurrentVoiceChannel] = React.useState({ name: null, uid: null })
+    const [voiceChat, setVoiceChat] = useState(false);
+    const [currentVoiceChannel, setCurrentVoiceChannel] = useState({ name: null, uid: null })
 
 
     const [config, setConfig] = useState(AgoraConfig)
@@ -585,7 +585,7 @@ const App = () => {
     const [agoraEngine, setAgoraEngine] = useState(AgoraClient);
     const screenShareRef = useRef(null)
     const [voiceConnected, setVoiceConnected] = useState(false);
-    const [liveUsers, setLiveUsers] = useState([]);
+    const [remoteUsers, setRemoteUsers] = useState([]);
     const [localTracks, setLocalTracks] = useState(null)
     const [currentAgoraUID, setCurrentAgoraUID] = useState(null)
     const [screenTrack, setScreenTrack] = useState(null);
@@ -604,129 +604,266 @@ const App = () => {
             }
         });
     }
-    
-    useEffect(()=>{
-        
-    })
-
 
     useEffect(() => {
         setConfig({ ...config, channel: currentVoiceChannel.uid })
     }, [currentVoiceChannel.uid])
 
-    useEffect(() => {
+    const [connectionState, setConnectionState] = useState({ state: null, reason: null })
 
+    useEffect(() => {
         agoraEngine.on("token-privilege-will-expire", async function () {
             const token = await FetchToken();
             setConfig({ ...config, token: token })
             await agoraEngine.renewToken(config.token);
         });
-
+        //enabled volume indicator
         agoraEngine.enableAudioVolumeIndicator();
 
-        agoraEngine.on("volume-indicator", volumes => {
-            setLiveUsers((previousUsers) => {
-                if (previousUsers) {
-                    return previousUsers.map(user => {
-                        if (user) {
-                            const volume = volumes.find(v => v.uid == user.uid);
-                            if (volume) {
-                                return { ...user, volume: volume.level };
-                            }
-                            return user;
-                        }
-                    });
-                }
-            });
+        agoraEngine.on("volume-indicator", (volumes) => {
+            handleVolume(volumes)
+        })
+        agoraEngine.on("user-published", (user, mediaType) => {
+            console.log(user.uid + "published");
+            handleUserSubscribe(user, mediaType)
+            handleUserPublishedToAgora(user, mediaType)
+        });
+        agoraEngine.on("user-joined", (user) => {
+            handleRemoteUserJoinedAgora(user)
+        })
+        agoraEngine.on("user-left", (user) => {
+            console.log(user.uid + "has left the channel");
+            handleRemoteUserLeftAgora(user)
+        })
+        agoraEngine.on("user-unpublished", (user, mediaType) => {
+            console.log(user.uid + "unpublished");
+            handleUserUnpublishedFromAgora(user, mediaType)
+        });
+
+        agoraEngine.on("connection-state-change", (currentState, prevState, reason) => {
+            setConnectionState({ state: currentState, reason: reason })
         })
 
-        agoraEngine.on("user-published", async (user, mediaType) => {
-            await agoraEngine.subscribe(user, mediaType)
-            console.log("639", user)
+        return () => {
+            removeLiveUserFromFirebase(currentAgoraUID)
 
-            setLiveUsers((previousUsers) => {
+            for (const localTrack of localTracks) {
+                localTrack.stop();
+                localTrack.close();
+            }
+            agoraEngine.off("user-published", handleRemoteUserJoinedAgora)
+            agoraEngine.off("user-left", handleRemoteUserLeftAgora)
+            agoraEngine.unpublish(localTracks).then(() => agoraEngine.leave())
+        }
+
+    }, []);
+
+    const handleUserSubscribe = async (user, mediaType) => {
+        const id = user.uid
+        await agoraEngine.subscribe(user, mediaType)
+    }
+
+    const handleVolume = (volumes) => {
+        setRemoteUsers((previousUsers) => {
+            if (previousUsers) {
+                return previousUsers.map(user => {
+                    if (user) {
+                        const volume = volumes.find(v => v.uid == user.uid);
+                        if (volume) {
+                            return { ...user, volume: volume.level };
+                        }
+                        return user;
+                    }
+                });
+            }
+        });
+    }
+
+
+    const handleUserUnpublishedFromAgora = (user, mediaType) => {
+        updateFirebaseMediaStatus(user.uid, mediaType, false)
+
+        if (mediaType === "audio") {
+            setRemoteUsers((previousUsers) => {
+                if (previousUsers !== undefined) {
+                    return (previousUsers.map((User) => {
+                        if (User) {
+                            if (User.uid == user.uid) {
+                                return { ...User, hasAudio: false, audioTrack: null, uid: user.uid }
+                            }
+                            return User
+                        }
+                    }))
+                }
+            });
+        }
+
+        if (mediaType === "video") {
+            setRemoteUsers((previousUsers) => {
+                if (previousUsers !== undefined) {
+                    return (previousUsers.map((User) => {
+                        if (User) {
+                            if (User.uid == user.uid) {
+                                return { ...User, hasVideo: false, videoTrack: null, uid: user.uid }
+                            }
+                            return User
+                        }
+                    }))
+                }
+            });
+        }
+    }
+
+    useEffect(() => {
+        // constantly monitor the state change of user, audio, video
+        if (currentVoiceChannel.uid) {
+            const voiceChannelRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+            const snapshot = onSnapshot(voiceChannelRef, (doc) => {
+                const list = doc.data().liveUser
+                if (list && list.length != 0) {
+                    list.forEach((User) => {
+                        setRemoteUsers((previousUser) => {
+                            if (previousUser != undefined) {
+                                return previousUser.map((user) => {
+                                    if (user.uid == User.uid) {
+                                        return { ...user, name: User.name, hasAudio: User.hasAudio, hasVideo: User.hasVideo }
+                                    }
+                                    return user;
+                                })
+                            }
+                        })
+                    })
+                }
+            })
+        }
+    }, [remoteUsers, config.channel])
+
+    const updateFirebaseMediaStatus = (agoraID, mediaType, status) => {
+
+        if (currentVoiceChannel.uid) {
+            const voiceChannelRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+
+            getDoc(voiceChannelRef).then((doc) => {
+                if (doc.exists()) {
+                    const arr = doc.data().liveUser
+                    const updateUser = arr.find(x => x.uid == agoraID)
+                    console.log(updateUser)
+                    if (updateUser) {
+                        if (mediaType === "audio") {
+                            updateUser.hasAudio = status;
+                        }
+                        if (mediaType === "video") {
+                            updateUser.hasVideo = status;
+                        }
+                    }
+
+                    updateDoc(voiceChannelRef, {
+                        liveUser: arr
+                    })
+                }
+            })
+        }
+    }
+
+    const handleUserPublishedToAgora = (user, mediaType) => {
+
+        updateFirebaseMediaStatus(user.uid, mediaType, true)
+
+        setRemoteUsers((previousUsers) => {
+            if (previousUsers !== undefined) {
                 return (previousUsers.map((User) => {
                     if (User) {
                         if (User.uid == user.uid) {
-                            if (mediaType == "video") {
-                                return { ...User, hasVideo: user.hasVideo, videoTrack: user.videoTrack, uid: user.uid }
+                            if (mediaType === "video") {
+                                return { ...User, hasVideo: true, videoTrack: user.videoTrack, uid: user.uid }
                             }
 
-                            if (mediaType == "audio") {
-                                return { ...User, hasAudio: user.hasAudio, audioTrack: user.audioTrack, uid: user.uid }
+                            if (mediaType === "audio") {
+                                return { ...User, hasAudio: true, audioTrack: user.audioTrack, uid: user.uid }
                             }
                         }
                         return User
                     }
                 }))
-            })
-
-        });
-
-        agoraEngine.on("user-joined", async (user) => {
-            // const channelDoc = doc(db, "voicechannels", currentVoiceChannel.uid)
-            // getDoc(channelDoc).then((doc) => {
-            //     const arr = doc.data().liveUser;
-            //     console.log("668", arr)
-            //     const obj = arr.filter(x => x.uid == user.uid)
-            // })
-            setLiveUsers((previousUsers) => {
-                return [...previousUsers, { uid: user.uid, hasAudio: user.hasAudio, audioTrack: user.audioTrack, hasVideo: user.hasVideo, videoTrack: user.videoTrack }]
-            })
+            }
         })
+    }
 
-        agoraEngine.on("user-left", async (user) => {
-            setLiveUsers((previousUsers) => {
-                previousUsers.filter((User) => User.uid == user.uid)
-            })
+    const handleRemoteUserJoinedAgora = (user) => {
+
+        setRemoteUsers((previousUsers) => {
+            if (previousUsers !== undefined) {
+                if (previousUsers.find(User => User.uid != user.uid)) {
+                    return [...previousUsers, { uid: user.uid, hasAudio: user.hasAudio, audioTrack: user.audioTrack, hasVideo: user.hasVideo, videoTrack: user.videoTrack }]
+                }
+            }
         })
+    }
 
+    useEffect(() => {
+        console.log(remoteUsers)
+    }, [remoteUsers])
 
-        agoraEngine.on("user-unpublished", async (user, mediaType) => {
-            console.log(user.uid + "has left the channel");
+    const handleLocalUserLeftAgora = async () => {
 
-            if (mediaType === "audio") {
-                setLiveUsers((previousUsers) => {
-                    return (previousUsers.map((User) => {
-                        if (User) {
-                            if (User.uid == user.uid) {
-                                return { ...User, hasAudio: false, audioTrack: null, uid: user.uid }
-                            } else {
-                                return User
-                            }
-                        }
-                    }))
-                });
-            }
-            if (mediaType === "video") {
-                setLiveUsers((previousUsers) => {
-                    return (previousUsers.map((User) => {
-                        if (User) {
-                            if (User.uid == user.uid) {
-                                return { ...User, hasVideo: false, videoTrack: null, uid: user.uid }
-                            } else {
-                                return User
-                            }
-                        }
-                    }))
-                });
-            }
+        removeLiveUserFromFirebase(currentAgoraUID)
+        setRemoteUsers([])
 
-
-        });
-
-        return () => {
-            for (const localTrack of localTracks) {
-                localTrack.stop();
-                localTrack.close();
-            }
-            agoraEngine.off("user-published", handleUserJoined)
-            agoraEngine.off("user-left", handleUserLeft)
-            agoraEngine.unpublish(tracks).then(() => agoraEngine.leave())
-            agoraEngine?.destroy();
+        for (const localTrack of localTracks) {
+            localTrack.stop();
+            localTrack.close();
         }
 
-    }, []);
+        await agoraEngine.unpublish(localTracks)
+        await agoraEngine.leave()
+
+        setLocalTracks(null)
+        console.log("You left the channel");
+        setCurrentVoiceChannel({ name: null, uid: null })
+    }
+
+    const handleRemoteUserLeftAgora = (user) => {
+
+        setRemoteUsers((previousUsers) => {
+            if (previousUsers !== undefined) {
+                const newArr = previousUsers.filter((User) => User.uid != user.uid)
+                return newArr;
+            }
+        })
+
+    }
+
+    const addLiveUserToFirebase = (userData) => {
+        const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+        getDoc(userRef).then((doc) => {
+            if (doc.exists()) {
+                const arr = doc.data().liveUser;
+                if (!arr.find(x => x.firebaseUID == currentUser.uid)) {
+                    updateDoc(userRef, {
+                        liveUser: arrayUnion(userData)
+                    })
+                }
+            }
+        })
+    }
+
+    const removeLiveUserFromFirebase = (agoraID) => {
+        if (agoraID && currentVoiceChannel.uid) {
+            const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+            getDoc(userRef).then((doc) => {
+                if (doc.exists()) {
+                    const arr = doc.data().liveUser;
+                    if (arr.find(x => x.uid == agoraID)) {
+                        const deleteUser = arr.find(x => x.uid == agoraID)
+                        console.log(deleteUser)
+                        updateDoc(userRef, {
+                            liveUser: arrayRemove(deleteUser)
+                        })
+                    }
+                }
+            })
+        }
+    }
 
     useEffect(() => {
 
@@ -746,11 +883,7 @@ const App = () => {
                         return Promise.all([AgoraRTC.createMicrophoneAndCameraTracks(), uid])
                     }).then(([tracks, uid]) => {
 
-
                         const [audioTrack, videoTrack] = tracks;
-
-                        videoTrack.setEnabled(false);
-                        audioTrack.setEnabled(false);
 
                         let data = {
                             firebaseUID: null,
@@ -760,8 +893,11 @@ const App = () => {
                         };
 
                         let userData = {}
+                        //get Document for currentUser in firebase
                         const userDoc = doc(db, "users", currentUser.uid)
+
                         getDoc(userDoc).then((doc) => {
+                            //if such document exist add its info to liveUser array
                             if (doc.exists()) {
                                 data = {
                                     firebaseUID: doc.data().userId,
@@ -772,7 +908,8 @@ const App = () => {
                                     hasVideo: false,
                                 }
 
-                                addLiveUser(data)
+
+                                addLiveUserToFirebase(data)
 
                                 userData = {
                                     firebaseUID: currentUser.uid,
@@ -786,11 +923,17 @@ const App = () => {
                                 }
 
                                 setCurrentAgoraUID(uid)
-                                setLiveUsers((previousUsers) => [...previousUsers, userData])
-
+                                setRemoteUsers((previousUsers) => {
+                                    if (previousUsers !== undefined) {
+                                        return [...previousUsers, userData]
+                                    }
+                                })
 
                                 setLocalTracks(tracks)
                                 agoraEngine.publish(tracks)
+
+                                videoTrack.setEnabled(false);
+                                audioTrack.setEnabled(false);
                                 console.log("Tracks successfully published!")
                                 setVoiceConnected(true)
                                 setVoiceChat(true)
@@ -807,36 +950,6 @@ const App = () => {
 
     }, [config.channel])
 
-    const addLiveUser = (userData) => {
-        const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
-        getDoc(userRef).then((doc) => {
-            if (doc.exists()) {
-                const arr = doc.data().liveUser;
-                if (!arr.find(x => x.firebaseUID == currentUser.uid)) {
-                    updateDoc(userRef, {
-                        liveUser: arrayUnion(userData)
-                    })
-                }
-            }
-        })
-    }
-
-    const removeLiveUser = () => {
-        if (currentVoiceChannel.uid) {
-            const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
-            getDoc(userRef).then((doc) => {
-                if (doc.exists()) {
-                    const arr = doc.data().liveUser;
-                    console.log("853", arr)
-                    const obj = arr.filter(x => x.firebaseUID == currentUser.uid)
-                    console.log("855", obj)
-                    updateDoc(userRef, {
-                        liveUser: arrayRemove(obj[0])
-                    })
-                }
-            })
-        }
-    }
 
 
     const [stats, setStats] = useState(0)
@@ -878,21 +991,6 @@ const App = () => {
         }
     }
 
-    const handleUserJoined = () => {
-
-    }
-
-    const handleUserLeft = async (user) => {
-
-        removeLiveUser()
-
-        await agoraEngine.leave()
-        setVoiceChat(false)
-        setVoiceConnected(false)
-        console.log("You left the channel");
-    }
-
-
     const handleDefen = () => {
         setDefen(!defen)
         document.getElementsByTagName("video").muted = defen
@@ -904,32 +1002,43 @@ const App = () => {
 
         if (isMutedVideo == false) {
             // Mute the local video.
+            updateFirebaseMediaStatus(currentAgoraUID, "video", false)
             agoraEngine && await video.setEnabled(false);
             setIsMutedVideo(true);
         } else {
             // Unmute the local video.
+            updateFirebaseMediaStatus(currentAgoraUID, "video", true)
             agoraEngine && await video.setEnabled(true);
             setIsMutedVideo(false)
         }
     }
+
+    useEffect(() => {
+        console.log(remoteUsers)
+    }, [remoteUsers])
 
     const handleVoiceMuted = async () => {
         const [audio, video] = localTracks
 
         if (muted == false) {
             // Mute the local video. 
+            updateFirebaseMediaStatus(currentAgoraUID, "audio", false)
             agoraEngine && await audio.setEnabled(false);
+
+
             setMuted(true)
         } else {
             // Unmute the local video.
+            updateFirebaseMediaStatus(currentAgoraUID, "audio", true)
             agoraEngine && await audio.setEnabled(true);
+
             setMuted(false)
         }
 
     }
 
-    const [muted, setMuted] = React.useState(true);
-    const [defen, setDefen] = React.useState(false);
+    const [muted, setMuted] = useState(true);
+    const [defen, setDefen] = useState(false);
 
     return (
 
@@ -960,7 +1069,7 @@ const App = () => {
                     <Route
                         path="/channels"
                         element={
-                            <React.Fragment>
+                            <Fragment>
                                 <ServerList
                                     handleAddServer={handleAddServer}
                                     handleCurrentServer={handleCurrentServer}
@@ -980,12 +1089,12 @@ const App = () => {
                                     setNewServerInfo={setNewServerInfo}
                                 />
                                 <Outlet />
-                            </React.Fragment>
+                            </Fragment>
                         }>
                         <Route
                             index
                             element={
-                                <React.Fragment>
+                                <Fragment>
                                     <Channel
                                         currentServer={currentServer}
                                         setCurrentServer={setCurrentServer}
@@ -1003,8 +1112,7 @@ const App = () => {
                                         setVoiceChat={setVoiceChat}
                                         currentVoiceChannel={currentVoiceChannel}
                                         setCurrentVoiceChannel={setCurrentVoiceChannel}
-                                        handleUserJoined={handleUserJoined}
-                                        handleUserLeft={handleUserLeft}
+                                        handleLocalUserLeftAgora={handleLocalUserLeftAgora}
                                         muted={muted}
                                         defen={defen}
                                         handleDefen={handleDefen}
@@ -1015,6 +1123,7 @@ const App = () => {
                                         isMutedVideo={isMutedVideo}
                                         screenShareToggle={screenShareToggle}
                                         stats={stats}
+                                        connectionState={connectionState}
                                     />
                                     {
                                         voiceChat ?
@@ -1024,8 +1133,8 @@ const App = () => {
                                                 config={config}
                                                 currentUser={currentUser}
                                                 isMutedVideo={isMutedVideo}
-                                                liveUsers={liveUsers}
-                                                setLiveUsers={setLiveUsers}
+                                                remoteUsers={remoteUsers}
+                                                setRemoteUsers={setRemoteUsers}
                                                 currentAgoraUID={currentAgoraUID}
                                             />
                                             :
@@ -1039,18 +1148,18 @@ const App = () => {
                                             />
 
                                     }
-                                </React.Fragment>
+                                </Fragment>
                             }
                         />
                         <Route
                             path='/channels/@me'
                             element={
-                                <React.Fragment>
+                                <Fragment>
                                     <FriendMenu friendList={friendList} currentUser={currentUser} friendIds={friendIds} signOut={signOut} setCurrentUser={setCurrentUser} currentPrivateChannel={currentPrivateChannel} handleOpenFriend={handleOpenFriend} handleCurrentPrivateChannel={handleCurrentPrivateChannel} muted={muted}
                                         defen={defen} handleDefen={handleDefen}
                                         handleVideoMuted={handleVideoMuted} />
                                     <FriendBody friendList={friendList} currentUser={currentUser} friendIds={friendIds} currentPrivateChannel={currentPrivateChannel} handleCurrentPrivateChannel={handleCurrentPrivateChannel} channelRef={channelRef} privateMessages={privateMessages} currentPrivateMessage={currentPrivateMessage} handlePrivateChatInfo={handlePrivateChatInfo} handleAddPrivateMessage={handleAddPrivateMessage} />
-                                </React.Fragment>
+                                </Fragment>
                             } />
 
                     </Route>
