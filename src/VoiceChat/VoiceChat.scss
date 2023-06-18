@@ -1,137 +1,338 @@
 @import "../App.scss";
 
 .voicechat-container {
-	display: flex;
-	flex: 1;
-	flex-direction: column;
 	background: #121212;
+	min-width: 0;
+	min-height: 0;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	position: relative;
+	overflow: hidden;
+	-webkit-box-flex: 1;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
 
 	&:hover {
-		.voicechat-header {
-			transition: all 0.5s;
-			opacity: 1;
-		}
-		.voicechat-footer {
+		.voicechat-control {
 			transition: all 0.5s;
 			opacity: 1;
 		}
 	}
 
-	.voicechat-header {
-		opacity: 0;
-		flex: 0 0 57px;
-		padding: 0 20px 0 20px;
-		background: transparent;
-		border-bottom: 1px solid darken($menu-bg, 2.5%);
-		align-items: center;
-		box-shadow: 0 1px 0 darken($channels-bg, 4.1%),
-			inset 0 -1px 0 rgba(#000, 0.1);
-		transition: background 0.15s ease;
-
-		position: relative;
+	.voicechat-wrapper {
 		display: -webkit-box;
 		display: -ms-flexbox;
 		display: flex;
-		-webkit-box-align: center;
-		-ms-flex-align: center;
-		align-items: center;
-		min-width: 0;
-		width: 100%;
+		position: relative;
 		-webkit-box-flex: 0;
 		-ms-flex: 0 0 auto;
-		// flex: 0 0 auto;
-		// height: 48px;
-		// padding: 0 8px;
-		font-size: 16px;
-		line-height: 20px;
-		cursor: default;
+		flex: 0 0 auto;
+		z-index: 2;
+		height: 100%;
 
-		.voicechat-header-title {
-			position: relative;
+		.callContainer {
 			-webkit-box-flex: 1;
 			-ms-flex: 1 1 auto;
 			flex: 1 1 auto;
-			display: -webkit-box;
-			display: -ms-flexbox;
-			display: flex;
-			-webkit-box-align: center;
-			-ms-flex-align: center;
-			align-items: center;
-			min-width: 0;
 			overflow: hidden;
-		}
-	}
 
-	.voicechat-content {
-		height: 100%;
-		height: 100%;
-		width: 100%;
-		margin-top: -57px;
-		position: relative;
-		display: -webkit-box;
-		display: -ms-flexbox;
-		-webkit-box-align: center;
-		-ms-flex-align: center;
-		align-items: center;
-		-webkit-box-pack: center;
-		-ms-flex-pack: center;
-		justify-content: center;
-
-		.voicechat-list {
-			inset: 64px 0px 56px 8px;
-			contain: layout;
-			position: absolute;
-			display: grid;
-			grid-template-columns: minmax(0, 1fr);
-
-			// .voicechat-tile {
-			// 	position: relative;
-			// 	width: 500px;
-			// 	margin: 0 auto;
-			// 	padding: 20px;
-
-			// 	width: 100%;
-			// 	height: 100%;
-			// 	display: -webkit-box;
-			// 	display: -ms-flexbox;
-			// 	display: flex;
-			// 	-ms-flex-wrap: nowrap;
-			// 	flex-wrap: nowrap;
-			// 	-webkit-box-pack: center;
-			// 	-ms-flex-pack: center;
-			// 	justify-content: center;
-			// 	-webkit-box-align: center;
-			// 	-ms-flex-align: center;
-			// 	align-items: center;
-			// }
-
-			.voicechat-tile {
-				position: relative;
-				max-width: 1024px;
-				max-height: 768px;
-				margin: 0 auto;
-				border-radius: 8px;
-				overflow: hidden;
-			}
-			.voicechat-tile video {
-				width: 100%;
+			.root {
 				height: 100%;
-				display: block;
+				width: 100%;
 				position: relative;
-				left: 0;
-				top: 0;
-				opacity: 1;
+				display: -webkit-box;
+				display: -ms-flexbox;
+				display: flex;
+				-webkit-box-align: center;
+				-ms-flex-align: center;
+				align-items: center;
+				-webkit-box-pack: center;
+				-ms-flex-pack: center;
+				justify-content: center;
+
+				.videoGridWrapper {
+					-ms-flex-item-align: stretch;
+					align-self: stretch;
+
+					-webkit-box-orient: horizontal;
+					-webkit-box-direction: normal;
+					-ms-flex-direction: row;
+					flex-direction: row;
+
+					display: -webkit-box;
+					display: -ms-flexbox;
+					display: flex;
+
+					-webkit-box-align: center;
+					-ms-flex-align: center;
+					align-items: center;
+
+					-webkit-box-pack: center;
+					-ms-flex-pack: center;
+					justify-content: center;
+
+					-ms-flex-wrap: nowrap;
+					flex-wrap: nowrap;
+
+					flex: 1 1 auto;
+
+					.voicechat-list {
+						inset: 5% 0px 5% 8px;
+						contain: layout;
+						position: absolute;
+						width: 100%;
+						height: 100%;
+						overflow: hidden;
+
+						display: grid;
+						grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+
+						.tile {
+							margin-right: 8px;
+							margin-bottom: 8px;
+							border-radius: 8px;
+							overflow: hidden;
+							width: 100%;
+							height: 100%;
+							background
+
+							.outer {
+								position: relative;
+								width: 100%;
+								padding-top: 56.25%;
+
+								.inner {
+									position: absolute;
+									top: 0;
+									right: 0;
+									bottom: 0;
+									left: 0;
+
+									.wrapper-tile {
+										display: -webkit-box;
+										display: -ms-flexbox;
+										display: flex;
+										position: relative;
+										height: 100%;
+
+										.tile-idle {
+											display: -webkit-box;
+											display: -ms-flexbox;
+											display: flex;
+											-webkit-box-flex: 1;
+											-ms-flex: 1 1 100%;
+											flex: 1 1 100%;
+											position: relative;
+											cursor: pointer;
+
+											position: relative;
+											background-color: var(--primary-700);
+											border-radius: 8px;
+											-webkit-box-sizing: border-box;
+											box-sizing: border-box;
+											overflow: hidden;
+										}
+									}
+								}
+							}
+						}
+					}
+
+					.voicechat-tile video {
+						width: 100%;
+						height: 100%;
+						display: block;
+						position: relative;
+						left: 0;
+						top: 0;
+						opacity: 1;
+						object-fit: cover;
+					}
+
+					.voicechat-tile:before {
+						content: "";
+						position: absolute;
+						background: rgba(0, 0, 0, 0.5);
+						border-radius: 8px;
+						top: 0;
+						right: 0;
+						bottom: 0;
+						left: 0;
+					}
+
+					.tileChild {
+						-webkit-box-flex: 1;
+						-ms-flex: 1 1 100%;
+						flex: 1 1 100%;
+						display: -webkit-box;
+						display: -ms-flexbox;
+						display: flex;
+
+						.videoWrapper {
+							position: relative;
+							overflow: hidden;
+							width: 100%;
+							height: 100%;
+						}
+
+						.overlayContainer {
+							position: absolute;
+							left: 0;
+							right: 0;
+							bottom: 0;
+							top: 0;
+							margin: 8px;
+							-webkit-transition: opacity 0.2s ease-in-out;
+							transition: opacity 0.2s ease-in-out;
+
+							.overlayTop {
+								left: 0;
+								display: inline-block;
+							}
+
+							.overlayBottom {
+								position: absolute;
+								bottom: 0;
+								left: 0;
+								right: 0;
+								display: -webkit-box;
+								display: -ms-flexbox;
+								display: flex;
+								-webkit-box-align: center;
+								-ms-flex-align: center;
+								align-items: center;
+								-webkit-box-pack: justify;
+								-ms-flex-pack: justify;
+								justify-content: space-between;
+								line-height: 0;
+								pointer-events: none;
+
+								.overlayTitle {
+									border-radius: 8px;
+									padding: 6px 12px;
+									-webkit-box-flex: 0;
+									-ms-flex: 0 1 auto;
+									flex: 0 1 auto;
+									margin-right: 8px;
+									display: -webkit-box;
+									display: -ms-flexbox;
+									display: flex;
+									-webkit-box-align: center;
+									-ms-flex-align: center;
+									align-items: center;
+									min-width: 0;
+								}
+
+								.statusContainer {
+									-webkit-box-flex: 0;
+									-ms-flex: 0 0 auto;
+									flex: 0 0 auto;
+									display: -webkit-box;
+									display: -ms-flexbox;
+									display: flex;
+									-webkit-box-align: center;
+									-ms-flex-align: center;
+									align-items: center;
+								}
+							}
+						}
+					}
+				}
 			}
 
-			.voicechat-tile:before {
-				content: "";
+			.voicechat-control {
+				pointer-events: none;
 				position: absolute;
-				background: rgba(0, 0, 0, 0.5);
-				border-radius: 8px;
 				top: 0;
 				right: 0;
 				bottom: 0;
 				left: 0;
+				padding: 0 16px 16px;
+				display: -webkit-box;
+				display: -ms-flexbox;
+				display: flex;
+				-webkit-box-orient: vertical;
+				-webkit-box-direction: normal;
+				-ms-flex-direction: column;
+				flex-direction: column;
+				-webkit-box-pack: justify;
+				-ms-flex-pack: justify;
+				justify-content: space-between;
+				z-index: 1;
+				opacity: 0;
+
+				.gradient-top {
+					flex: 0 0 57px;
+					padding: 0 20px 0 20px;
+					background: transparent;
+					border-bottom: 1px solid darken($menu-bg, 2.5%);
+					align-items: center;
+					box-shadow: 0 1px 0 darken($channels-bg, 4.1%),
+						inset 0 -1px 0 rgba(#000, 0.1);
+					transition: background 0.15s ease;
+
+					position: relative;
+					display: -webkit-box;
+					display: -ms-flexbox;
+					display: flex;
+					-webkit-box-align: center;
+					-ms-flex-align: center;
+					align-items: center;
+					min-width: 0;
+					width: 100%;
+					-webkit-box-flex: 0;
+					-ms-flex: 0 0 auto;
+					// flex: 0 0 auto;
+					// height: 48px;
+					// padding: 0 8px;
+					font-size: 16px;
+					line-height: 20px;
+					cursor: default;
+
+					.voicechat-header-title {
+						position: relative;
+						-webkit-box-flex: 1;
+						-ms-flex: 1 1 auto;
+						flex: 1 1 auto;
+						display: -webkit-box;
+						display: -ms-flexbox;
+						display: flex;
+						-webkit-box-align: center;
+						-ms-flex-align: center;
+						align-items: center;
+						min-width: 0;
+						overflow: hidden;
+					}
+				}
+
+				.gradient-bottom {
+					flex: 0 0 57px;
+					padding: 0 20px 0 20px;
+					background: transparent;
+					border-bottom: 1px solid #2b2d31;
+					align-items: center;
+					box-shadow: 0 1px 0 #212326, inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+					transition: background 0.15s ease;
+					position: relative;
+					display: -webkit-box;
+					display: -ms-flexbox;
+					display: flex;
+					-webkit-box-align: center;
+					-ms-flex-align: center;
+					align-items: center;
+					min-width: 0;
+					width: 100%;
+					-webkit-box-flex: 0;
+					-ms-flex: 0 0 auto;
+					font-size: 16px;
+					line-height: 20px;
+					cursor: default;
+				}
 			}
 		}
 	}

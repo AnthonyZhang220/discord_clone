@@ -332,7 +332,7 @@ export default function Chat({ currentUser, currentMessage, currentChannel, hand
                                 </ListItemButton>
                             </ListItem>
                 }
-            </Fragment >
+            </Fragment>
         )
     }, [chatList])
 

@@ -25,7 +25,7 @@ function VideoPlayer({ remoteUser, currentAgoraUID }) {
 
     return (
         <React.Fragment>
-            <video autoPlay ref={videoRef} style={{ position: "relative", opacity: 1, left: 0, top: 0 }} />
+            <video autoPlay ref={videoRef} className="video" />
             <audio autoPlay ref={audioRef} />
         </React.Fragment>
     )
