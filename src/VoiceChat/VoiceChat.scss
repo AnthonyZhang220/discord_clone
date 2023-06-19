@@ -82,162 +82,138 @@
 					flex: 1 1 auto;
 
 					.voicechat-list {
-						inset: 5% 0px 5% 8px;
 						contain: layout;
-						position: absolute;
 						width: 100%;
-						height: 100%;
 						overflow: hidden;
 
 						display: grid;
+						grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
 						grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
 
-						.tile {
-							margin-right: 8px;
-							margin-bottom: 8px;
-							border-radius: 8px;
-							overflow: hidden;
-							width: 100%;
-							height: 100%;
-							background
+						.voicechat-row {
+							.tile {
+								margin-right: 8px;
+								margin-bottom: 8px;
+								border-radius: 8px;
+								overflow: hidden;
 
-							.outer {
-								position: relative;
-								width: 100%;
-								padding-top: 56.25%;
+								.outer {
+									position: relative;
+									width: 100%;
+									padding-top: 56.25%;
 
-								.inner {
-									position: absolute;
-									top: 0;
-									right: 0;
-									bottom: 0;
-									left: 0;
+									.inner {
+										position: absolute;
+										top: 0;
+										right: 0;
+										bottom: 0;
+										left: 0;
 
-									.wrapper-tile {
-										display: -webkit-box;
-										display: -ms-flexbox;
-										display: flex;
-										position: relative;
-										height: 100%;
-
-										.tile-idle {
+										.wrapper-tile {
 											display: -webkit-box;
 											display: -ms-flexbox;
 											display: flex;
-											-webkit-box-flex: 1;
-											-ms-flex: 1 1 100%;
-											flex: 1 1 100%;
 											position: relative;
-											cursor: pointer;
+											height: 100%;
 
-											position: relative;
-											background-color: var(--primary-700);
-											border-radius: 8px;
-											-webkit-box-sizing: border-box;
-											box-sizing: border-box;
-											overflow: hidden;
+											.tile-idle {
+												display: -webkit-box;
+												display: -ms-flexbox;
+												display: flex;
+												-webkit-box-flex: 1;
+												-ms-flex: 1 1 100%;
+												flex: 1 1 100%;
+												position: relative;
+												cursor: pointer;
+
+												position: relative;
+												background-color: var(--primary-700);
+												border-radius: 8px;
+												-webkit-box-sizing: border-box;
+												box-sizing: border-box;
+												overflow: hidden;
+
+												.tileChild {
+													-webkit-box-flex: 1;
+													-ms-flex: 1 1 100%;
+													flex: 1 1 100%;
+													display: -webkit-box;
+													display: -ms-flexbox;
+													display: flex;
+													position: relative;
+
+													.videoWrapper {
+														position: relative;
+														overflow: hidden;
+														width: 100%;
+														height: 100%;
+													}
+
+													.overlayContainer {
+														position: absolute;
+														left: 0;
+														right: 0;
+														bottom: 0;
+														top: 0;
+														margin: 8px;
+														-webkit-transition: opacity 0.2s ease-in-out;
+														transition: opacity 0.2s ease-in-out;
+
+														.overlayTop {
+															left: 0;
+															display: inline-block;
+														}
+
+														.overlayBottom {
+															position: absolute;
+															bottom: 0;
+															left: 0;
+															right: 0;
+															display: -webkit-box;
+															display: -ms-flexbox;
+															display: flex;
+															-webkit-box-align: center;
+															-ms-flex-align: center;
+															align-items: center;
+															-webkit-box-pack: justify;
+															-ms-flex-pack: justify;
+															justify-content: space-between;
+															line-height: 0;
+															pointer-events: none;
+
+															.overlayTitle {
+																border-radius: 8px;
+																padding: 6px 12px;
+																-webkit-box-flex: 0;
+																-ms-flex: 0 1 auto;
+																flex: 0 1 auto;
+																margin-right: 8px;
+																display: -webkit-box;
+																display: -ms-flexbox;
+																display: flex;
+																-webkit-box-align: center;
+																-ms-flex-align: center;
+																align-items: center;
+																min-width: 0;
+															}
+
+															.statusContainer {
+																-webkit-box-flex: 0;
+																-ms-flex: 0 0 auto;
+																flex: 0 0 auto;
+																display: -webkit-box;
+																display: -ms-flexbox;
+																display: flex;
+																-webkit-box-align: center;
+																-ms-flex-align: center;
+																align-items: center;
+															}
+														}
+													}
+												}
+											}
 										}
 									}
-								}
-							}
-						}
-					}
-
-					.voicechat-tile video {
-						width: 100%;
-						height: 100%;
-						display: block;
-						position: relative;
-						left: 0;
-						top: 0;
-						opacity: 1;
-						object-fit: cover;
-					}
-
-					.voicechat-tile:before {
-						content: "";
-						position: absolute;
-						background: rgba(0, 0, 0, 0.5);
-						border-radius: 8px;
-						top: 0;
-						right: 0;
-						bottom: 0;
-						left: 0;
-					}
-
-					.tileChild {
-						-webkit-box-flex: 1;
-						-ms-flex: 1 1 100%;
-						flex: 1 1 100%;
-						display: -webkit-box;
-						display: -ms-flexbox;
-						display: flex;
-
-						.videoWrapper {
-							position: relative;
-							overflow: hidden;
-							width: 100%;
-							height: 100%;
-						}
-
-						.overlayContainer {
-							position: absolute;
-							left: 0;
-							right: 0;
-							bottom: 0;
-							top: 0;
-							margin: 8px;
-							-webkit-transition: opacity 0.2s ease-in-out;
-							transition: opacity 0.2s ease-in-out;
-
-							.overlayTop {
-								left: 0;
-								display: inline-block;
-							}
-
-							.overlayBottom {
-								position: absolute;
-								bottom: 0;
-								left: 0;
-								right: 0;
-								display: -webkit-box;
-								display: -ms-flexbox;
-								display: flex;
-								-webkit-box-align: center;
-								-ms-flex-align: center;
-								align-items: center;
-								-webkit-box-pack: justify;
-								-ms-flex-pack: justify;
-								justify-content: space-between;
-								line-height: 0;
-								pointer-events: none;
-
-								.overlayTitle {
-									border-radius: 8px;
-									padding: 6px 12px;
-									-webkit-box-flex: 0;
-									-ms-flex: 0 1 auto;
-									flex: 0 1 auto;
-									margin-right: 8px;
-									display: -webkit-box;
-									display: -ms-flexbox;
-									display: flex;
-									-webkit-box-align: center;
-									-ms-flex-align: center;
-									align-items: center;
-									min-width: 0;
-								}
-
-								.statusContainer {
-									-webkit-box-flex: 0;
-									-ms-flex: 0 0 auto;
-									flex: 0 0 auto;
-									display: -webkit-box;
-									display: -ms-flexbox;
-									display: flex;
-									-webkit-box-align: center;
-									-ms-flex-align: center;
-									align-items: center;
 								}
 							}
 						}
