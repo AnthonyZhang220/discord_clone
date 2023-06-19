@@ -38,7 +38,7 @@ const VoiceChat = ({ currentVoiceChannel, isMutedVideo, currentUser, remoteUsers
                             <Box className="voicechat-list">
                                 {remoteUsers !== null && remoteUsers?.length != 0 && remoteUsers?.map((remoteUser) =>
                                     <Box key={remoteUser.uid} className="voicechat-row" sx={{ backgroundColor: bannerColor, transition: "background-color 0.1s" }} >
-                                        <Box className="tile">
+                                        <Box className="tile" >
                                             <Box className="outer">
                                                 <Box className="inner">
                                                     <Box className="wrapper-tile">
