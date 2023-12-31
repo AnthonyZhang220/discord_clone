@@ -1,0 +1,15 @@
+<svg width="346" height="54" viewBox="0 0 346 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="346" height="54" fill="#E5E5E5"/>
+<rect width="879" height="1663" transform="translate(-99 -227)" fill="white"/>
+<rect x="0.845947" width="345" height="54" rx="10" fill="#1877F2"/>
+<g clip-path="url(#clip0_0_1)">
+<rect width="24" height="24" transform="translate(15.8459 15)" fill="#1877F2"/>
+<path d="M39.3459 27.0699C39.3459 20.7186 34.1972 15.5699 27.8459 15.5699C21.4947 15.5699 16.3459 20.7186 16.3459 27.0699C16.3459 32.8099 20.5513 37.5674 26.0491 38.4302V30.3941H23.1292V27.0699H26.0491V24.5363C26.0491 21.6541 27.7659 20.0621 30.3928 20.0621C31.651 20.0621 32.967 20.2867 32.967 20.2867V23.1168H31.5169C30.0883 23.1168 29.6428 24.0032 29.6428 24.9127V27.0699H32.8323L32.3224 30.3941H29.6428V38.4302C35.1406 37.5674 39.3459 32.8099 39.3459 27.0699Z" fill="white"/>
+</g>
+<text fill="white" xml:space="preserve" style="white-space: pre" font-family="Helvetica" font-size="20" font-weight="bold" letter-spacing="0em"><tspan x="54.8459" y="33.3994">Continue with Facebook</tspan></text>
+<defs>
+<clipPath id="clip0_0_1">
+<rect width="24" height="24" fill="white" transform="translate(15.8459 15)"/>
+</clipPath>
+</defs>
+</svg>
