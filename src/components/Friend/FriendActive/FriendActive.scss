@@ -1,0 +1,30 @@
+.friend-active {
+	-webkit-box-flex: 0;
+	-ms-flex: 0 1 30%;
+	flex: 0 1 30%;
+	min-width: 360px;
+	max-width: 420px;
+
+	.friend-active-container {
+		height: 100%;
+		background-color: #2b2d31;
+
+		.friend-active-wrapper {
+			padding: 16px;
+			height: 100%;
+			border-left: 1px solid var(--background-modifier-accent);
+			margin-left: 2px;
+			overflow: hidden scroll;
+			padding-right: 8px;
+            
+			.friend-active-memberlist {
+				width: 240px;
+				padding: 0 0 20px;
+				-webkit-box-flex: 0;
+				-ms-flex: 0 0 auto;
+				flex: 0 0 auto;
+				height: auto;
+			}
+		}
+	}
+}
