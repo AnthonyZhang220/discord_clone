@@ -10,7 +10,7 @@ import { lighten, styled } from '@mui/material/styles';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import FriendIcon from '../Friend/FriendBody/friend.svg'
 import { FunctionTooltip } from "../CustomUIComponents";
-import StatusList from "../../utils/StatusList";
+import StatusList from "../StatusList";
 
 import "./FriendMenu.scss";
 import { QuerySnapshot, onSnapshot, query, collection, where } from "firebase/firestore";

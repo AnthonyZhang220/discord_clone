@@ -14,8 +14,8 @@ import { useDispatch, useSelector } from "react-redux";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { signOut } from "../../../../utils/authentication";
 import ColorThief from "colorthief"
-import StatusList from "../../../../utils/StatusList";
-import { statusFormat } from "../../../../utils/statusFormat";
+import StatusList from "../../../StatusList";
+import { statusFormat } from "../../../../utils/formatter";
 import { changeStatus } from "../../../../utils/authentication";
 import { setUserDetailPopover } from "../../../../redux/features/popoverSlice";
 

@@ -28,7 +28,7 @@ import VoiceChat from './components/Chat/VoiceChat/VoiceChat'
 import { useDispatch, useSelector } from 'react-redux'
 import ThemeContextProvider from './contexts/ThemeContextProvider'
 import CssBaseline from '@mui/material/CssBaseline';
-import { convertDateDivider } from './utils/dateConverter'
+import { convertDateDivider } from './utils/formatter'
 import { listenToAuthStateChange } from './utils/authentication'
 
 import "./App.scss";

@@ -3,7 +3,7 @@ import { Box, FormControl, InputBase, FormHelperText, List, ListItemButton, List
 import ChatIcon from '@mui/icons-material/Chat';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { FunctionTooltip, FriendMessageIconButton } from '../CustomUIComponents';
-import StatusList from '../../utils/StatusList';
+import StatusList from '../StatusList';
 
 
 import "./FriendList.scss"

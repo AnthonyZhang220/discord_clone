@@ -22,21 +22,4 @@ const channelSlice = createSlice({
 })
 
 export const { setNewChannelInfo, setChannelList, setVoiceChannelList } = channelSlice.actions;
-
-export const handleCreateChannel = (currentServer, newChannelInfo) => async (dispatch) => {
-    await addDoc(collection(db, "channels"), {
-        name: newChannelInfo.channelName,
-        serverRef: currentServer.uid,
-        createdAt: Timestamp.fromDate(new Date()),
-        messages: [],
-    }).then(() => {
-        dispatch(setNewChannelInfo({ channelName: "" }))
-        // handleChannelModalClose();
-
-    })
-
-}
-
-
-
 export default channelSlice.reducer;

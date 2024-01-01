@@ -22,7 +22,7 @@ import { FunctionTooltip } from '../../CustomUIComponents';
 import PrivateChat from '../../PrivateChat/PrivateChat';
 import { AlternateEmailSharp } from '@mui/icons-material';
 import AddFriend from '../../AddFriend/AddFriend';
-import StatusList from '../../../utils/StatusList';
+import StatusList from '../../StatusList';
 
 
 const FriendBody = ({ currentPrivateChannel, user, privateMessages, handleCurrentPrivateChannel, friendList, handleAddPrivateMessage, }) => {

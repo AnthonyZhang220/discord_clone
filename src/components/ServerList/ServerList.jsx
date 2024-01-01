@@ -14,28 +14,28 @@ import { CreateServerDialog, JoinServerDialog, ServerDialog } from '../Modals/Mo
 
 import "./ServerList.scss"
 import { setCreateServerModal } from '../../redux/features/modalSlice';
+import { setServerList } from '../../redux/features/serverSlice';
 
-const ServerList = ({ user, handleCurrentServer, currentServer, setCurrentServer, file, setFile, currentChannel }) => {
+const ServerList = ({ user }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { createServerModal, createServerFormModal, joinServerModal } = useSelector((state) => state.modal)
-    const [serverList, setServerList] = useState([]);
-
+    const { serverList } = useSelector(state => state.server)
 
     // Get list of servers that belong to the current user
     useEffect(() => {
         if (user) {
-            const q = query(collection(db, 'servers'), where('members', 'array-contains', user.uid));
+            const q = query(collection(db, 'servers'), where('members', 'array-contains', user.serverId));
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 const userServers = [];
                 snapshot.forEach((doc) => {
                     userServers.push({
-                        name: doc.data().name,
+                        serverName: doc.data().serverName,
                         serverPic: doc.data().serverPic,
-                        uid: doc.id,
+                        serverId: doc.id,
                     });
                 });
-                setServerList(userServers);
+                dispatch(setServerList(userServers))
             });
         }
 
@@ -65,14 +65,14 @@ const ServerList = ({ user, handleCurrentServer, currentServer, setCurrentServer
                     </ServerNameTooltip>
                 </Box>
                 <Divider variant="fullWidth" flexItem sx={{ backgroundColor: "#35363c", m: "8px", borderRadius: "1px", height: "2px" }} />
-                {serverList.map(({ name, serverPic, uid }) => (
-                    <Box className={`server focusable ${uid === currentServer.uid && !friendButton ? "active" : ""} ${mouseDown ? "transformDown" : ""}`} role="button" key={uid} onMouseDown={() => setMouseDown(true)} onClick={() => {
-                        handleCurrentServer(name, uid);
+                {serverList.map(({ serverName, serverPic, serverId }) => (
+                    <Box className={`server focusable ${serverId === selectedServer.serverId && !friendButton ? "active" : ""} ${mouseDown ? "transformDown" : ""}`} role="button" key={serverId} onMouseDown={() => setMouseDown(true)} onClick={() => {
+                        handleSelectedServer(serverName, serverId);
                         setFriendButton(false);
                     }} >
                         <ServerNameTooltip title={
                             <React.Fragment>
-                                <Typography variant="body1" sx={{ m: 0.5 }} >{name}</Typography>
+                                <Typography variant="body1" sx={{ m: 0.5 }} >{serverName}</Typography>
                             </React.Fragment>
                         } placement="right">
                             <Avatar className="server-icon" src={serverPic} />
