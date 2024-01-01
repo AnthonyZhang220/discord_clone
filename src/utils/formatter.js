@@ -1,3 +1,22 @@
+//Change the format of status text
+export const statusFormat = (status) => {
+    if (status === "online") {
+        return "Online"
+    }
+    if (status === "offline") {
+        return "Offline"
+    }
+    if (status === "donotdisturb") {
+        return "Do Not Disturb"
+    }
+    if (status === "invisible") {
+        return "Invisible"
+    }
+    if (status === "idle") {
+        return "Idle"
+    }
+}
+
 export const convertDate = (date) => {
     const newDate = new Date(date.seconds * 1000)
     const formattedDate = newDate.toLocaleDateString('en-US', { month: "2-digit", day: "2-digit", year: "2-digit" })

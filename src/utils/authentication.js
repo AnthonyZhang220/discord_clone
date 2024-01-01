@@ -4,7 +4,7 @@ import { auth, db } from "../firebase";
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { FacebookAuthProvider, TwitterAuthProvider, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
 import { redirect } from 'react-router-dom';
-import { getSelectStore } from "./getSelectStore";
+import { getSelectStore } from "./userSelectStore";
 import { setUser } from "../redux/features/authSlice";
 
 

@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useRef, useEffect } from 'react'
 import { Box, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography, Avatar, Badge, ListSubheader, Popover, Divider } from '@mui/material'
 import { styled } from '@mui/material/styles';
-import StatusList from '../../../../../utils/StatusList';
+import StatusList from '../../../../StatusList';
 import { lighten } from '@mui/material/styles';
 import ColorThief from "colorthief"
 

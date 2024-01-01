@@ -2,6 +2,11 @@ import store from "../redux/store";
 import { addDoc, updateDoc } from "firebase/firestore";
 import { uploadBytesResumable, uploadBytes, ref as storageRef, getDownloadURL } from 'firebase/storage';
 import { setNewServerInfo, setIsLoading } from "../redux/features/serverSlice";
+
+
+
+
+
 //add new Server with handleUploadServerImage();
 export const handleCreateServer = async (user, newServerInfo) => {
     dispatch(setIsLoading(true));

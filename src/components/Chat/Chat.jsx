@@ -46,7 +46,7 @@ import './Chat.scss'
 import { Outlet } from 'react-router-dom';
 import { FunctionTooltip } from '../CustomUIComponents';
 import { Message } from '@mui/icons-material';
-import { convertDate, convertDateDivider, convertTime } from '../../utils/dateConverter';
+import { convertDate, convertDateDivider, convertTime } from '../../utils/formatter';
 import { useSelector } from 'react-redux';
 
 // const URL = 'http://localhost:3000';

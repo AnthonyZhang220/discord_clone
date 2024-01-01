@@ -43,7 +43,7 @@ import Snackbar from '@mui/material/Snackbar';
 import { Alert } from '@mui/material';
 import { MenuListItemButton } from '../CustomUIComponents';
 
-import StatusList from '../../utils/StatusList';
+import StatusList from '../StatusList';
 import './PrivateChat.scss'
 
 import { Outlet } from 'react-router-dom';

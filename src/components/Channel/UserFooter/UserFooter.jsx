@@ -10,12 +10,12 @@ import MicOffIcon from '@mui/icons-material/MicOff';
 
 import IconButton from '@mui/material/IconButton';
 import SettingsIcon from '@mui/icons-material/Settings';
-import StatusList from '../../../utils/StatusList';
+import StatusList from '../../StatusList';
 import { UserDetailPopover } from "./UserDetailPopover/UserDetailPopover";
 import "./UserFooter.scss"
 import { useDispatch, useSelector } from "react-redux";
 import { setUserDetailPopover } from "../../../redux/features/popoverSlice";
-import { toggleVoice, toggleHeadphone } from "../../../utils/voiceControl";
+import { toggleVoice, toggleHeadphone } from "../../../utils/voiceControlToggles";
 
 
 const UserFooter = () => {
