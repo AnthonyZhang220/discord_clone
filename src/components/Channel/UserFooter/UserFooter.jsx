@@ -22,7 +22,7 @@ const UserFooter = () => {
 
     const userAvatarRef = useRef(null);
     const dispatch = useDispatch();
-    const { isMuted, isDeafen } = useSelector((state) => state.control)
+    const { isMuted, isDeafen } = useSelector((state) => state.voiceChat)
     const { user } = useSelector((state) => state.auth)
 
     return (
@@ -50,7 +50,7 @@ const UserFooter = () => {
                     isMuted ?
                         <Tooltip title="Unmute" placement='top'>
                             <IconButton className="user-footer-button" aria-label="Mute" color="error" onClick={() => {
-                                dispatch(toggleVoice(isMuted))
+                                toggleVoice()
                             }}>
                                 <MicOffIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
@@ -58,7 +58,7 @@ const UserFooter = () => {
                         :
                         <Tooltip title="Mute" placement='top'>
                             <IconButton className="user-footer-button" aria-label="Mute" color="success" onClick={() => {
-                                dispatch(toggleVoice(isMuted))
+                                toggleVoice()
                             }} >
                                 <MicIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
@@ -68,7 +68,7 @@ const UserFooter = () => {
                     isDeafen ?
                         <Tooltip title="Undefen" placement='top'>
                             <IconButton className="user-footer-button" aria-label="Defen" color="error" onClick={() =>
-                                dispatch(toggleHeadphone(isDeafen))
+                                toggleHeadphone()
                             } >
                                 <HeadsetOffIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
@@ -76,7 +76,7 @@ const UserFooter = () => {
                         :
                         <Tooltip title="Defen" placement='top'>
                             <IconButton className="user-footer-button" aria-label="Defen" color="success" onClick={() =>
-                                dispatch(toggleHeadphone(isDeafen))
+                                toggleHeadphone()
                             }
                             >
                                 <HeadsetIcon sx={{ height: 20, width: 20 }} />

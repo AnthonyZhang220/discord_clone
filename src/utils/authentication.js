@@ -5,8 +5,8 @@ import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { FacebookAuthProvider, TwitterAuthProvider, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
 import { redirect } from 'react-router-dom';
 import { getSelectStore } from "./userSelectStore";
-import { setUser } from "../redux/features/authSlice";
-
+import { setIsLoggedIn, setUser } from "../redux/features/authSlice";
+import { getBannerColor } from "./getBannerColor";
 
 
 const GoogleProvider = new GoogleAuthProvider();
@@ -46,27 +46,31 @@ export async function listenToAuthStateChange() {
 
                 if (userDoc.exists()) {
                     const userData = userDoc.data();
+                    console.log("userData", userData)
                     store.dispatch(setUser(userData))
                 } else {
                     const userDoc = await setDoc(userRef, {
                         displayName: user.displayName,
                         email: user.email ? user.email : "",
                         profileURL: user.photoURL,
-                        userId: user.uid,
+                        id: user.uid,
                         createdAt: Timestamp.fromDate(new Date()),
                         status: "online",
                         friends: [],
+                        bannerColor: await getBannerColor(user.photoURL)
                     })
                     if (userDoc) {
                         store.dispatch(setUser(userDoc))
                     }
                 }
                 getSelectStore(user.uid)
-                redirect("/channels")
+                store.dispatch(setIsLoggedIn(true))
+                return redirect("/channels")
             } else {
                 updateDoc(doc(db, "users", user.uid))
                 store.dispatch(setUser(null))
-                redirect("/")
+                store.dispatch(setIsLoggedIn(false))
+                return redirect("/")
             }
         })
     } catch (error) {
@@ -86,6 +90,7 @@ export async function signOut() {
 
             if (updateSuccess) {
                 store.dispatch(setUser({ displayName: null, profileURL: null, uid: null, createdAt: null }))
+                store.dispatch(setIsLoggedIn(false))
                 return redirect("/")
             }
         }

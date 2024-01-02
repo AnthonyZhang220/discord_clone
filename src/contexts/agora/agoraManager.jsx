@@ -3,6 +3,8 @@ import { Box } from "@mui/material";
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { IMicrophoneAudioTrack, ICameraVideoTrack } from "agora-rtc-react";
 import { AgoraConfig } from "../../Agora";
+import { setIsVoiceChatConnected, setRemoteUsers } from "../../redux/features/voiceChatSlice";
+import { useSelector } from "react-redux";
 
 const AgoraContext = createContext(null);
 
@@ -21,18 +23,35 @@ export const AgoraManager = ({ config, children }) => {
     const agoraEngine = useRTCClient();
     const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack();
     const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack();
-    const remoteUsers = useRemoteUsers();
 
-    const [role, setRole] = useState("host");
+    const remoteUsers = useRemoteUsers();
+    const { isMuted, isDeafen, isVoiceChatConnected } = useSelector(state => state.voiceChat)
+    const { voiceChatChannel } = useSelector(state => state.channel)
 
     usePublish([localMicrophoneTrack, localCameraTrack]);
 
     const { isConnected } = useJoin({
         appid: config.appid,
         channel: config.channelName,
-        token: config, rtcToken,
+        token: config.rtcToken,
         uid: config.uid,
     })
+
+    useEffect(() => {
+        if (isConnected) {
+            dispatch(setIsVoiceChatConnected(true))
+        } else {
+            dispatch(setIsVoiceChatConnected(false))
+        }
+    }, [isConnected])
+
+    useEffect(() => {
+        if (remoteUsers) {
+            dispatch(setRemoteUsers(remoteUsers))
+        } else {
+            dispatch(setRemoteUsers([]))
+        }
+    }, [remoteUsers])
 
     useClientEvent(agoraEngine, "user-joined", (user) => {
 
@@ -62,7 +81,7 @@ export const AgoraManager = ({ config, children }) => {
             {children}
             <Box id="videos">
                 <Box className="vid" style={{ height: 300, width: 600 }}>
-                    <LocalVideoTrack track={localCameraTrack} play={true} />
+                    <LocalVideoTrack track={localCameraTrack} play={true} muted={isMuted} />
                 </Box>
                 {remoteUsers.map((remoteUser) => (
                     <Box className="vid" style={{ height: 300, width: 600 }} key={remoteUser.uid}>

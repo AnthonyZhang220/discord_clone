@@ -1,10 +1,10 @@
 import store from "../redux/store";
-import { setIsMuted, setIsCameraOn, setIsDeafen, setIsScreenSharingOn, setIsSharingOn, setIsVoiceChatConnected } from "../redux/features/controlSlice";
+import { setIsMuted, setIsCameraOn, setIsDeafen, setIsScreenSharingOn, setIsSharingOn, setIsVoiceChatConnected } from "../redux/features/voiceChatSlice";
 
-export const toggleVoice = async (isMuted) => {
+export const toggleVoice = async () => {
     const [audio, video] = localTracks
 
-    if (store.getState(isMuted) === false) {
+    if (store.getState().voiceChat.isMuted === false) {
         // Mute the local video. 
         updateFirebaseMediaStatus(currentAgoraUID, "audio", false)
         const muteSuccess = agoraEngine && await audio.setEnabled(false)
@@ -24,7 +24,7 @@ export const toggleVoice = async (isMuted) => {
 export const toggleCamera = async () => {
     const [audio, video] = localTracks
 
-    if (store.getState(isCameraOn)) {
+    if (store.getState().voiceChat.isCameraOn) {
         // Mute the local video.
         updateFirebaseMediaStatus(currentAgoraUID, "video", false)
         const turnOffCamSuccess = agoraEngine && await video.setEnabled(false);
@@ -41,17 +41,17 @@ export const toggleCamera = async () => {
     }
 }
 
-export const toggleHeadphone = async (isDeafen) => {
-    if (store.getState(isDeafen)) {
+export const toggleHeadphone = async () => {
+    if (store.getState().voiceChat.isDeafen) {
         store.dispatch(setIsDeafen(false))
     } else {
         store.dispatch(setIsDeafen(true))
     }
 }
 
-export const toggleScreenShare = async (isScreenSharingOn) => {
+export const toggleScreenShare = async () => {
 
-    if (store.getState(isScreenSharingOn) == false) {
+    if (store.getState().voiceChat.isScreenSharingOn == false) {
         const screenTrack = await AgoraRTC.createScreenVideoTrack({ displaySurface: "browser", encoderConfig: "720p_2", optimizationMode: "motion" }, "auto");
         const [video, audio] = screenTrack
         // const newScreenTrack = screenTrack.getMediaStreamTrack()

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { db } from "../../firebase";
 import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, getDocs, doc } from 'firebase/firestore';
 
-import { Avatar, Box, Button, Modal, TextField, Dialog, DialogActions, DialogContent, DialogTitle, DialogContentText, Typography, IconButton, ListItemButton, ListItemText, Divider } from '@mui/material'
+import { Avatar, Box, Typography, IconButton, Divider } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add';
 import ExploreIcon from '@mui/icons-material/Explore';
 import { ServerNameTooltip, InfoInput } from '../CustomUIComponents';
@@ -12,52 +12,45 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { CreateServerDialog, JoinServerDialog, ServerDialog } from '../Modals/Modals';
 
-import "./ServerList.scss"
+import { handleSelectServer } from '../../utils/handlers/serverHandlers';
 import { setCreateServerModal } from '../../redux/features/modalSlice';
-import { setServerList } from '../../redux/features/serverSlice';
+import { setCurrServerList } from '../../redux/features/serverSlice';
+import "./ServerList.scss"
+import { setIsDirectMessagePageOpen } from '../../redux/features/directMessageSlice';
 
-const ServerList = ({ user }) => {
+const ServerList = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { createServerModal, createServerFormModal, joinServerModal } = useSelector((state) => state.modal)
-    const { serverList } = useSelector(state => state.server)
+    const { currServerList } = useSelector(state => state.server)
+    const { user } = useSelector(state => state.auth)
+    const { selectedServer } = useSelector(state => state.userSelectStore)
+    const { isDirectMessagePageOpen } = useSelector(state => state.directMessage)
 
     // Get list of servers that belong to the current user
     useEffect(() => {
-        if (user) {
-            const q = query(collection(db, 'servers'), where('members', 'array-contains', user.serverId));
+        if (user.id) {
+            const q = query(collection(db, 'servers'), where('members', 'array-contains', user.id));
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 const userServers = [];
                 snapshot.forEach((doc) => {
                     userServers.push({
-                        serverName: doc.data().serverName,
-                        serverPic: doc.data().serverPic,
-                        serverId: doc.id,
+                        name: doc.data().name,
+                        avatar: doc.data().avatar,
+                        id: doc.id,
                     });
                 });
-                dispatch(setServerList(userServers))
+                dispatch(setCurrServerList(userServers))
             });
         }
-
-    }, [user]);
-
-    const [friendButton, setFriendButton] = React.useState(false);
-
-    const handleClickFriend = () => {
-        setFriendButton(true);
-        navigate("/channels/@me");
-    }
+    }, [user.id]);
 
     const [mouseDown, setMouseDown] = React.useState(false);
-
-    useEffect(() => {
-        console.log(dispatch)
-    }, [dispatch])
 
     return (
         <Box component='aside' className="servers">
             <Box className="servers-list">
-                <Box className={`server focusable server-friends ${friendButton ? "active" : ""}`} role="button" aria-label="Discord Friend" onClick={() => handleClickFriend()}>
+                <Box className={`server focusable server-friends ${isDirectMessagePageOpen ? "active" : ""}`} role="button" aria-label="Discord Friend" onClick={() => dispatch(setIsDirectMessagePageOpen(true))}>
                     <ServerNameTooltip title={<React.Fragment>
                         <Typography variant="body1" sx={{ m: 0.5 }} >Direct Messages</Typography>
                     </React.Fragment>} placement="right">
@@ -65,17 +58,16 @@ const ServerList = ({ user }) => {
                     </ServerNameTooltip>
                 </Box>
                 <Divider variant="fullWidth" flexItem sx={{ backgroundColor: "#35363c", m: "8px", borderRadius: "1px", height: "2px" }} />
-                {serverList.map(({ serverName, serverPic, serverId }) => (
-                    <Box className={`server focusable ${serverId === selectedServer.serverId && !friendButton ? "active" : ""} ${mouseDown ? "transformDown" : ""}`} role="button" key={serverId} onMouseDown={() => setMouseDown(true)} onClick={() => {
-                        handleSelectedServer(serverName, serverId);
-                        setFriendButton(false);
+                {currServerList.map(({ name, avatar, id }) => (
+                    <Box className={`server focusable ${id === selectedServer && !isDirectMessagePageOpen ? "active" : ""} ${mouseDown ? "transformDown" : ""}`} role="button" key={id} onMouseDown={() => setMouseDown(true)} onClick={() => {
+                        handleSelectServer(name, id);
                     }} >
                         <ServerNameTooltip title={
                             <React.Fragment>
-                                <Typography variant="body1" sx={{ m: 0.5 }} >{serverName}</Typography>
+                                <Typography variant="body1" sx={{ m: 0.5 }} >{name}</Typography>
                             </React.Fragment>
                         } placement="right">
-                            <Avatar className="server-icon" src={serverPic} />
+                            <Avatar className="server-icon" src={avatar} />
                         </ServerNameTooltip>
                     </Box>
 
