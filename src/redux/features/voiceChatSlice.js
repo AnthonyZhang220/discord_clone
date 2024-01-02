@@ -4,11 +4,13 @@ import { createSlice } from '@reduxjs/toolkit';
 const voiceChatSlice = createSlice({
     name: 'voiceChat',
     initialState: {
-        isSharingEnabled: false,
-        isMutedVideo: true,
+        isMuted: true,
+        isDeafen: false,
+        isCameraOn: false,
+        isScreenSharingOn: false,
+        isVoiceChatConnected: false,
         agoraEngine: null,
         screenShareRef: null,
-        voiceConnected: false,
         remoteUsers: [],
         localTracks: null,
         currentAgoraUID: null,
@@ -16,20 +18,27 @@ const voiceChatSlice = createSlice({
         // Add other voice chat-related state here
     },
     reducers: {
-        setSharingEnabled: (state, action) => {
-            state.isSharingEnabled = action.payload;
+        // Add other voice chat-related reducers here
+        setIsMuted: (state, action) => {
+            state.isMuted = action.payload;
         },
-        setMutedVideo: (state, action) => {
-            state.isMutedVideo = action.payload;
+        setIsDeafen: (state, action) => {
+            state.isDeafen = action.payload;
+        },
+        setIsCameraOn: (state, action) => {
+            state.isCameraOn = action.payload;
+        },
+        setIsScreenSharingOn: (state, action) => {
+            state.isScreenSharingOn = action.payload;
+        },
+        setIsVoiceChatConnected: (state, action) => {
+            state.isVoiceChatConnected = action.payload;
         },
         setAgoraEngine: (state, action) => {
             state.agoraEngine = action.payload;
         },
         setScreenShareRef: (state, action) => {
             state.screenShareRef = action.payload;
-        },
-        setVoiceConnected: (state, action) => {
-            state.voiceConnected = action.payload;
         },
         setRemoteUsers: (state, action) => {
             state.remoteUsers = action.payload;
@@ -43,16 +52,18 @@ const voiceChatSlice = createSlice({
         setScreenTrack: (state, action) => {
             state.screenTrack = action.payload;
         },
-        // Add other voice chat-related reducers here
     },
 });
 
 export const {
-    setSharingEnabled,
-    setMutedVideo,
+    setIsCameraOn,
+    setIsMuted,
+    setIsDeafen,
+    setIsSharingOn,
+    setIsVoiceChatConnected,
+    setIsScreenSharingOn,
     setAgoraEngine,
     setScreenShareRef,
-    setVoiceConnected,
     setRemoteUsers,
     setLocalTracks,
     setCurrentAgoraUID,

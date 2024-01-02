@@ -6,12 +6,12 @@ import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 
 function VoiceChatTile() {
     return (
-        <Box key={remoteUser.uid} className="voicechat-row" sx={{ backgroundColor: bannerColor, transition: "background-color 0.1s" }} >
+        <Box key={remoteUser.uid} className="voicechat-row" sx={{ transition: "background-color 0.1s" }} >
             <Box className="videoWrapper">
             </Box>
             {remoteUser.hasVideo ?
                 null :
-                <Avatar src={remoteUser.avatar} alt={remoteUser.name} sx={{ position: "absolute", left: "50%", top: "50%", width: 100, height: 100, mt: "-50px", ml: "-50px" }} imgProps={{ ref: profileRef, crossOrigin: "Anonymous" }} />
+                <Avatar src={remoteUser.avatar} alt={remoteUser.name} sx={{ position: "absolute", left: "50%", top: "50%", width: 100, height: 100, mt: "-50px", ml: "-50px" }} imgProps={{ crossOrigin: "Anonymous" }} />
             }
             <Box className="overlayContainer">
                 <Box className="overlayTop">

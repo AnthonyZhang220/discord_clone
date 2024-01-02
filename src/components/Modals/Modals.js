@@ -14,7 +14,7 @@ import { setCreateChannelModal, setCreateServerFormModal, setCreateServerModal, 
 import { copyToClip } from "../../utils/copyToClip"
 import { setNewServerInfo, setUploadFileLocationURL, setJoinServerId, setUploadServerProfileImage } from "../../redux/features/serverSlice";
 import { setNewChannelInfo } from "../../redux/features/channelSlice";
-import { handleCreateServer, handleJoinServer } from "../../utils/serverHandlers";
+import { handleCreateServer, handleJoinServer } from "../../utils/handlers/serverHandlers";
 import styled from "@emotion/styled";
 
 
@@ -123,7 +123,7 @@ export function CreateServerDialog({ createServerFormModal }) {
                             variant="outlined"
                             autoComplete='off'
                             onChange={e => dispatch(setNewServerInfo({ ...newServerInfo, serverName: e.target.value }))}
-                            placeholder={`${user.name}'s Server`}
+                            placeholder={`${user.displayName}'s Server`}
                         />
                     </FormControl>
                 </Box>
@@ -188,7 +188,7 @@ export function JoinServerDialog({ joinServerModal }) {
 //invite people
 export function InviteDialog({ inviteModal }) {
     const dispatch = useDispatch();
-    const { selectedServer } = useSelector((state) => state.userSelectStore)
+    const { currServer } = useSelector((state) => state.server)
     return (
         <Dialog className="Create-Channel-Modal" open={inviteModal} onClose={() => dispatch(setInviteModal(false))} PaperProps={{
             style: {
@@ -197,7 +197,7 @@ export function InviteDialog({ inviteModal }) {
                 width: "440px"
             }
         }}>
-            <DialogTitle sx={{ color: "#ffffff" }} variant='h3'>Invite friends to {selectedServer.serverName}</DialogTitle>
+            <DialogTitle sx={{ color: "#ffffff" }} variant='h3'>Invite friends to {currServer.name}</DialogTitle>
             <DialogContent>
                 <Box component="form">
                     <FormControl variant="standard" required fullWidth>
@@ -211,11 +211,11 @@ export function InviteDialog({ inviteModal }) {
                             name="name"
                             variant="outlined"
                             autoComplete="off"
-                            defaultValue={selectedServer.id}
+                            defaultValue={currServer.id}
                             readOnly
                             endAdornment={
                                 <InputAdornment position="end">
-                                    <Button onClick={() => copyToClip(selectedServer.id)}>Copy</Button>
+                                    <Button onClick={() => copyToClip(currServer.id)}>Copy</Button>
                                 </InputAdornment>
                             }
                         />

@@ -2,23 +2,13 @@ import React, { useEffect, useState, useRef, useCallback, Fragment } from 'react
 import Chat from './components/Chat/Chat'
 import ServerList from './components/ServerList/ServerList'
 import Channel from './components/Channel/Channel'
-import FriendMenu from './components/FriendMenu/FriendMenu'
-
 import { Box } from '@mui/system'
 import { Routes, Route, useNavigate } from 'react-router-dom'
-
 import LoginPage, { ResetPasswordPage } from './components/LoginPage/LoginPage'
 import { RegisterPage } from './components/LoginPage/LoginPage'
 import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, setDoc, doc, getDocs, QuerySnapshot, updateDoc, getDoc, documentId, orderBy, limitToLast, arrayRemove } from 'firebase/firestore';
-import { storage } from './firebase'
 import { db, auth, realtimedb } from './firebase'
-import { ref as realtimeRef, set, onValue, update, get } from 'firebase/database'
-
-
-
 import { Outlet } from 'react-router-dom'
-import FriendBody from './components/Friend/FriendBody/FriendBody'
-
 import AgoraRTC from 'agora-rtc-sdk-ng';
 import { AgoraClient, AgoraConfig } from './Agora'
 // import { RtcRole } from "agora-token"
@@ -30,23 +20,23 @@ import ThemeContextProvider from './contexts/ThemeContextProvider'
 import CssBaseline from '@mui/material/CssBaseline';
 import { convertDateDivider } from './utils/formatter'
 import { listenToAuthStateChange } from './utils/authentication'
+import DirectMessageMenu from "./components/DirectMessage/DirectMessageMenu/DirectMessageMenu";
+import DirectMessageBody from './components/DirectMessage/DirectMessageBody/DirectMessageBody';
+import DirectMessageHeader from './components/DirectMessage/DirectMessageHeader/DirectMessageHeader'
+
 
 import "./App.scss";
 
 function App() {
     const dispatch = useDispatch()
-    const { user, selectedServer, selectedChannel } = useSelector((state) => state.auth)
-    const [imageDir, setImageDir] = useState("")
+    const { user } = useSelector((state) => state.auth)
     const [friendList, setFriendList] = useState([])
 
     useEffect(() => {
         listenToAuthStateChange();
+        console.log("user App", user)
         return listenToAuthStateChange;
     }, [auth])
-
-    // add new server image
-    const handleUploadServerImage = async () => {
-    }
 
     const [friendIds, setFriendIds] = useState([]);
 
@@ -177,53 +167,6 @@ function App() {
     }, [currentVoiceChannel.uid])
 
     const [connectionState, setConnectionState] = useState({ state: null, reason: null })
-
-    useEffect(() => {
-        agoraEngine.on("token-privilege-will-expire", async function () {
-            const token = await fetchToken(config);
-            setConfig({ ...config, token: token })
-            await agoraEngine.renewToken(config.token);
-        });
-        //enabled volume indicator
-        agoraEngine.enableAudioVolumeIndicator();
-
-        agoraEngine.on("volume-indicator", (volumes) => {
-        })
-        agoraEngine.on("user-published", (user, mediaType) => {
-            console.log(user.uid + "published");
-            handleUserSubscribe(user, mediaType)
-            handleUserPublishedToAgora(user, mediaType)
-        });
-        agoraEngine.on("user-joined", (user) => {
-            handleRemoteUserJoinedAgora(user)
-        })
-        agoraEngine.on("user-left", (user) => {
-            console.log(user.uid + "has left the channel");
-            handleRemoteUserLeftAgora(user)
-        })
-        agoraEngine.on("user-unpublished", (user, mediaType) => {
-            console.log(user.uid + "unpublished");
-            handleUserUnpublishedFromAgora(user, mediaType)
-        });
-
-        agoraEngine.on("connection-state-change", (currentState, prevState, reason) => {
-            setConnectionState({ state: currentState, reason: reason })
-        })
-
-        return () => {
-            removeLiveUserFromFirebase(currentAgoraUID)
-
-            for (const localTrack of localTracks) {
-                localTrack.stop();
-                localTrack.close();
-            }
-            agoraEngine.off("user-published", handleRemoteUserJoinedAgora)
-            agoraEngine.off("user-left", handleRemoteUserLeftAgora)
-            agoraEngine.unpublish(localTracks).then(() => agoraEngine.leave())
-        }
-
-    }, []);
-
 
 
     useEffect(() => {
@@ -415,8 +358,9 @@ function App() {
                             path='/channels/@me'
                             element={
                                 <Fragment>
-                                    <FriendMenu friendList={friendList} friendIds={friendIds} currentPrivateChannel={currentPrivateChannel} handleOpenFriend={handleOpenFriend} />
-                                    <FriendBody friendList={friendList} friendIds={friendIds} currentPrivateChannel={currentPrivateChannel} channelRef={channelRef} privateMessages={privateMessages} />
+                                    <DirectMessageMenu />
+                                    <DirectMessageHeader />
+                                    <DirectMessageBody />
                                 </Fragment>
                             } />
                     </Route>
