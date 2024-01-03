@@ -1,15 +1,17 @@
 import React, { Fragment, useMemo, useEffect } from 'react'
 import { Box, FormControl, InputBase, FormHelperText, List, ListItemButton, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton, Typography, Divider, Badge } from '@mui/material'
 import FriendTab from '../FriendTab/FriendTab'
+import { useSelector } from 'react-redux'
 
 import "./FriendList.scss"
 
-export default function FriendList({ category, friendList, handleCurrentPrivateChannel }) {
+export default function FriendList() {
+    const { friendFilter, friendList } = useSelector(state => state.directMessage)
     return (
         <Box className="friend-list-container">
             <List dense>
                 {
-                    category == "all" ?
+                    friendFilter == "all" ?
                         <Fragment>
                             <Box sx={{ p: 1 }}>
                                 <Typography variant="h6">
@@ -17,8 +19,8 @@ export default function FriendList({ category, friendList, handleCurrentPrivateC
                                 </Typography>
                             </Box>
                             {
-                                friendList.map(({ displayName, status, profileURL, userId }) => (
-                                    <FriendItem displayName={displayName} profileURL={profileURL} status={status} key={userId} />
+                                friendList.map(({ displayName, status, profileURL, id }) => (
+                                    <FriendTab displayName={displayName} profileURL={profileURL} status={status} key={id} />
                                 ))
                             }
                         </Fragment>
@@ -30,8 +32,8 @@ export default function FriendList({ category, friendList, handleCurrentPrivateC
                                 </Typography>
                             </Box>
                             {
-                                friendList.filter(property => property.status !== "offline").map(({ displayName, status, profileURL, userId }) => (
-                                    <FriendTab displayName={displayName} profileURL={profileURL} status={status} key={userId} />
+                                friendList.filter(property => property.status !== "offline").map(({ displayName, status, profileURL, id }) => (
+                                    <FriendTab displayName={displayName} profileURL={profileURL} status={status} key={id} />
                                 ))
                             }
                         </Fragment>

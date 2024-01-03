@@ -5,6 +5,8 @@ const popoverSlice = createSlice({
     initialState: {
         serverSettingsPopover: false,
         userDetailPopover: false,
+        memberDetailPopover: false,
+
     },
     reducers: {
         toggleServerSettings: (state, action) => {
@@ -12,11 +14,14 @@ const popoverSlice = createSlice({
         },
         setUserDetailPopover: (state, action) => {
             state.userDetailPopover = action.payload;
-        }
+        },
+        setMemberDetailPopover: (state, action) => {
+            state.memberDetailPopover = action.payload;
+        },
     }
 })
 
-export const { toggleServerSettings, setUserDetailPopover } = popoverSlice.actions;
+export const { toggleServerSettings, setUserDetailPopover, setMemberDetailPopover } = popoverSlice.actions;
 
 export default popoverSlice.reducer;
 

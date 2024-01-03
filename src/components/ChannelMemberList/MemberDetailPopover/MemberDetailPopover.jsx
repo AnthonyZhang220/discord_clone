@@ -1,16 +1,22 @@
 import React from "react";
 import { Box, ListItem, ListItemText, Avatar, Badge, Popover, Divider } from '@mui/material';
+import { MemberListItemButton } from "../../CustomUIComponents";
 import StatusList from '../../StatusList';
+import { setMemberDetailPopover } from "../../../redux/features/popoverSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-export const MemberDetailPopover = ({ openMemberDetail, setOpenMemberDetail, memberRef, memberDetail }) => {
+export const MemberDetailPopover = ({ memberRef }) => {
+    const dispatch = useDispatch();
+    const { memberDetailPopover } = useSelector(state => state.popover)
+    const { memberDetail } = useSelector(state => state.memberList)
 
     return (
         <Popover
             className='member-detail-paper'
-            open={openMemberDetail}
-            onClose={() => setOpenMemberDetail(false)}
+            open={memberDetailPopover}
+            onClose={() => dispatch(setMemberDetailPopover(false))}
             anchorReference="anchorEl"
-            anchorEl={memberRef}
+            anchorEl={memberRef ? () => memberRef : null}
             PaperProps={{
                 style: {
                     background: "#232428", borderRadius: "8px 8px 8px 8px", width: "340px", fontSize: 14,
@@ -22,11 +28,11 @@ export const MemberDetailPopover = ({ openMemberDetail, setOpenMemberDetail, mem
             }}
             anchorOrigin={{
                 vertical: 0,
-                horizontal: -350,
+                horizontal: 0,
             }}
             transformOrigin={{
                 vertical: 'top',
-                horizontal: 'left',
+                horizontal: 'right',
             }}
         >
             <Box className="member-detail-top">

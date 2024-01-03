@@ -6,49 +6,6 @@
 	flex-direction: column;
 	background: $chat-bg;
 
-	.friend-main-header {
-		flex: 0 0 57px;
-		padding: 0 20px 0 20px;
-		background: $menu-bg;
-		border-bottom: 1px solid darken($menu-bg, 2.5%);
-		display: flex;
-		align-items: center;
-		box-shadow: 0 1px 0 darken($channels-bg, 4.1%),
-			inset 0 -1px 0 rgba(#000, 0.1);
-		transition: background 0.15s ease;
-
-		.friend-main-header-name {
-			display: flex;
-			font-weight: normal;
-			font-size: 1.3rem;
-			letter-spacing: 0.05rem;
-			align-items: center;
-
-			.friend-main-header-hashtag {
-				font-size: 1.2rem;
-				font-weight: 300;
-			}
-		}
-
-		.friend-main-header-feature {
-			margin-left: auto;
-		}
-
-		.signin {
-			-webkit-box-flex: 0;
-			-ms-flex: 0 0 auto;
-			flex: 0 0 auto;
-			min-width: 0;
-
-			display: -webkit-box;
-			display: -ms-flexbox;
-			display: flex;
-			-webkit-box-align: center;
-			-ms-flex-align: center;
-			align-items: center;
-		}
-	}
-
 	.content::before {
 		content: "";
 		position: absolute;
@@ -182,34 +139,7 @@
 	}
 }
 
-.userSidebar-container {
-	position: relative;
-	width: 340px;
-	height: 100%;
-	background-color: #2b2d31;
-
-	.userSidebar-memberlist-wrapper {
-		-webkit-box-pack: center;
-		-ms-flex-pack: center;
-		justify-content: center;
-		position: relative;
-		max-height: 100%;
-		display: -webkit-box;
-		display: -ms-flexbox;
-		display: flex;
-
-		.userSidebar-memberlist {
-			width: 340px;
-			padding: 0 12px 12px;
-			-webkit-box-flex: 0;
-			-ms-flex: 0 0 auto;
-			flex: 0 0 auto;
-			height: auto;
-		}
-	}
-}
-
-.userSidebar-detail-paper {
+.user-detail-paper {
 	display: -webkit-box;
 	display: -ms-flexbox;
 	display: flex;
@@ -222,10 +152,11 @@
 	flex-grow: 1;
 	border-radius: 8px 8px 0 0;
 
-	.userSidebar-detail-top {
-		.userSidebar-detail-banner {
+	.user-detail-top {
+		.user-detail-banner {
 			min-width: 340px;
 			min-height: 60px;
+			height: 60px;
 			width: 100%;
 
 			mask {
@@ -259,8 +190,7 @@
 				}
 			}
 		}
-
-		.userSidebar-detail-avatar {
+		.user-detail-avatar {
 			position: absolute;
 			z-index: 0;
 			left: 22px;
@@ -269,7 +199,7 @@
 		}
 	}
 
-	.userSidebar-detail-list {
+	.user-detail-list {
 		position: relative;
 		border-radius: 8px;
 		display: -webkit-box;
@@ -280,9 +210,8 @@
 		-ms-flex-direction: column;
 		flex-direction: column;
 		overflow: hidden;
-
-		margin: 16px;
-		padding: 0 12px 12px;
-		background-color: #111214;
+		margin: 48px 16px 16px 16px;
+		padding: 4px 0 4px 0;
+		max-height: calc(100vh - 128px);
 	}
 }
