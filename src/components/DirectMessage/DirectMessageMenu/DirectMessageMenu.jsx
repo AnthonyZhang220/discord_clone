@@ -14,25 +14,30 @@ import StatusList from "../../StatusList";
 
 import { QuerySnapshot, onSnapshot, query, collection, where } from "firebase/firestore";
 import { db } from "../../../firebase";
+import { useDispatch, useSelector } from "react-redux";
+import { setDirectMessageList } from "../../../redux/features/chatListSlice";
+import { setIsFriendListPageOpen } from "../../../redux/features/directMessageSlice";
+import { DirectMessageList } from "./DirectMessageList/DirectMessageList";
 import "./DirectMessageMenu.scss";
 
 
-function DirectMessageMenu({ user, changeStatus, signOut, setCurrentUser, handleOpenFriend, handleCurrentPrivateChannel, currentPrivateChannel, muted, defen, handleDefen, handleMuted }) {
-
-    const [privateChannelList, setPrivateChannelList] = useState([]);
+function DirectMessageMenu() {
+    const dispatch = useDispatch();
+    const { user } = useSelector(state => state.auth)
+    const { directMessageList, currDirectMessageChannel } = useSelector(state => state.directMessage)
     const [privateChannelId, setPrivateChannelId] = useState([]);
 
 
     useEffect(() => {
-        if (user) {
-            const q = query(collection(db, "privatechannels"), where("memberRef", "array-contains", user.uid))
+        if (user.id) {
+            const q = query(collection(db, "privatechannels"), where("memberRef", "array-contains", user.id))
             const unsub = onSnapshot(q, (QuerySnapshot) => {
                 let data = [];
                 QuerySnapshot.forEach((doc) => {
                     const userRef = doc.data().memberRef
-                    if (userRef[0] === user.uid) {
+                    if (userRef[0] === user.id) {
                         data.push(userRef[1])
-                    } else if (userRef[1] === user.uid) {
+                    } else if (userRef[1] === user.id) {
                         data.push(userRef[0])
                     }
                 })
@@ -40,28 +45,20 @@ function DirectMessageMenu({ user, changeStatus, signOut, setCurrentUser, handle
             })
         }
 
-    }, [user])
+    }, [user.id])
 
     useEffect(() => {
         if (privateChannelId.length > 0) {
             const q = query(collection(db, "users"), where("userId", "in", privateChannelId))
             const unsub = onSnapshot(q, (QuerySnapshot) => {
-                let data = [];
+                let dmList = [];
                 QuerySnapshot.forEach((doc) => {
-                    data.push({
-                        name: doc.data().displayName,
-                        avatar: doc.data().profileURL,
-                        status: doc.data().status,
-                        userId: doc.data().userId,
-                    })
+                    dmList.push(doc.data())
                 })
-                setPrivateChannelList(data)
+                dispatch(setDirectMessageList(dmList))
             })
         }
     }, [privateChannelId])
-
-
-
 
     return (
         <Box component="aside" className='friend-container'>
@@ -70,7 +67,7 @@ function DirectMessageMenu({ user, changeStatus, signOut, setCurrentUser, handle
             </Box>
             <Box component="section" className="friend-menu-container">
                 <ListItem disablePadding>
-                    <ListItemButton sx={{ borderRadius: "4px", backgroundColor: currentPrivateChannel.uid == null ? lighten("#313338", 0.1) : "inherit" }} onClick={() => handleOpenFriend()}>
+                    <ListItemButton sx={{ borderRadius: "4px", backgroundColor: currDirectMessageChannel.id == null ? lighten("#313338", 0.1) : "inherit" }} onClick={() => dispatch(setIsFriendListPageOpen(true))}>
                         <SvgIcon edge="start" component={FriendIcon} sx={{ mr: 1 }} />
                         <ListItemText primary="Friends" />
                     </ListItemButton>
@@ -91,14 +88,12 @@ function DirectMessageMenu({ user, changeStatus, signOut, setCurrentUser, handle
                     </Box>
                 </Box>
                 <Box component="ul" className="friend-menu-conversation">
-                    {privateChannelList?.map(({ name, avatar, userId, status }) => (
-                        <DirectMessageList key={userId} name={name} avatar={avatar} userId={userId} status={status} />
+                    {directMessageList?.map(({ name, avatar, id, status }) => (
+                        <DirectMessageList key={id} name={name} avatar={avatar} status={status} />
                     ))}
                 </Box>
             </Box>
-            <UserFooter user={user} changeStatus={changeStatus} signOut={signOut} setCurrentUser={setCurrentUser} muted={muted} handleDefen={handleDefen}
-                handleMuted={handleMuted}
-                defen={defen} />
+            <UserFooter />
         </Box>
     )
 }

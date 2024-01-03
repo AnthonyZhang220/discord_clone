@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, memo } from 'react'
 //send meesage to db
-import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, setDoc, doc, getDocs, QuerySnapshot, updateDoc, getDoc, documentId, orderBy, limitToLast, arrayRemove } from 'firebase/firestore';
 import { uploadBytes, getDownloadURL, ref } from 'firebase/storage';
 import { db, storage } from "../../../../firebase";
 //material ui comp
@@ -22,21 +22,74 @@ import { Alert } from '@mui/material';
 import { MenuListItemButton } from '../../../CustomUIComponents';
 
 import StatusList from '../../../StatusList';
-import './PrivateChat.scss'
 
 import { FunctionTooltip } from '../../../CustomUIComponents';
 import { setDraftDirectMessage } from '../../../../redux/features/draftSlice';
 import { bytesToMB } from '../../../../utils/bytesToMB';
 import { convertDate, convertTime, convertDateDivider } from '../../../../utils/formatter';
-import { useSelector } from 'react-redux';
+import { UserSidebar } from './UserSideBar/UserSideBar';
+import { useDispatch, useSelector } from 'react-redux';
+import { setDirectMessageList } from '../../../../redux/features/chatListSlice';
+import './PrivateChat.scss'
 
-export default function PrivateChat({ user, userSideBar, currentPrivateChannel, privateMessages, handleAddPrivateMessage }) {
+export default function PrivateChat({ user, userSideBar, handleAddPrivateMessage }) {
     const formRef = useRef();
     const chatScroller = useRef();
     const [openUpload, setOpenUpload] = useState(false);
+    const dispatch = useDispatch();
     const { draftDirectMessage } = useSelector(state => state.draft)
+    const { currDirectMessageChannel, isDirectMessageSidebarOpen } = useSelector(state => state.directMessage)
     const { isMemberListOpen } = useSelector(state => state.memberList)
+    const { directMessageList } = useSelector(state => state.chatList)
 
+    useEffect(() => {
+        if (currDirectMessageChannel) {
+            const q = query(
+                collection(db, "messages"),
+                where("channelRef", "==", currDirectMessageChannel.id || ""),
+                orderBy("createdAt"),
+                limitToLast(20)
+            );
+
+            const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+                let chatList = [];
+                let previousUserRef = null;
+                let previousDate = null;
+
+                QuerySnapshot.forEach((doc) => {
+                    const chatMessage = doc.data()
+                    const currentDate = convertDateDivider(chatMessage.createdAt);
+
+                    if (previousDate === null || currentDate != previousDate) {
+                        chatList.push({ dividerDate: currentDate })
+                    }
+                    if (previousUserRef == null || currentDate != previousDate) {
+                        chatList.push(chatMessage);
+                    } else if (chatMessage.userRef === previousUserRef) {
+                        chatList.push({
+                            userName: null,
+                            avatar: null,
+                            createdAt: doc.data().createdAt,
+                            type: doc.data().type,
+                            fileName: null,
+                            content: doc.data().content,
+                            userRef: doc.data().userRef,
+                            id: doc.id
+                        });
+                    } else {
+                        chatList.push(chatMessage);
+                    }
+
+                    previousUserRef = chatMessage.userRef
+                    previousDate = convertDateDivider(chatMessage.createdAt)
+                });
+
+                dispatch(setDirectMessageList(chatList))
+                //scroll new message
+            });
+        }
+        // chatScroller.current.scrollIntoView({ behavior: "smooth" });
+    }, [currDirectMessageChannel]);
 
     const handleUploadOpen = () => {
         setOpenUpload(true)
@@ -139,77 +192,28 @@ export default function PrivateChat({ user, userSideBar, currentPrivateChannel, 
         return (
             <List component="ol" className="scrollerInner">
                 <ListItem>
-                    <Avatar alt={currentPrivateChannel.name} src={currentPrivateChannel.avatar} style={{ borderRadius: "50%", width: "80px", height: "80px" }} />
+                    <Avatar alt={currDirectMessageChannel.name} src={currDirectMessageChannel.avatar} style={{ borderRadius: "50%", width: "80px", height: "80px" }} />
                 </ListItem>
                 <ListItem>
-                    <Typography variant='h3'>{currentPrivateChannel.name}</Typography>
+                    <Typography variant='h3'>{currDirectMessageChannel.name}</Typography>
                 </ListItem>
                 <ListItem>
                     <Typography variant="body2">This is the beginning of your direct message history with <b>
-                        {currentPrivateChannel.name}
+                        {currDirectMessageChannel.name}
                     </b>
                         .
                     </Typography>
                 </ListItem>
-                {privateMessages.map(({ content, userName, avatar, createdAt, type, fileName, dividerDate }, index) => (
+                {directMessageList.map(({ content, userName, avatar, createdAt, type, fileName, dividerDate }, index) => (
                     <ChatItem className="message" content={content} userName={userName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} dividerDate={dividerDate} />
                 ))}
                 {/* <Divider>CENTER</Divider> */}
                 <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
             </List>
         )
-    }, [privateMessages])
+    }, [directMessageList])
 
-    const UserSideBar = useMemo(() => {
-        return (
-            <Box className="userSidebar-container">
-                <Box component="aside" className="userSidebar-memberlist-wrapper" sx={{ width: "100%", transition: "background-color 0.1s" }}>
-                    <Box className="userSidebar-memberlist" >
-                        <Box>
-                            <Box className="userSidebar-detail-top">
-                                <svg className="userSidebar-detail-banner">
-                                    <mask id="uid_347">
-                                        <rect></rect>
-                                        <circle></circle>
-                                    </mask>
-                                    <foreignObject className="userSidebar-detail-object">
-                                    </foreignObject>
-                                </svg>
-                                <Badge
-                                    overlap="circular"
-                                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                                    className="userSidebar-detail-avatar"
-                                    badgeContent={
-                                        <StatusList status={currentPrivateChannel.status} />
-                                    }
-                                >
-                                    <Avatar alt={currentPrivateChannel.name} sx={{ width: "80px", height: "80px" }} src={currentPrivateChannel.avatar} imgProps={{ crossOrigin: "Anonymous" }} />
-                                </Badge>
-                            </Box>
-                            <Box className="userSidebar-detail-list">
-                                <ListItem dense>
-                                    <MenuListItemButton>
-                                        <ListItemText primary={currentPrivateChannel.name} primaryTypographyProps={{ variant: "h3" }} />
-                                    </MenuListItemButton>
-                                </ListItem>
-                                <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
-                                <ListItem dense>
-                                    <MenuListItemButton>
-                                        <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(currentPrivateChannel.createdAt * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
-                                            style: {
-                                                color: "white"
-                                            }
-                                        }} />
-                                    </MenuListItemButton>
-                                </ListItem>
-                                <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
-                            </Box>
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
-        )
-    }, [currentPrivateChannel.avatar])
+
 
     return (
         <Box className="content">
@@ -282,16 +286,13 @@ export default function PrivateChat({ user, userSideBar, currentPrivateChannel, 
                             variant="outlined"
                             onChange={(e) => dispatch(setDraftDirectMessage(e.target.value))}
                             value={draftDirectMessage}
-                            placeholder={`Message @${currentPrivateChannel.name}`}
+                            placeholder={`Message @${currDirectMessageChannel.name}`}
                         />
                     </FormControl>
                 </Box>
             </Box>
             {
-                userSideBar ?
-                    UserSideBar
-                    :
-                    null
+                isDirectMessageSidebarOpen && <UserSidebar currDirectMessageChannel={currDirectMessageChannel} />
             }
         </Box>
     )

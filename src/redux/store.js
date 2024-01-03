@@ -1,4 +1,4 @@
-import { combineReducers, configureStore, applyMiddleware, Tuple } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authSlice from "./features/authSlice";
 import draftSlice from "./features/draftSlice";
 import channelSlice from "./features/channelSlice";
@@ -29,6 +29,10 @@ const rootReducer = combineReducers({
 
 const store = configureStore({
     reducer: rootReducer,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        })
 })
 
 export default store;

@@ -1,0 +1,91 @@
+@import "../../../App.scss";
+
+.friend-main-header {
+	flex: 0 0 57px;
+	padding: 0 20px 0 20px;
+	background: $menu-bg;
+	border-bottom: 1px solid darken($menu-bg, 2.5%);
+	align-items: center;
+	box-shadow: 0 1px 0 darken($channels-bg, 4.1%), inset 0 -1px 0 rgba(#000, 0.1);
+	transition: background 0.15s ease;
+
+	position: relative;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	min-width: 0;
+	width: 100%;
+	-webkit-box-flex: 0;
+	-ms-flex: 0 0 auto;
+	// flex: 0 0 auto;
+	// height: 48px;
+	// padding: 0 8px;
+	font-size: 16px;
+	line-height: 20px;
+	cursor: default;
+
+	.friend-main-header-name {
+		position: relative;
+		-webkit-box-flex: 1;
+		-ms-flex: 1 1 auto;
+		flex: 1 1 auto;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		-webkit-box-align: center;
+		-ms-flex-align: center;
+		align-items: center;
+		min-width: 0;
+		overflow: hidden;
+
+		.friend-main-header-text {
+			font-size: 1.2rem;
+			font-weight: 300;
+		}
+
+		.friend-main-header-button {
+			.addfriend-button {
+				background-color: #248046;
+				color: #ffffff;
+
+				.active {
+					background-color: #313338;
+					color: #248046;
+				}
+			}
+
+			.active {
+				background-color: lighten(#313338, 10%);
+				color: #ffffff;
+			}
+		}
+	}
+
+	.friend-main-header-feature {
+		margin-left: auto;
+
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		-webkit-box-align: center;
+		-ms-flex-align: center;
+		align-items: center;
+
+		-webkit-box-flex: 0;
+		-ms-flex: 0 0 auto;
+		flex: 0 0 auto;
+		min-width: 0;
+		.friend-main-header-feature-icon {
+			position: relative;
+			height: 24px;
+			width: auto;
+			-webkit-box-flex: 0;
+			-ms-flex: 0 0 auto;
+			flex: 0 0 auto;
+			margin: 0 8px;
+		}
+	}
+}

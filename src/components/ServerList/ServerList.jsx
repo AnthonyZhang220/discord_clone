@@ -45,6 +45,14 @@ const ServerList = () => {
         }
     }, [user.id]);
 
+    useEffect(() => {
+        if (isDirectMessagePageOpen) {
+            navigate("/channels/@me")
+        } else {
+            navigate("/channels")
+        }
+    }, [isDirectMessagePageOpen])
+
     const [mouseDown, setMouseDown] = React.useState(false);
 
     return (

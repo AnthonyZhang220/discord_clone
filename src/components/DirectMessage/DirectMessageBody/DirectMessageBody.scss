@@ -1,0 +1,8 @@
+@import "../../../App.scss";
+
+.friend-main-container {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	background: $chat-bg;
+}

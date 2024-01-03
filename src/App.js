@@ -34,7 +34,6 @@ function App() {
 
     useEffect(() => {
         listenToAuthStateChange();
-        console.log("user App", user)
         return listenToAuthStateChange;
     }, [auth])
 
@@ -74,81 +73,14 @@ function App() {
                 })
                 setFriendList(friendList)
             })
-
             // return unsubscribe
         }
-
-
     }, [friendIds])
 
-    const [currentPrivateChannel, setCurrentPrivateChannel] = useState({ uid: null, name: null, status: null, avatar: null });
     const [channelRef, setChannelRef] = useState("")
-    const [privateMessages, setPrivateMessages] = useState([])
-
-
-
-    const handleOpenFriend = () => {
-        setCurrentPrivateChannel({
-            uid: null,
-            name: null,
-            status: null,
-            avatar: null,
-            createdAt: null,
-        })
-    }
-
-    useEffect(() => {
-        if (currentPrivateChannel) {
-            const q = query(
-                collection(db, "messages"),
-                where("channelRef", "==", currentPrivateChannel.uid || ""),
-                orderBy("createdAt"),
-                limitToLast(20)
-            );
-
-            const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
-                let chatList = [];
-                let previousUserRef = null;
-                let previousDate = null;
-
-                QuerySnapshot.forEach((doc) => {
-                    const chatMessage = doc.data()
-                    const currentDate = convertDateDivider(chatMessage.createdAt);
-
-                    if (previousDate === null || currentDate != previousDate) {
-                        chatList.push({ dividerDate: currentDate })
-                    }
-                    if (previousUserRef == null || currentDate != previousDate) {
-                        chatList.push(chatMessage);
-                    } else if (chatMessage.userRef === previousUserRef) {
-                        chatList.push({
-                            userName: null,
-                            avatar: null,
-                            createdAt: doc.data().createdAt,
-                            type: doc.data().type,
-                            fileName: null,
-                            content: doc.data().content,
-                            userRef: doc.data().userRef,
-                            id: doc.id
-                        });
-                    } else {
-                        chatList.push(chatMessage);
-                    }
-
-                    previousUserRef = chatMessage.userRef
-                    previousDate = convertDateDivider(chatMessage.createdAt)
-                });
-
-                setPrivateMessages(chatList);
-                //scroll new message
-            });
-        }
-        // chatScroller.current.scrollIntoView({ behavior: "smooth" });
-    }, [currentPrivateChannel]);
 
     const [voiceChat, setVoiceChat] = useState(false);
     const [currentVoiceChannel, setCurrentVoiceChannel] = useState({ name: null, uid: null })
-
 
     const [config, setConfig] = useState(AgoraConfig)
 
@@ -160,43 +92,13 @@ function App() {
     const [currentAgoraUID, setCurrentAgoraUID] = useState(null)
     const [screenTrack, setScreenTrack] = useState(null);
 
-
-
     useEffect(() => {
         setConfig({ ...config, channel: currentVoiceChannel.uid })
     }, [currentVoiceChannel.uid])
 
     const [connectionState, setConnectionState] = useState({ state: null, reason: null })
 
-
     useEffect(() => {
-        // constantly monitor the state change of user, audio, video
-        if (currentVoiceChannel.uid) {
-            const voiceChannelRef = doc(db, "voicechannels", currentVoiceChannel.uid)
-            const snapshot = onSnapshot(voiceChannelRef, (doc) => {
-                const list = doc.data().liveUser
-                if (list && list.length != 0) {
-                    list.forEach((User) => {
-                        setRemoteUsers((previousUser) => {
-                            if (previousUser != undefined) {
-                                return previousUser.map((user) => {
-                                    if (user.uid == User.uid) {
-                                        return { ...user, name: User.name, hasAudio: User.hasAudio, hasVideo: User.hasVideo }
-                                    }
-                                    return user;
-                                })
-                            }
-                        })
-                    })
-                }
-            })
-        }
-    }, [remoteUsers, config.channel])
-
-
-
-    useEffect(() => {
-
         const fetch = async () => {
             const token = await fetchToken()
 
@@ -269,15 +171,10 @@ function App() {
                                 setVoiceChat(true)
                             }
                         })
-
-
-
                     })
 
             });
-
         }
-
     }, [config.channel])
 
     const [stats, setStats] = useState(0)
@@ -359,7 +256,6 @@ function App() {
                             element={
                                 <Fragment>
                                     <DirectMessageMenu />
-                                    <DirectMessageHeader />
                                     <DirectMessageBody />
                                 </Fragment>
                             } />

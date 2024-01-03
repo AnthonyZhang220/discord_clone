@@ -1,59 +1,61 @@
-import React, { useMemo, useState, useRef, useEffect } from 'react'
-import { Box, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography, Avatar, Badge, ListSubheader, Popover, Divider } from '@mui/material'
+import React, { useState, useRef, useEffect } from 'react'
+import { Box, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography, Avatar, Badge, ListSubheader } from '@mui/material'
 
-
-import { doc, getDoc, where, query, collection, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { MemberListItemButton } from '../CustomUIComponents';
+import StatusList from '../StatusList';
 import { useDispatch, useSelector } from 'react-redux';
 import { MemberDetailPopover } from './MemberDetailPopover/MemberDetailPopover';
-
-import { setMemberList } from '../../redux/features/memberListSlice';
+import { setMemberList, setMemberDetail } from '../../redux/features/memberListSlice';
 
 import "./ChannelMemberList.scss"
-
+import { setMemberDetailPopover } from '../../redux/features/popoverSlice';
 
 function ChannelMemberList() {
     const dispatch = useDispatch();
     const { selectedServer } = useSelector(state => state.userSelectStore)
     const { memberList } = useSelector(state => state.memberList)
-
-    const memberRefs = useRef([])
+    const memberRefs = useRef({});
     const [memberRef, setMemberRef] = useState(null);
-
-    const [openMemberDetail, setOpenMemberDetail] = useState(false);
 
     const getMemberList = async () => {
         if (selectedServer) {
             const serverRef = doc(db, "servers", selectedServer)
             const serverDoc = await getDoc(serverRef)
             const memberIds = serverDoc.data().members;
+            let fetchedMemberList = [];
+            let fetchedMemberRefs = [];
+            console.log(memberIds)
 
-            memberIds.forEach((memberId) => {
-                const userRef = doc(db, "users", memberId)
-                const userDoc = getDoc(userRef);
-                dispatch(setMemberList([...memberList, userDoc]))
-            })
+            for (let i = 0; i < memberIds.length; ++i) {
+                const userRef = doc(db, "users", memberIds[i])
+                const userDoc = await getDoc(userRef)
+                fetchedMemberList.push(userDoc.data())
+                fetchedMemberRefs.push(memberIds[i])
+            }
+            console.log("memberRefs", memberRefs)
+            setMemberRef(fetchedMemberRefs)
+            dispatch(setMemberList(fetchedMemberList))
         }
     }
 
     useEffect(() => {
         if (selectedServer) {
             getMemberList();
+            console.log(memberList)
         }
     }, [selectedServer])
 
 
-    const handleOpenMemberDetail = async (memberId) => {
-        setMemberRef(memberRefs.current[memberId])
+    const handleOpenMemberDetail = (memberId) => {
+        console.log("memberId", memberId)
+        const currentMemberDetail = memberList.find(member => member.id === memberId)
+        dispatch(setMemberDetail(currentMemberDetail))
 
-
-        const memberRef = doc(db, "users", memberId)
-        const memberDoc = await getDoc(memberRef)
-
-        setOpenMemberDetail(true);
-        setMemberDetail({ name: memberDoc.data().displayName, status: memberDoc.data().status, profileURL: memberDoc.data().profileURL, createdAt: memberDoc.data().createdAt.seconds })
-
+        const clickedMemberRefs = memberRefs.current[memberId]
+        console.log("clickedMemberRefs", clickedMemberRefs)
+        setMemberRef(clickedMemberRefs)
+        dispatch(setMemberDetailPopover(true))
     }
 
     const online = (status) => {
@@ -78,9 +80,9 @@ function ChannelMemberList() {
                                     </ListSubheader>
                                 }>
                                     {
-                                        memberList?.filter(member => online(member.status) === true).map(({ displayName, profileURL, status, userId }, index) => (
-                                            <ListItem key={userId} disablePadding sx={{ opacity: 1 }} ref={ele => memberRefs.current[userId] = ele}>
-                                                <ListItemButton onClick={() => handleOpenMemberDetail(userId)}>
+                                        memberList?.filter(member => online(member.status) === true).map(({ displayName, profileURL, status, id }) => (
+                                            <ListItem key={id} disablePadding sx={{ opacity: 1 }} ref={ele => memberRefs.current[id] = ele}>
+                                                <ListItemButton onClick={() => handleOpenMemberDetail(id)}>
                                                     <ListItemAvatar >
                                                         <Badge
                                                             overlap="circular"
@@ -107,9 +109,9 @@ function ChannelMemberList() {
                                     </ListSubheader>
                                 }>
                                     {
-                                        memberList?.filter(member => online(member.status) === false).map(({ displayName, profileURL, status, userId }, index) => (
-                                            <ListItem key={userId} disablePadding sx={{ opacity: 0.3 }} ref={ele => memberRefs.current[userId] = ele}>
-                                                <ListItemButton onClick={() => handleOpenMemberDetail(userId)}>
+                                        memberList?.filter(member => online(member.status) === false).map(({ displayName, profileURL, id }) => (
+                                            <ListItem key={id} disablePadding sx={{ opacity: 0.3 }} ref={ele => memberRefs.current[id] = ele}>
+                                                <ListItemButton onClick={() => handleOpenMemberDetail(id)}>
                                                     <ListItemAvatar >
                                                         <Badge
                                                             overlap="circular"
@@ -130,7 +132,7 @@ function ChannelMemberList() {
                     </Box>
                 </Box>
             </Box>
-            <MemberDetailPopover openMemberDetail={openMemberDetail} setOpenMemberDetail={setOpenMemberDetail} memberRef={memberRef} />
+            <MemberDetailPopover memberRef={memberRef} />
         </Box>
     )
 }

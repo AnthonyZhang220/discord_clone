@@ -42,7 +42,6 @@ const Channel = () => {
 
     //get channel list by server UID
     useEffect(() => {
-        console.log(selectedServer)
         if (selectedServer) {
             const q = query(collection(db, "channels"), where("serverRef", "==", selectedServer));
             const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
@@ -52,6 +51,7 @@ const Channel = () => {
                 })
                 dispatch(setCurrChannelList(list))
             })
+             
         }
     }, [selectedServer])
 
@@ -69,6 +69,30 @@ const Channel = () => {
         }
 
     }, [selectedServer])
+
+    // useEffect(() => {
+    //     // constantly monitor the state change of user, audio, video
+    //     if (currentVoiceChannel.uid) {
+    //         const voiceChannelRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+    //         const snapshot = onSnapshot(voiceChannelRef, (doc) => {
+    //             const list = doc.data().liveUser
+    //             if (list && list.length != 0) {
+    //                 list.forEach((User) => {
+    //                     setRemoteUsers((previousUser) => {
+    //                         if (previousUser != undefined) {
+    //                             return previousUser.map((user) => {
+    //                                 if (user.uid == User.uid) {
+    //                                     return { ...user, name: User.name, hasAudio: User.hasAudio, hasVideo: User.hasVideo }
+    //                                 }
+    //                                 return user;
+    //                             })
+    //                         }
+    //                     })
+    //                 })
+    //             }
+    //         })
+    //     }
+    // }, [remoteUsers, config.channel])
 
     return (
         <Box component="aside" className='channel-container'>
