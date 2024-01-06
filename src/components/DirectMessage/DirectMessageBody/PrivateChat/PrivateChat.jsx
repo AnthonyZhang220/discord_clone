@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useMemo, memo } from 'react'
 //send meesage to db
 import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, setDoc, doc, getDocs, QuerySnapshot, updateDoc, getDoc, documentId, orderBy, limitToLast, arrayRemove } from 'firebase/firestore';
-import { uploadBytes, getDownloadURL, ref } from 'firebase/storage';
 import { db, storage } from "../../../../firebase";
 //material ui comp
 import Box from '@mui/material/Box';
@@ -17,36 +16,32 @@ import FormControl from '@mui/material/FormControl';
 import InputBase from '@mui/material/InputBase';
 import { ClickAwayListener } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
-import Snackbar from '@mui/material/Snackbar';
-import { Alert } from '@mui/material';
-import { MenuListItemButton } from '../../../CustomUIComponents';
-
-import StatusList from '../../../StatusList';
 
 import { FunctionTooltip } from '../../../CustomUIComponents';
 import { setDraftDirectMessage } from '../../../../redux/features/draftSlice';
 import { bytesToMB } from '../../../../utils/bytesToMB';
 import { convertDate, convertTime, convertDateDivider } from '../../../../utils/formatter';
-import { UserSidebar } from './UserSideBar/UserSideBar';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDirectMessageList } from '../../../../redux/features/chatListSlice';
+import UserSidebar from './UserSideBar/UserSideBar';
 import './PrivateChat.scss'
 
-export default function PrivateChat({ user, userSideBar, handleAddPrivateMessage }) {
+export default function PrivateChat({ user, handleAddPrivateMessage }) {
     const formRef = useRef();
     const chatScroller = useRef();
     const [openUpload, setOpenUpload] = useState(false);
     const dispatch = useDispatch();
     const { draftDirectMessage } = useSelector(state => state.draft)
-    const { currDirectMessageChannel, isDirectMessageSidebarOpen } = useSelector(state => state.directMessage)
+    const { currDirectMessageChannel, isDirectMessageSidebarOpen, currDirectMessageChannelRef } = useSelector(state => state.directMessage)
     const { isMemberListOpen } = useSelector(state => state.memberList)
     const { directMessageList } = useSelector(state => state.chatList)
 
     useEffect(() => {
-        if (currDirectMessageChannel) {
+        if (currDirectMessageChannelRef) {
+            console.log("currDirectMessageChannelRef", currDirectMessageChannelRef)
             const q = query(
                 collection(db, "messages"),
-                where("channelRef", "==", currDirectMessageChannel.id || ""),
+                where("channelRef", "==", currDirectMessageChannelRef || ""),
                 orderBy("createdAt"),
                 limitToLast(20)
             );
@@ -57,9 +52,9 @@ export default function PrivateChat({ user, userSideBar, handleAddPrivateMessage
                 let previousDate = null;
 
                 QuerySnapshot.forEach((doc) => {
+                    console.log(doc)
                     const chatMessage = doc.data()
                     const currentDate = convertDateDivider(chatMessage.createdAt);
-
                     if (previousDate === null || currentDate != previousDate) {
                         chatList.push({ dividerDate: currentDate })
                     }
@@ -83,13 +78,12 @@ export default function PrivateChat({ user, userSideBar, handleAddPrivateMessage
                     previousUserRef = chatMessage.userRef
                     previousDate = convertDateDivider(chatMessage.createdAt)
                 });
-
                 dispatch(setDirectMessageList(chatList))
                 //scroll new message
             });
         }
         // chatScroller.current.scrollIntoView({ behavior: "smooth" });
-    }, [currDirectMessageChannel]);
+    }, [currDirectMessageChannelRef]);
 
     const handleUploadOpen = () => {
         setOpenUpload(true)
@@ -192,14 +186,14 @@ export default function PrivateChat({ user, userSideBar, handleAddPrivateMessage
         return (
             <List component="ol" className="scrollerInner">
                 <ListItem>
-                    <Avatar alt={currDirectMessageChannel.name} src={currDirectMessageChannel.avatar} style={{ borderRadius: "50%", width: "80px", height: "80px" }} />
+                    <Avatar alt={currDirectMessageChannel.displayName} src={currDirectMessageChannel.avatar} style={{ borderRadius: "50%", width: "80px", height: "80px" }} />
                 </ListItem>
                 <ListItem>
-                    <Typography variant='h3'>{currDirectMessageChannel.name}</Typography>
+                    <Typography variant='h3'>{currDirectMessageChannel.displayName}</Typography>
                 </ListItem>
                 <ListItem>
                     <Typography variant="body2">This is the beginning of your direct message history with <b>
-                        {currDirectMessageChannel.name}
+                        {currDirectMessageChannel.displayName}
                     </b>
                         .
                     </Typography>
@@ -211,7 +205,7 @@ export default function PrivateChat({ user, userSideBar, handleAddPrivateMessage
                 <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
             </List>
         )
-    }, [directMessageList])
+    }, [currDirectMessageChannel, directMessageList])
 
 
 
@@ -286,7 +280,7 @@ export default function PrivateChat({ user, userSideBar, handleAddPrivateMessage
                             variant="outlined"
                             onChange={(e) => dispatch(setDraftDirectMessage(e.target.value))}
                             value={draftDirectMessage}
-                            placeholder={`Message @${currDirectMessageChannel.name}`}
+                            placeholder={`Message @${currDirectMessageChannel.displayName}`}
                         />
                     </FormControl>
                 </Box>

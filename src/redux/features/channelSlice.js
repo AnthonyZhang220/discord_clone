@@ -28,5 +28,5 @@ const channelSlice = createSlice({
     }
 })
 
-export const { setNewChannelInfo, setCurrChannelList, setCurrVoiceChannelList, setCurrChannel } = channelSlice.actions;
+export const { setNewChannelInfo, setCurrChannelList, setCurrVoiceChannelList, setCurrChannel, setCurrVoiceChannel } = channelSlice.actions;
 export default channelSlice.reducer;

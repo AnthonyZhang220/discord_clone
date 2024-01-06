@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useMemo, Fragment, useRef } from 'react'
 //send meesage to db
-import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { addDoc, collection, QuerySnapshot, Timestamp } from "firebase/firestore";
 import { uploadBytes, getDownloadURL, ref } from 'firebase/storage';
 //query get chat message from db
 import {
+    doc,
+    getDoc,
     query,
     orderBy,
     onSnapshot,
@@ -45,6 +47,7 @@ import { convertDate, convertDateDivider, convertTime } from '../../utils/format
 import { useDispatch, useSelector } from 'react-redux';
 import { setDraftMessage } from '../../redux/features/draftSlice';
 import { setIsMemberListOpen } from '../../redux/features/memberListSlice';
+import { setCurrChannel } from '../../redux/features/channelSlice';
 
 // const URL = 'http://localhost:3000';
 // export const socket = io(URL);
@@ -66,6 +69,17 @@ export default function Chat() {
     const handleUploadOpen = () => {
         setOpenUpload(true)
     }
+
+    useEffect(() => {
+        if (selectedChannel) {
+            const getChannelRef = async () => {
+                const channelRef = doc(db, "channels", selectedChannel || "");
+                const channelDoc = await getDoc(channelRef);
+                dispatch(setCurrChannel({ name: channelDoc.data().name, id: channelDoc.id }))
+            }
+            getChannelRef();
+        }
+    }, [selectedChannel])
 
     useEffect(() => {
         if (selectedChannel) {

@@ -65,12 +65,12 @@ export async function listenToAuthStateChange() {
                 }
                 getSelectStore(user.uid)
                 store.dispatch(setIsLoggedIn(true))
-                return redirect("/channels")
+                redirect("/channels")
             } else {
                 updateDoc(doc(db, "users", user.uid))
                 store.dispatch(setUser(null))
                 store.dispatch(setIsLoggedIn(false))
-                return redirect("/")
+                redirect("/")
             }
         })
     } catch (error) {
@@ -91,7 +91,7 @@ export async function signOut() {
             if (updateSuccess) {
                 store.dispatch(setUser({ displayName: null, profileURL: null, uid: null, createdAt: null }))
                 store.dispatch(setIsLoggedIn(false))
-                return redirect("/")
+                redirect("/")
             }
         }
     } catch (error) {

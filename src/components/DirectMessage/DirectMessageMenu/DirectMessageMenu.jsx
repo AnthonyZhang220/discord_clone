@@ -15,8 +15,7 @@ import StatusList from "../../StatusList";
 import { QuerySnapshot, onSnapshot, query, collection, where } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useDispatch, useSelector } from "react-redux";
-import { setDirectMessageList } from "../../../redux/features/chatListSlice";
-import { setIsFriendListPageOpen } from "../../../redux/features/directMessageSlice";
+import { setIsFriendListPageOpen, setDirectMessageChannelList, setDirectMessageChannelRefs } from "../../../redux/features/directMessageSlice";
 import { DirectMessageList } from "./DirectMessageList/DirectMessageList";
 import "./DirectMessageMenu.scss";
 
@@ -24,41 +23,46 @@ import "./DirectMessageMenu.scss";
 function DirectMessageMenu() {
     const dispatch = useDispatch();
     const { user } = useSelector(state => state.auth)
-    const { directMessageList, currDirectMessageChannel } = useSelector(state => state.directMessage)
-    const [privateChannelId, setPrivateChannelId] = useState([]);
-
+    const { directMessageChannelRefs, isFriendListPageOpen, directMessageChannelList } = useSelector(state => state.directMessage)
 
     useEffect(() => {
         if (user.id) {
             const q = query(collection(db, "privatechannels"), where("memberRef", "array-contains", user.id))
+            let data = {};
             const unsub = onSnapshot(q, (QuerySnapshot) => {
-                let data = [];
                 QuerySnapshot.forEach((doc) => {
                     const userRef = doc.data().memberRef
-                    if (userRef[0] === user.id) {
-                        data.push(userRef[1])
-                    } else if (userRef[1] === user.id) {
-                        data.push(userRef[0])
+                    const channelRef = doc.id
+                    const firstUser = userRef[0];
+                    const secondUser = userRef[1];
+                    if (firstUser === user.id) {
+                        data[secondUser] = channelRef;
+                    } else if (secondUser === user.id) {
+                        data[firstUser] = channelRef;
                     }
                 })
-                setPrivateChannelId(data);
+                dispatch(setDirectMessageChannelRefs(data))
             })
         }
-
     }, [user.id])
 
     useEffect(() => {
-        if (privateChannelId.length > 0) {
-            const q = query(collection(db, "users"), where("userId", "in", privateChannelId))
+
+        if (Object.keys(directMessageChannelRefs).length) {
+            let userArr = [];
+            for (const key in directMessageChannelRefs) {
+                userArr.push(key)
+            }
+            const q = query(collection(db, "users"), where("id", "in", userArr))
             const unsub = onSnapshot(q, (QuerySnapshot) => {
                 let dmList = [];
                 QuerySnapshot.forEach((doc) => {
                     dmList.push(doc.data())
                 })
-                dispatch(setDirectMessageList(dmList))
+                dispatch(setDirectMessageChannelList(dmList))
             })
         }
-    }, [privateChannelId])
+    }, [Object.keys(directMessageChannelRefs).length])
 
     return (
         <Box component="aside" className='friend-container'>
@@ -67,7 +71,7 @@ function DirectMessageMenu() {
             </Box>
             <Box component="section" className="friend-menu-container">
                 <ListItem disablePadding>
-                    <ListItemButton sx={{ borderRadius: "4px", backgroundColor: currDirectMessageChannel.id == null ? lighten("#313338", 0.1) : "inherit" }} onClick={() => dispatch(setIsFriendListPageOpen(true))}>
+                    <ListItemButton sx={{ borderRadius: "4px", backgroundColor: isFriendListPageOpen ? lighten("#313338", 0.1) : "inherit" }} onClick={() => dispatch(setIsFriendListPageOpen(true))}>
                         <SvgIcon edge="start" component={FriendIcon} sx={{ mr: 1 }} />
                         <ListItemText primary="Friends" />
                     </ListItemButton>
@@ -88,8 +92,8 @@ function DirectMessageMenu() {
                     </Box>
                 </Box>
                 <Box component="ul" className="friend-menu-conversation">
-                    {directMessageList?.map(({ name, avatar, id, status }) => (
-                        <DirectMessageList key={id} name={name} avatar={avatar} status={status} />
+                    {directMessageChannelList?.map(({ displayName, avatar, id, status, createdAt }) => (
+                        <DirectMessageList key={id} id={id} displayName={displayName} avatar={avatar} status={status} createdAt={createdAt} />
                     ))}
                 </Box>
             </Box>

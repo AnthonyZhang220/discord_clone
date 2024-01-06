@@ -9,14 +9,16 @@ import { toggleServerSettings } from "../../../redux/features/popoverSlice";
 import { handleInviteToServer, handleDeleteServer } from "../../../utils/handlers/serverHandlers";
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { useDispatch, useSelector } from "react-redux";
 
 //server settings menu
-export default function ServerSettings({ serverSettingsPopover, channelHeaderRef }) {
-
+export default function ServerSettings({ channelHeaderRef }) {
+    const dispatch = useDispatch();
+    const { serverSettingsPopover } = useSelector(state => state.popover)
     return (
         <Popover
             open={serverSettingsPopover}
-            onClose={toggleServerSettings}
+            onClose={() => dispatch(toggleServerSettings())}
             anchorEl={channelHeaderRef.current}
             anchorReference="anchorEl"
             PaperProps={{
@@ -36,7 +38,7 @@ export default function ServerSettings({ serverSettingsPopover, channelHeaderRef
             <ListItem sx={{
                 p: 0.75
             }}>
-                <ListItemButton onClick={handleInviteToServer} sx={{
+                <ListItemButton onClick={() => handleInviteToServer()} sx={{
                     color: "#949cf7",
                     borderRadius: "4px",
                     "&:hover": {
@@ -51,7 +53,7 @@ export default function ServerSettings({ serverSettingsPopover, channelHeaderRef
                 </ListItemButton>
             </ListItem>
             <ListItem sx={{ p: 0.75 }}>
-                <ListItemButton onClick={toggleServerSettings} sx={{
+                <ListItemButton onClick={() => dispatch(toggleServerSettings())} sx={{
                     color: "#ffffff",
                     borderRadius: "4px",
                     "&:hover": {
@@ -67,7 +69,7 @@ export default function ServerSettings({ serverSettingsPopover, channelHeaderRef
             </ListItem>
             <Divider sx={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
             <ListItem sx={{ p: 0.75 }}>
-                <ListItemButton onClick={handleDeleteServer} sx={{
+                <ListItemButton onClick={() => handleDeleteServer()} sx={{
                     color: "#f23f42",
                     borderRadius: "4px",
                     "&:hover": {

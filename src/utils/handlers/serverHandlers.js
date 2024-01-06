@@ -14,7 +14,7 @@ import { setIsDirectMessagePageOpen } from "../../redux/features/directMessageSl
 // }
 
 export const handleSelectServer = (serverName, serverId) => {
-    
+
     const storedData = localStorage.getItem("userSelectStore");
     const userSelectStore = JSON.parse(storedData);
     const storeChannelIds = userSelectStore?.selectedChannelIds;
@@ -31,6 +31,7 @@ export const handleSelectServer = (serverName, serverId) => {
     localStorage.setItem("userSelectStore", updatedUserSelectStore)
     store.dispatch(setIsDirectMessagePageOpen(false))
     store.dispatch(setSelectedServer(serverId))
+    store.dispatch(setSelectedChannel(getDefaultChannelId))
     store.dispatch(setCurrServer({ name: serverName, id: serverId }));
 }
 

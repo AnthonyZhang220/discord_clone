@@ -1,11 +1,16 @@
+import React from "react"
+import { useSelector } from "react-redux";
+import { lighten } from "@mui/material";
 import { ListItem, ListItemButton, ListItemText, ListItemAvatar, Badge, Avatar } from "@mui/material";
+import { handleCurrDirectMessageChannel } from "../../../../utils/handlers/channelHandlers";
+import StatusList from "../../../StatusList";
 
-export const DirectMessageList = ({ userId, status, name, avatar }) => {
-
+export const DirectMessageList = ({ id, status, displayName, avatar, createdAt }) => {
+    const { currDirectMessageChannel, isFriendListPageOpen } = useSelector(state => state.directMessage)
     return (
-        <ListItem id={userId} disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
-            <ListItemButton onClick={() => handleCurrentPrivateChannel(userId)} sx={{
-                backgroundColor: currentPrivateChannel.uid == userId ? lighten("#313338", 0.1) : "inherit",
+        <ListItem disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
+            <ListItemButton onClick={() => handleCurrDirectMessageChannel(id, status, displayName, avatar, createdAt)} sx={{
+                backgroundColor: !isFriendListPageOpen && currDirectMessageChannel.id == id ? lighten("#313338", 0.1) : "inherit",
             }}>
                 <ListItemAvatar sx={{ minWidth: "0", mr: 1 }}>
                     <Badge
@@ -15,10 +20,10 @@ export const DirectMessageList = ({ userId, status, name, avatar }) => {
                             <StatusList status={status} size={12} />
                         }
                     >
-                        <Avatar alt={name} src={avatar} sx={{ width: 32, height: 32 }} />
+                        <Avatar alt={displayName} src={avatar} sx={{ width: 32, height: 32 }} />
                     </Badge>
                 </ListItemAvatar>
-                <ListItemText primary={name} />
+                <ListItemText primary={displayName} />
             </ListItemButton>
         </ListItem>
     )

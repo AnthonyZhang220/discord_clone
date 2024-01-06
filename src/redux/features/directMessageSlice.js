@@ -5,8 +5,12 @@ const directMessageSlice = createSlice({
     initialState: {
         isDirectMessagePageOpen: true,
         currDirectMessageChannel: {},
+        currDirectMessageChannelRef: "",
         friendFilter: "",
         friendList: [],
+        friendIdList: [],
+        directMessageChannelRefs: {},
+        directMessageChannelList: [],
         isFriendListPageOpen: false,
         isDirectMessageSidebarOpen: false,
     },
@@ -23,14 +27,26 @@ const directMessageSlice = createSlice({
         setFriendList: (state, action) => {
             state.friendList = action.payload;
         },
+        setDirectMessageChannelList: (state, action) => {
+            state.directMessageChannelList = action.payload;
+        },
         setIsFriendListPageOpen: (state, action) => {
             state.isFriendListPageOpen = action.payload;
         },
-        setIsDirectMessageSidebarOpen: (state, action) => {
-            state.isDirectMessageSidebarOpen = action.payload;
+        toggleDirectMessageSidebar: (state, action) => {
+            state.isDirectMessageSidebarOpen = !state.isDirectMessageSidebarOpen;
+        },
+        setDirectMessageChannelRefs: (state, action) => {
+            state.directMessageChannelRefs = action.payload;
+        },
+        setCurrDirectMessageChannelRef: (state, action) => {
+            state.currDirectMessageChannelRef = action.payload;
+        },
+        setFriendIdList: (state, action) => {
+            state.friendIdList = action.payload;
         }
     }
 })
 
-export const { setIsDirectMessagePageOpen, setCurrDirectMessageChannel, setFriendFilter, setIsFriendListPageOpen, setIsDirectMessageSidebarOpen } = directMessageSlice.actions;
+export const { setFriendIdList, setFriendList, setCurrDirectMessageChannelRef, setDirectMessageChannelRefs, setDirectMessageChannelList, setIsDirectMessagePageOpen, setCurrDirectMessageChannel, setFriendFilter, setIsFriendListPageOpen, toggleDirectMessageSidebar } = directMessageSlice.actions;
 export default directMessageSlice.reducer;

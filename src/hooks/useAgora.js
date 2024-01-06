@@ -14,7 +14,6 @@ function useAgora() {
             handleVolume(volumes)
         })
         agoraEngine.on("user-published", (user, mediaType) => {
-            console.log(user.uid + "published");
             handleUserSubscribe(user, mediaType)
             handleUserPublishedToAgora(user, mediaType)
         });
@@ -22,11 +21,9 @@ function useAgora() {
             handleRemoteUserJoinedAgora(user)
         })
         agoraEngine.on("user-left", (user) => {
-            console.log(user.uid + "has left the channel");
             handleRemoteUserLeftAgora(user)
         })
         agoraEngine.on("user-unpublished", (user, mediaType) => {
-            console.log(user.uid + "unpublished");
             handleUserUnpublishedFromAgora(user, mediaType)
         });
 
