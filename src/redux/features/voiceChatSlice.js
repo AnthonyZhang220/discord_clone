@@ -9,12 +9,16 @@ const voiceChatSlice = createSlice({
         isCameraOn: false,
         isScreenSharingOn: false,
         isVoiceChatConnected: false,
+        isVoiceChatPageOpen: false,
         agoraEngine: null,
+        agoraConfig: {},
         screenShareRef: null,
         remoteUsers: [],
         localTracks: null,
-        currentAgoraUID: null,
+        currAgoraUID: null,
         screenTrack: null,
+        connectionState: {},
+        latency: null,
         // Add other voice chat-related state here
     },
     reducers: {
@@ -46,12 +50,24 @@ const voiceChatSlice = createSlice({
         setLocalTracks: (state, action) => {
             state.localTracks = action.payload;
         },
-        setCurrentAgoraUID: (state, action) => {
-            state.currentAgoraUID = action.payload;
+        setCurrAgoraUID: (state, action) => {
+            state.currAgoraUID = action.payload;
         },
         setScreenTrack: (state, action) => {
             state.screenTrack = action.payload;
         },
+        setAgoraConfig: (state, action) => {
+            state.agoraConfig = action.payload;
+        },
+        setIsVoiceChatPageOpen: (state, action) => {
+            state.isVoiceChatPageOpen = action.payload;
+        },
+        setConnectionState: (state, action) => {
+            state.connectionState = action.payload;
+        },
+        setLatency: (state, action) => {
+            state.latency = action.payload;
+        }
     },
 });
 
@@ -68,6 +84,10 @@ export const {
     setLocalTracks,
     setCurrentAgoraUID,
     setScreenTrack,
+    setAgoraConfig,
+    setIsVoiceChatPageOpen,
+    setConnectionState,
+    setLatency,
 } = voiceChatSlice.actions;
 export default voiceChatSlice.reducer;
 

@@ -14,7 +14,7 @@ import { AgoraClient, AgoraConfig } from './Agora'
 // import { RtcRole } from "agora-token"
 import { fetchToken } from './utils/fetchToken'
 
-import VoiceChat from './components/Chat/VoiceChat/VoiceChat'
+import VoiceChat from './components/VoiceChat/VoiceChat'
 import { useDispatch, useSelector } from 'react-redux'
 import ThemeContextProvider from './contexts/ThemeContextProvider'
 import CssBaseline from '@mui/material/CssBaseline';
@@ -22,7 +22,6 @@ import { convertDateDivider } from './utils/formatter'
 import { listenToAuthStateChange } from './utils/authentication'
 import DirectMessageMenu from "./components/DirectMessage/DirectMessageMenu/DirectMessageMenu";
 import DirectMessageBody from './components/DirectMessage/DirectMessageBody/DirectMessageBody';
-import DirectMessageHeader from './components/DirectMessage/DirectMessageHeader/DirectMessageHeader'
 
 
 import "./App.scss";
@@ -30,164 +29,95 @@ import "./App.scss";
 function App() {
     const dispatch = useDispatch()
     const { user } = useSelector((state) => state.auth)
-    const [friendList, setFriendList] = useState([])
+    const { isVoiceChatPageOpen } = useSelector(state => state.voiceChat)
+    const { currVoiceChannel } = useSelector(state => state.channel)
 
     useEffect(() => {
         listenToAuthStateChange();
         return listenToAuthStateChange;
     }, [auth])
 
-    const [friendIds, setFriendIds] = useState([]);
-
-    useEffect(() => {
-        if (user.uid) {
-            // const docRef = doc(collectionRef, user.uid)
-            const docRef = query(collection(db, "users"), where("userId", "==", user.uid))
-
-            const unsub = onSnapshot(docRef, (QuerySnapshot) => {
-                let data = [];
-                QuerySnapshot.forEach((doc) => {
-                    data = doc.data().friends
-                })
-                setFriendIds(data)
-            })
-
-            // return unsub
-        }
-
-    }, [user.uid])
-
-    //get user's friend list
-    useEffect(() => {
-        if (friendIds.length > 0) {
-            const q = query(collection(db, "users"), where("userId", "in", friendIds))
-            const unsubscribe = onSnapshot(q, (snapshot) => {
-                const friendList = [];
-                snapshot.forEach((doc) => {
-                    friendList.push({
-                        displayName: doc.data().displayName,
-                        profileURL: doc.data().profileURL,
-                        status: doc.data().status,
-                        userId: doc.data().userId
-                    })
-                })
-                setFriendList(friendList)
-            })
-            // return unsubscribe
-        }
-    }, [friendIds])
-
-    const [channelRef, setChannelRef] = useState("")
-
-    const [voiceChat, setVoiceChat] = useState(false);
-    const [currentVoiceChannel, setCurrentVoiceChannel] = useState({ name: null, uid: null })
-
     const [config, setConfig] = useState(AgoraConfig)
 
     const [agoraEngine, setAgoraEngine] = useState(AgoraClient);
-    const screenShareRef = useRef(null)
-    const [voiceConnected, setVoiceConnected] = useState(false);
-    const [remoteUsers, setRemoteUsers] = useState([]);
-    const [localTracks, setLocalTracks] = useState(null)
-    const [currentAgoraUID, setCurrentAgoraUID] = useState(null)
-    const [screenTrack, setScreenTrack] = useState(null);
+    // useEffect(() => {
+    //     const fetch = async () => {
+    //         const token = await fetchToken()
 
-    useEffect(() => {
-        setConfig({ ...config, channel: currentVoiceChannel.uid })
-    }, [currentVoiceChannel.uid])
+    //         return new Promise((resolve, reject) => {
+    //             resolve(token)
+    //         })
+    //     }
 
-    const [connectionState, setConnectionState] = useState({ state: null, reason: null })
+    //     if (config.channel) {
 
-    useEffect(() => {
-        const fetch = async () => {
-            const token = await fetchToken()
+    //         fetch().then((token) => {
+    //             agoraEngine.join(config.appId, config.channel, token, null)
+    //                 .then((uid) => {
+    //                     return Promise.all([AgoraRTC.createMicrophoneAndCameraTracks(), uid])
+    //                 }).then(([tracks, uid]) => {
 
-            return new Promise((resolve, reject) => {
-                resolve(token)
-            })
-        }
+    //                     const [audioTrack, videoTrack] = tracks;
 
-        if (config.channel) {
+    //                     let data = {
+    //                         firebaseUID: null,
+    //                         uid: null,
+    //                         name: null,
+    //                         avatar: null
+    //                     };
 
-            fetch().then((token) => {
-                agoraEngine.join(config.appId, config.channel, token, null)
-                    .then((uid) => {
-                        return Promise.all([AgoraRTC.createMicrophoneAndCameraTracks(), uid])
-                    }).then(([tracks, uid]) => {
+    //                     let userData = {}
+    //                     //get Document for user in firebase
+    //                     const userDoc = doc(db, "users", user.uid)
 
-                        const [audioTrack, videoTrack] = tracks;
-
-                        let data = {
-                            firebaseUID: null,
-                            uid: null,
-                            name: null,
-                            avatar: null
-                        };
-
-                        let userData = {}
-                        //get Document for user in firebase
-                        const userDoc = doc(db, "users", user.uid)
-
-                        getDoc(userDoc).then((doc) => {
-                            //if such document exist add its info to liveUser array
-                            if (doc.exists()) {
-                                data = {
-                                    firebaseUID: doc.data().userId,
-                                    uid: uid,
-                                    name: doc.data().displayName,
-                                    avatar: doc.data().profileURL,
-                                    hasAudio: false,
-                                    hasVideo: false,
-                                }
+    //                     getDoc(userDoc).then((doc) => {
+    //                         //if such document exist add its info to liveUser array
+    //                         if (doc.exists()) {
+    //                             data = {
+    //                                 firebaseUID: doc.data().userId,
+    //                                 uid: uid,
+    //                                 name: doc.data().displayName,
+    //                                 avatar: doc.data().profileURL,
+    //                                 hasAudio: false,
+    //                                 hasVideo: false,
+    //                             }
 
 
-                                addLiveUserToFirebase(data)
+    //                             addLiveUserToFirebase(data)
 
-                                userData = {
-                                    firebaseUID: user.uid,
-                                    name: data.name,
-                                    avatar: data.avatar,
-                                    uid,
-                                    videoTrack,
-                                    audioTrack,
-                                    hasVideo: false,
-                                    hasAudio: false
-                                }
+    //                             userData = {
+    //                                 firebaseUID: user.uid,
+    //                                 name: data.name,
+    //                                 avatar: data.avatar,
+    //                                 uid,
+    //                                 videoTrack,
+    //                                 audioTrack,
+    //                                 hasVideo: false,
+    //                                 hasAudio: false
+    //                             }
 
-                                setCurrentAgoraUID(uid)
-                                setRemoteUsers((previousUsers) => {
-                                    if (previousUsers !== undefined) {
-                                        return [...previousUsers, userData]
-                                    }
-                                })
+    //                             setCurrentAgoraUID(uid)
+    //                             setRemoteUsers((previousUsers) => {
+    //                                 if (previousUsers !== undefined) {
+    //                                     return [...previousUsers, userData]
+    //                                 }
+    //                             })
 
-                                setLocalTracks(tracks)
-                                agoraEngine.publish(tracks)
+    //                             setLocalTracks(tracks)
+    //                             agoraEngine.publish(tracks)
 
-                                videoTrack.setEnabled(false);
-                                audioTrack.setEnabled(false);
-                                console.log("Tracks successfully published!")
-                                setVoiceConnected(true)
-                                setVoiceChat(true)
-                            }
-                        })
-                    })
+    //                             videoTrack.setEnabled(false);
+    //                             audioTrack.setEnabled(false);
+    //                             console.log("Tracks successfully published!")
+    //                             setVoiceConnected(true)
+    //                             setVoiceChat(true)
+    //                         }
+    //                     })
+    //                 })
 
-            });
-        }
-    }, [config.channel])
-
-    const [stats, setStats] = useState(0)
-
-    const getStats = () => {
-        const stats = agoraEngine.getRTCStats()
-        setStats(stats.RTT)
-    }
-
-    useEffect(() => {
-        const interval = setInterval(getStats, 5000)
-        return () => clearInterval(interval);
-    }, [agoraEngine])
+    //         });
+    //     }
+    // }, [config.channel])
 
     const handleDefen = () => {
         setDefen(!defen)
@@ -198,14 +128,9 @@ function App() {
         <ThemeContextProvider>
             <CssBaseline />
             <Routes>
-                <Route path="/"
-                    element={
-                        <LoginPage />
-                    } />
-                <Route path="/reset"
-                    element={<ResetPasswordPage />} />
-                <Route path="/register"
-                    element={<RegisterPage />} />
+                <Route path="/" element={<LoginPage />} />
+                <Route path="/reset" element={<ResetPasswordPage />} />
+                <Route path="/register" element={<RegisterPage />} />
                 <Route element={
                     <Box className="app-mount">
                         <Box className="app-container" >
@@ -213,40 +138,22 @@ function App() {
                         </Box>
                     </Box>
                 } >
-                    <Route
-                        path="/channels"
+                    <Route path="/channels"
                         element={
                             <Fragment>
                                 <ServerList />
                                 <Outlet />
                             </Fragment>
                         }>
-                        <Route
-                            index
+                        <Route index
                             element={
                                 <Fragment>
-                                    <Channel
-                                        voiceChat={voiceChat}
-                                        setVoiceChat={setVoiceChat}
-                                        currentVoiceChannel={currentVoiceChannel}
-                                        setCurrentVoiceChannel={setCurrentVoiceChannel}
-                                        voiceConnected={voiceConnected}
-                                        stats={stats}
-                                        connectionState={connectionState}
-                                    />
+                                    <Channel />
                                     {
-                                        voiceChat ?
-                                            <VoiceChat
-                                                voiceChat={voiceChat}
-                                                currentVoiceChannel={currentVoiceChannel}
-                                                config={config}
-                                                remoteUsers={remoteUsers}
-                                                setRemoteUsers={setRemoteUsers}
-                                                currentAgoraUID={currentAgoraUID}
-                                            />
+                                        isVoiceChatPageOpen ?
+                                            <VoiceChat currVoiceChannel={currVoiceChannel} />
                                             :
                                             <Chat />
-
                                     }
                                 </Fragment>
                             }

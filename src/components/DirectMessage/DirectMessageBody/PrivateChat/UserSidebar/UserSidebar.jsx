@@ -1,15 +1,16 @@
+import React, { useEffect } from "react"
 import Box from '@mui/material/Box';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 import { Badge, Divider } from '@mui/material';
-
 import { MenuListItemButton } from '../../../../CustomUIComponents';
 import StatusList from '../../../../StatusList';
 
 import "./UserSidebar.scss";
 
 export default function UserSidebar({ currDirectMessageChannel }) {
+
     return (
         <Box className="userSidebar-container">
             <Box component="aside" className="userSidebar-memberlist-wrapper" sx={{ width: "100%", transition: "background-color 0.1s" }}>
@@ -32,13 +33,13 @@ export default function UserSidebar({ currDirectMessageChannel }) {
                                     <StatusList status={currDirectMessageChannel.status} />
                                 }
                             >
-                                <Avatar alt={currDirectMessageChannel.name} sx={{ width: "80px", height: "80px" }} src={currDirectMessageChannel.avatar} imgProps={{ crossOrigin: "Anonymous" }} />
+                                <Avatar alt={currDirectMessageChannel.displayName} sx={{ width: "80px", height: "80px" }} src={currDirectMessageChannel.avatar} imgProps={{ crossOrigin: "Anonymous" }} />
                             </Badge>
                         </Box>
                         <Box className="userSidebar-detail-list">
                             <ListItem dense>
                                 <MenuListItemButton>
-                                    <ListItemText primary={currDirectMessageChannel.name} primaryTypographyProps={{ variant: "h3" }} />
+                                    <ListItemText primary={currDirectMessageChannel.displayName} primaryTypographyProps={{ variant: "h3" }} />
                                 </MenuListItemButton>
                             </ListItem>
                             <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />

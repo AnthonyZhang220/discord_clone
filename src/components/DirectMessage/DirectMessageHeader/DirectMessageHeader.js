@@ -11,15 +11,12 @@ import { TextFieldProps } from '@mui/material/TextField';
 import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
 import { Stack } from '@mui/material';
 
-
-
-
 import StatusList from '../../StatusList';
 import { FunctionTooltip } from '../../CustomUIComponents';
 import { AlternateEmailSharp } from '@mui/icons-material';
 import { useDispatch, useSelector } from "react-redux";
 import { setFriendFilter } from "../../../redux/features/directMessageSlice";
-import { setIsDirectMessageSidebarOpen } from "../../../redux/features/directMessageSlice";
+import { toggleDirectMessageSidebar } from "../../../redux/features/directMessageSlice";
 import "./DirectMessageHeader.scss"
 
 export default function DirectMessageHeader() {
@@ -92,14 +89,14 @@ export const FriendHeader = () => {
 
 export const PrivateChannelHeader = () => {
     const dispatch = useDispatch();
-    const { currDirectMessageChannel, isDirectMessageSidebarOpen } = useSelector(state => state.directMessage)
+    const { currDirectMessageChannel } = useSelector(state => state.directMessage)
 
     return (
         <Box className="friend-main-header" component="section">
             <Box className="friend-main-header-name">
                 <AlternateEmailSharp sx={{ color: "#8a8e94", marginRight: "6px", alignItems: "baseline" }} />
                 <Box component="span" variant="h3" className="friend-main-header-hashtag">
-                    {currDirectMessageChannel.name}
+                    {currDirectMessageChannel.displayName}
                 </Box>
                 <Box>
                     <StatusList status={currDirectMessageChannel.status} size={15} />
@@ -110,7 +107,7 @@ export const PrivateChannelHeader = () => {
                     <React.Fragment>
                         <Typography variant="body1" sx={{ m: 0.5 }} >More</Typography>
                     </React.Fragment>} placement="bottom">
-                    <PeopleAltIcon color="white" onClick={() => dispatch(setIsDirectMessageSidebarOpen(!isDirectMessageSidebarOpen))} />
+                    <PeopleAltIcon color="white" onClick={() => dispatch(toggleDirectMessageSidebar())} />
                 </FunctionTooltip>
             </Box>
         </Box>

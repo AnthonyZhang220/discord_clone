@@ -25,7 +25,7 @@ function ChannelMemberList() {
             const memberIds = serverDoc.data().members;
             let fetchedMemberList = [];
             let fetchedMemberRefs = [];
-            console.log(memberIds)
+
 
             for (let i = 0; i < memberIds.length; ++i) {
                 const userRef = doc(db, "users", memberIds[i])
@@ -33,7 +33,7 @@ function ChannelMemberList() {
                 fetchedMemberList.push(userDoc.data())
                 fetchedMemberRefs.push(memberIds[i])
             }
-            console.log("memberRefs", memberRefs)
+
             setMemberRef(fetchedMemberRefs)
             dispatch(setMemberList(fetchedMemberList))
         }
@@ -42,18 +42,17 @@ function ChannelMemberList() {
     useEffect(() => {
         if (selectedServer) {
             getMemberList();
-            console.log(memberList)
         }
     }, [selectedServer])
 
 
     const handleOpenMemberDetail = (memberId) => {
-        console.log("memberId", memberId)
+
         const currentMemberDetail = memberList.find(member => member.id === memberId)
         dispatch(setMemberDetail(currentMemberDetail))
 
         const clickedMemberRefs = memberRefs.current[memberId]
-        console.log("clickedMemberRefs", clickedMemberRefs)
+
         setMemberRef(clickedMemberRefs)
         dispatch(setMemberDetailPopover(true))
     }

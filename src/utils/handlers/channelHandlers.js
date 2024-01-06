@@ -1,49 +1,49 @@
 import store from "../../redux/store"
 import { setNewChannelInfo, setCurrChannel } from "../../redux/features/channelSlice"
-import { update } from "firebase/database"
 import { setSelectedChannel } from "../../redux/features/userSelectStoreSlice"
+import { setDirectMessageChannelRef, setIsFriendListPageOpen, setCurrDirectMessageChannelRef, setCurrDirectMessageChannel } from "../../redux/features/directMessageSlice"
+import { db } from "../../firebase"
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore"
+import { setDirectMessageList } from "../../redux/features/chatListSlice"
+import { setIsVoiceChatPageOpen } from "../../redux/features/voiceChatSlice"
 
-export const handleCreateChannel = async (currentServer, newChannelInfo) => {
-    await addDoc(collection(db, "channels"), {
+export const handleCreateChannel = async (newChannelInfo) => {
+    const doc = await addDoc(collection(db, "channels"), {
         name: newChannelInfo.channelName,
         serverRef: store.getState().userSelectStore.selectedServer,
         createdAt: Timestamp.fromDate(new Date()),
         messages: [],
-    }).then(() => {
+    })
+    if (doc) {
         store.dispatch(setNewChannelInfo({ channelName: "" }))
         // handleChannelModalClose();
-    })
+    }
 }
 
-export const handleCurrentPrivateChannel = async (channelId) => {
-
-    const q = query(collection(db, "privatechannels"), where("memberRef", "array-contains", user.uid))
-
-    let userRef = [];
-    const docRef = await getDocs(q)
-    docRef.forEach((doc) => {
-        userRef = doc.data().memberRef
+export const handleCreateVoiceChannel = async (newChannelInfo) => {
+    const doc = await addDoc(collection(db, "voicechannels"), {
+        name: newChannelInfo.channelName,
+        serverRef: store.getState().userSelectStore.selectedServer,
+        createdAt: Timestamp.fromDate(new Date()),
+        messages: [],
     })
-
-
-    let userId = "";
-    if (userRef[0] === user.uid) {
-        userId = userRef[1]
-    } else if (userRef[1] === user.uid) {
-        userId = userRef[0]
+    if (doc) {
+        store.dispatch(setNewChannelInfo({ channelName: "" }))
+        // handleChannelModalClose();
     }
-    const resRef = doc(db, "users", userId)
-    const queryRef = await getDoc(resRef);
+}
 
-    setCurrentPrivateChannel({
-        uid: queryRef.data().userId,
-        displayName: queryRef.data().displayName,
-        status: queryRef.data().status,
-        avatar: queryRef.data().profileURL,
-        createdAt: queryRef.data().createdAt.seconds,
-    })
-
-    setChannelRef(channelRef);
+export const handleCurrDirectMessageChannel = async (userId, status, displayName, avatar, createdAt) => {
+    console.log(userId)
+    store.dispatch(setCurrDirectMessageChannel({ id: userId, status: status, displayName: displayName, avatar: avatar, createdAt: createdAt }))
+    const privateChannels = store.getState().directMessage.directMessageChannelRefs;
+    console.log(privateChannels)
+    const channelRef = doc(db, "privatechannels", privateChannels[userId]);
+    const channelDoc = await getDoc(channelRef);
+    const ref = channelDoc.data().channelRef;
+    console.log(ref)
+    store.dispatch(setCurrDirectMessageChannelRef(ref))
+    store.dispatch(setIsFriendListPageOpen(false))
 }
 
 export const handleSelectChannel = (channelName, channelId) => {
@@ -57,6 +57,9 @@ export const handleSelectChannel = (channelName, channelId) => {
     const updatedUserSelectStore = JSON.stringify(userSelectStore)
 
     localStorage.setItem("userSelectStore", updatedUserSelectStore)
+    store.dispatch(setIsVoiceChatPageOpen(false))
     store.dispatch(setSelectedChannel(channelId))
     store.dispatch(setCurrChannel({ name: channelName, id: channelId }))
 }
+
+

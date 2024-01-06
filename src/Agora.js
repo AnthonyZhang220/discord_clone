@@ -14,5 +14,4 @@ export const AgoraConfig = {
     // Set the user ID.
     uid: 0,
     serverUrl: process.env.REACT_APP_SERVER_URL,
-
 }

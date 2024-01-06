@@ -28,10 +28,10 @@ import { setCreateChannelModal } from '../../redux/features/modalSlice';
 import { setCurrChannelList, setCurrVoiceChannelList } from '../../redux/features/channelSlice';
 import { toggleServerSettings } from '../../redux/features/popoverSlice';
 import { handleSelectChannel } from '../../utils/handlers/channelHandlers';
+import { handleJoinVoiceChannel } from '../../utils/handlers/voiceChannelHandlers';
 
 const Channel = () => {
     const channelHeaderRef = useRef(null);
-    const [liveList, setLiveList] = useState([])
     const dispatch = useDispatch()
     const { createChannelModal, inviteModal } = useSelector((state) => state.modal)
     const { user } = useSelector(state => state.auth)
@@ -39,6 +39,7 @@ const Channel = () => {
     const { currVoiceChannel, currChannelList, currVoiceChannelList } = useSelector(state => state.channel)
     const { currServer } = useSelector(state => state.server)
     const { serverSettingsPopover } = useSelector(state => state.popover)
+    const { isVoiceChatConnected } = useSelector(state => state.voiceChat)
 
     //get channel list by server UID
     useEffect(() => {
@@ -51,7 +52,7 @@ const Channel = () => {
                 })
                 dispatch(setCurrChannelList(list))
             })
-             
+
         }
     }, [selectedServer])
 
@@ -70,33 +71,9 @@ const Channel = () => {
 
     }, [selectedServer])
 
-    // useEffect(() => {
-    //     // constantly monitor the state change of user, audio, video
-    //     if (currentVoiceChannel.uid) {
-    //         const voiceChannelRef = doc(db, "voicechannels", currentVoiceChannel.uid)
-    //         const snapshot = onSnapshot(voiceChannelRef, (doc) => {
-    //             const list = doc.data().liveUser
-    //             if (list && list.length != 0) {
-    //                 list.forEach((User) => {
-    //                     setRemoteUsers((previousUser) => {
-    //                         if (previousUser != undefined) {
-    //                             return previousUser.map((user) => {
-    //                                 if (user.uid == User.uid) {
-    //                                     return { ...user, name: User.name, hasAudio: User.hasAudio, hasVideo: User.hasVideo }
-    //                                 }
-    //                                 return user;
-    //                             })
-    //                         }
-    //                     })
-    //                 })
-    //             }
-    //         })
-    //     }
-    // }, [remoteUsers, config.channel])
-
     return (
         <Box component="aside" className='channel-container'>
-            <Box component="header" className="channel-header focusable" onClick={toggleServerSettings} ref={channelHeaderRef}>
+            <Box component="header" className="channel-header focusable" onClick={() => dispatch(toggleServerSettings())} ref={channelHeaderRef}>
                 <Typography component="h6" className="channel-header-name" variant='h6'>
                     {currServer.name}
                 </Typography>
@@ -133,7 +110,6 @@ const Channel = () => {
                         <Box key={id} id={id} component="li" className={`channel channel-text ${id === selectedChannel ? "active" : ""}`}
                             onClick={() => {
                                 handleSelectChannel(name, id)
-                                setVoiceChat(false)
                             }}
                         >
                             <NumbersIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />
@@ -158,11 +134,10 @@ const Channel = () => {
                     </Box>
                 </Box>
                 <Box component="ul" className="channel-list-text">
-                    {currVoiceChannelList.map(({ name, id, liveUser }) => (
+                    {currVoiceChannelList.map(({ name, id, participants }) => (
                         <Box key={id}>
                             <Box key={id} id={id} component="li" className={`channel channel-text ${id === currVoiceChannel.uid ? "active" : ""}`} onClick={() => {
-                                setCurrVoiceChannel({ name: name, uid: id })
-                                setVoiceChat(true)
+                                handleJoinVoiceChannel(name, id)
                             }}>
                                 <VolumeUpIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />
                                 <Box component="span" className="channel-name">{name}</Box>
@@ -171,13 +146,13 @@ const Channel = () => {
                                 </IconButton>
                             </Box>
                             {
-                                liveUser.map(({ avatar, name, uid }, index) => (
-                                    <ListItem key={uid + index} id={uid} disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
+                                participants.map(({ displayName, profileURL, id }) => (
+                                    <ListItem key={id} id={id} disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
                                         <ListItemButton>
                                             <ListItemAvatar sx={{ minWidth: "0", mr: 1, ml: "auto" }}>
-                                                <Avatar alt={name} src={avatar} sx={{ width: 20, height: 20 }} />
+                                                <Avatar alt={displayName} src={profileURL} sx={{ width: 20, height: 20 }} />
                                             </ListItemAvatar>
-                                            <ListItemText primary={name} />
+                                            <ListItemText primary={displayName} />
                                         </ListItemButton>
                                     </ListItem>
                                 ))
@@ -186,11 +161,7 @@ const Channel = () => {
                     ))}
                 </Box>
             </Box>
-            {/* {connectionState.state != "DISCONNECTED" && typeof (connectionState.state) == "string" ?
-                <VoiceControl />
-                :
-                null
-            } */}
+            {isVoiceChatConnected && <VoiceControl />}
             <UserFooter className="user-footer-container" />
             <InviteDialog selectedServer={selectedServer} inviteModal={inviteModal} />
             <CreateChannelDialog createChannelModal={createChannelModal} />
