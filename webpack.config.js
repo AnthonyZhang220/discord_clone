@@ -1,4 +1,4 @@
-const Dotenv = require('dotenv-webpack');
+const DotenvWebpackPlugin = require('dotenv-webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const path = require('path');
@@ -64,10 +64,10 @@ module.exports = {
         ],
     },
     plugins: [
-        new Dotenv(),
         new HtmlWebpackPlugin({
             template: path.join(__dirname, 'public', 'index.html')
         }),
+        new DotenvWebpackPlugin(),
         new NodePolyfillPlugin(),
     ]
 };
