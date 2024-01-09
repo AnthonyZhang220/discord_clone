@@ -70,7 +70,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             <StatusList status={user.status} />
                         }
                     >
-                        <Avatar alt={user.displayName} sx={{ width: "80px", height: "80px" }} src={user.profileURL} imgProps={{ crossOrigin: "Anonymous" }} />
+                        <Avatar alt={user.displayName} sx={{ width: "80px", height: "80px" }} src={user.avatar} imgProps={{ crossOrigin: "Anonymous" }} />
                     </Badge>
                 </Box>
                 <Box className="user-detail-list" sx={{ backgroundColor: "#111214" }}>

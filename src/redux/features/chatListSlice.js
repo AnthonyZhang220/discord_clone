@@ -5,7 +5,7 @@ const chatListSlice = createSlice({
     name: 'chatList',
     initialState: {
         directMessageList: [],
-        messeageList: [],
+        messageList: [],
         // Add other private channel-related state here
     },
     reducers: {
@@ -13,7 +13,7 @@ const chatListSlice = createSlice({
             state.draftDirectMessage = action.payload;
         },
         setMessageList: (state, action) => {
-            state.channelRef = action.payload;
+            state.messageList = action.payload;
         },
         // Add other private channel-related reducers here
     },

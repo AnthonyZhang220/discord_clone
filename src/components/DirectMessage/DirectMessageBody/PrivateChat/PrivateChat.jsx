@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect, useMemo, memo } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 //send meesage to db
-import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, setDoc, doc, getDocs, QuerySnapshot, updateDoc, getDoc, documentId, orderBy, limitToLast, arrayRemove } from 'firebase/firestore';
+import { onSnapshot, query, where, collection, orderBy, limitToLast } from 'firebase/firestore';
 import { db, storage } from "../../../../firebase";
 //material ui comp
 import Box from '@mui/material/Box';
@@ -19,14 +19,15 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 import { FunctionTooltip } from '../../../CustomUIComponents';
 import { setDraftDirectMessage } from '../../../../redux/features/draftSlice';
-import { bytesToMB } from '../../../../utils/bytesToMB';
 import { convertDate, convertTime, convertDateDivider } from '../../../../utils/formatter';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDirectMessageList } from '../../../../redux/features/chatListSlice';
 import UserSidebar from './UserSideBar/UserSideBar';
 import './PrivateChat.scss'
+import { handleSubmitDirectMessage } from '../../../../utils/handlers/messageHandlers';
+import { handleUploadFile } from '../../../../utils/handlers/messageHandlers';
 
-export default function PrivateChat({ user, handleAddPrivateMessage }) {
+export default function PrivateChat() {
     const formRef = useRef();
     const chatScroller = useRef();
     const [openUpload, setOpenUpload] = useState(false);
@@ -62,7 +63,7 @@ export default function PrivateChat({ user, handleAddPrivateMessage }) {
                         chatList.push(chatMessage);
                     } else if (chatMessage.userRef === previousUserRef) {
                         chatList.push({
-                            userName: null,
+                            displayName: null,
                             avatar: null,
                             createdAt: doc.data().createdAt,
                             type: doc.data().type,
@@ -89,7 +90,7 @@ export default function PrivateChat({ user, handleAddPrivateMessage }) {
         setOpenUpload(true)
     }
 
-    const ChatItem = ({ content, userName, avatar, createdAt, type, fileName, dividerDate }) => {
+    const ChatItem = useMemo(() => ({ content, displayName, avatar, createdAt, type, fileName, dividerDate }) => {
 
         const FormatChat = () => {
 
@@ -131,11 +132,11 @@ export default function PrivateChat({ user, handleAddPrivateMessage }) {
                             <ListItem className="message" sx={{ p: 0, m: 0 }}>
                                 <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
                                     <ListItemAvatar>
-                                        <Avatar alt={userName} src={avatar} />
+                                        <Avatar alt={displayName} src={avatar} />
                                     </ListItemAvatar>
                                     <ListItemText primary={
                                         <React.Fragment>
-                                            {userName}
+                                            {displayName}
                                             <Typography
                                                 sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
                                                 component="span"
@@ -180,7 +181,8 @@ export default function PrivateChat({ user, handleAddPrivateMessage }) {
                 }
             </React.Fragment>
         )
-    }
+    }, [directMessageList])
+
     const ChatList = useMemo(() => {
 
         return (
@@ -198,14 +200,14 @@ export default function PrivateChat({ user, handleAddPrivateMessage }) {
                         .
                     </Typography>
                 </ListItem>
-                {directMessageList.map(({ content, userName, avatar, createdAt, type, fileName, dividerDate }, index) => (
-                    <ChatItem className="message" content={content} userName={userName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} dividerDate={dividerDate} />
+                {directMessageList.map(({ content, displayName, avatar, createdAt, type, fileName, dividerDate }, index) => (
+                    <ChatItem className="message" content={content} displayName={displayName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} dividerDate={dividerDate} />
                 ))}
                 {/* <Divider>CENTER</Divider> */}
                 <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
             </List>
         )
-    }, [currDirectMessageChannel, directMessageList])
+    }, [currDirectMessageChannel.id, directMessageList])
 
 
 
@@ -219,7 +221,7 @@ export default function PrivateChat({ user, handleAddPrivateMessage }) {
                         </Box>
                     </Box>
                 </Box>
-                <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleAddPrivateMessage(e)} sx={{
+                <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleSubmitDirectMessage(e)} sx={{
                     position: "relative",
                     msFlexPositive: "false",
                     flexShrink: "0",

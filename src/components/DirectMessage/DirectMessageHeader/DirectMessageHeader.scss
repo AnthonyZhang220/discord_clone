@@ -47,19 +47,26 @@
 		}
 
 		.friend-main-header-button {
-			.addfriend-button {
-				background-color: #248046;
-				color: #ffffff;
-
-				.active {
-					background-color: #313338;
-					color: #248046;
-				}
+			&:hover {
+				background-color: darken(#3e4046, 10%);
+				border-radius: 4px;
 			}
 
-			.active {
-				background-color: lighten(#313338, 10%);
-				color: #ffffff;
+			&.active {
+				background-color: darken(#ffffff, 60%);
+			}
+		}
+
+		.addfriend-button {
+			background-color: #248046;
+			color: #ffffff;
+
+			&:hover {
+				background-color: darken(#ffffff, 40%);
+				border-radius: 4px;
+			}
+			&.active {
+				background-color: darken(#248046, 10%);
 			}
 		}
 	}

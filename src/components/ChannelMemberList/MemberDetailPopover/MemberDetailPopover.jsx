@@ -54,7 +54,7 @@ export const MemberDetailPopover = ({ memberRef }) => {
                         <StatusList status={memberDetail.status} />
                     }
                 >
-                    <Avatar alt={memberDetail.name} sx={{ width: "80px", height: "80px" }} src={memberDetail.profileURL} imgProps={{ crossOrigin: "" }} />
+                    <Avatar alt={memberDetail.name} sx={{ width: "80px", height: "80px" }} src={memberDetail.avatar} imgProps={{ crossOrigin: "" }} />
                 </Badge>
             </Box>
             <Box className="member-detail-list" sx={{ backgroundColor: "#111214" }}>

@@ -52,7 +52,7 @@ export async function listenToAuthStateChange() {
                     const userDoc = await setDoc(userRef, {
                         displayName: user.displayName,
                         email: user.email ? user.email : "",
-                        profileURL: user.photoURL,
+                        avatar: user.photoURL,
                         id: user.uid,
                         createdAt: Timestamp.fromDate(new Date()),
                         status: "online",
@@ -89,7 +89,7 @@ export async function signOut() {
             })
 
             if (updateSuccess) {
-                store.dispatch(setUser({ displayName: null, profileURL: null, uid: null, createdAt: null }))
+                store.dispatch(setUser({ displayName: null, avatar: null, uid: null, createdAt: null }))
                 store.dispatch(setIsLoggedIn(false))
                 redirect("/")
             }

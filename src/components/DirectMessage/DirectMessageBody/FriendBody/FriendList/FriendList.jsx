@@ -1,5 +1,5 @@
-import React, { Fragment, useMemo, useEffect } from 'react'
-import { Box, FormControl, InputBase, FormHelperText, List, ListItemButton, ListItem, ListItemAvatar, ListItemText, Avatar, IconButton, Typography, Divider, Badge } from '@mui/material'
+import React, { Fragment, useEffect } from 'react'
+import { Box, List, Typography } from '@mui/material'
 import { query, collection, where, onSnapshot } from 'firebase/firestore'
 import { db } from '../../../../../firebase'
 import FriendTab from '../FriendTab/FriendTab'
@@ -39,7 +39,7 @@ export default function FriendList() {
                 snapshot.forEach((doc) => {
                     friendList.push({
                         displayName: doc.data().displayName,
-                        profileURL: doc.data().profileURL,
+                        avatar: doc.data().avatar,
                         status: doc.data().status,
                         id: doc.data().id
                     })
@@ -49,6 +49,7 @@ export default function FriendList() {
             // return unsubscribe
         }
     }, [friendIdList.length])
+
     return (
         <Box className="friend-list-container">
             <List dense>
@@ -61,8 +62,8 @@ export default function FriendList() {
                                 </Typography>
                             </Box>
                             {
-                                friendList.map(({ displayName, status, profileURL, id }) => (
-                                    <FriendTab displayName={displayName} profileURL={profileURL} status={status} key={id} />
+                                friendList.map(({ displayName, status, avatar, id }) => (
+                                    <FriendTab displayName={displayName} avatar={avatar} id={id} status={status} key={id} />
                                 ))
                             }
                         </Fragment>
@@ -74,8 +75,8 @@ export default function FriendList() {
                                 </Typography>
                             </Box>
                             {
-                                friendList.filter(obj => obj.status !== "offline").map(({ displayName, status, profileURL, id }) => (
-                                    <FriendTab displayName={displayName} profileURL={profileURL} status={status} key={id} />
+                                friendList.filter(obj => obj.status !== "offline").map(({ displayName, status, avatar, id }) => (
+                                    <FriendTab displayName={displayName} avatar={avatar} id={id} status={status} key={id} />
                                 ))
                             }
                         </Fragment>

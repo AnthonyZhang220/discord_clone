@@ -9,11 +9,8 @@ import { RegisterPage } from './components/LoginPage/LoginPage'
 import { onSnapshot, query, where, addDoc, collection, Timestamp, arrayUnion, setDoc, doc, getDocs, QuerySnapshot, updateDoc, getDoc, documentId, orderBy, limitToLast, arrayRemove } from 'firebase/firestore';
 import { db, auth, realtimedb } from './firebase'
 import { Outlet } from 'react-router-dom'
-import AgoraRTC from 'agora-rtc-sdk-ng';
-import { AgoraClient, AgoraConfig } from './Agora'
 // import { RtcRole } from "agora-token"
 import { fetchToken } from './utils/fetchToken'
-
 import VoiceChat from './components/VoiceChat/VoiceChat'
 import { useDispatch, useSelector } from 'react-redux'
 import ThemeContextProvider from './contexts/ThemeContextProvider'
@@ -37,9 +34,6 @@ function App() {
         return listenToAuthStateChange;
     }, [auth])
 
-    const [config, setConfig] = useState(AgoraConfig)
-
-    const [agoraEngine, setAgoraEngine] = useState(AgoraClient);
     // useEffect(() => {
     //     const fetch = async () => {
     //         const token = await fetchToken()
@@ -118,12 +112,6 @@ function App() {
     //         });
     //     }
     // }, [config.channel])
-
-    const handleDefen = () => {
-        setDefen(!defen)
-        document.getElementsByTagName("video").muted = defen
-    }
-
     return (
         <ThemeContextProvider>
             <CssBaseline />

@@ -1,10 +1,13 @@
 import store from "../../redux/store";
-import { addDoc, updateDoc } from "firebase/firestore";
-import { uploadBytesResumable, uploadBytes, ref as storageRef, getDownloadURL } from 'firebase/storage';
-import { setNewServerInfo, setIsLoading, setCurrServer } from "../../redux/features/serverSlice";
+import { addDoc, updateDoc, collection, Timestamp, arrayUnion, doc, query, where, getDocs, deleteDoc } from "firebase/firestore";
+import { uploadBytesResumable, uploadBytes, ref, getDownloadURL } from 'firebase/storage';
+import { storage, db } from "../../firebase";
+import { setNewServerInfo, setIsLoading, setCurrServer, setUploadServerProfileImage } from "../../redux/features/serverSlice";
 import { setSelectedChannel, setSelectedServer } from "../../redux/features/userSelectStoreSlice";
 import { setIsDirectMessagePageOpen } from "../../redux/features/directMessageSlice";
-
+import { setCreateServerFormModal, setCreateServerModal } from "../../redux/features/modalSlice";
+import { toggleServerSettings } from "../../redux/features/popoverSlice";
+import { setCurrChannelList } from "../../redux/features/channelSlice";
 // userSelectStore
 // {
 // selectedServerId: "",
@@ -37,8 +40,8 @@ export const handleSelectServer = (serverName, serverId) => {
 
 
 //add new Server with handleUploadServerImage();
-export const handleCreateServer = async (user, newServerInfo) => {
-    dispatch(setIsLoading(true));
+export const handleCreateServer = async (newServerInfo) => {
+    store.dispatch(setIsLoading(true));
     // Create the file metadata
     /** @type {any} */
     const metadata = {
@@ -47,40 +50,48 @@ export const handleCreateServer = async (user, newServerInfo) => {
 
     const date = new Date();
     const timeString = date.toISOString();
+    const user = store.getState().auth.user;
+    const file = store.getState().server.uploadServerProfileImage;
 
     // Upload file and metadata to the object 'images/mountains.jpg'
-    const serverProfileRef = storageRef(storage, `serverProfile/${user.uid}/${fileName}-${timeString}`, metadata);
+    const serverProfileRef = ref(storage, `serverProfile/${user.id}/${file.name}-${timeString}`, metadata);
 
-    const uploadProgress = await uploadBytes(serverProfileRef, file)
-    const url = await getDownloadURL(serverProfileRef)
+    console.log("serverProfileRef", serverProfileRef)
 
+    const uploadTask = await uploadBytes(serverProfileRef, file)
+    const url = await getDownloadURL(uploadTask.ref)
+
+    console.log("url", url)
     const serverDoc = collection(db, "servers");
     const channelDoc = collection(db, "channels");
 
     //upload image
-    await addDoc(serverDoc, {
-        serverPic: url,
-        name: newServerInfo.name,
-        ownerId: user.uid,
+    const addedServer = await addDoc(serverDoc, {
+        avatar: url,
+        name: newServerInfo.serverName,
+        ownerId: user.id,
         createdAt: Timestamp.fromDate(new Date()),
-        members: [user.uid],
-    }).then((doc) => {
-        addDoc(channelDoc, {
-            name: "general",
-            serverRef: doc.id,
-            createdAt: Timestamp.fromDate(new Date()),
-            messages: [],
-        }).then(() => {
-            store.dispatch(setIsLoading(false))
-            store.dispatch(setNewServerInfo({ serverName: "", serverPic: "" }))
-            // setServerURL(null);
-            // setFile(null);
-        })
-
+        members: arrayUnion(user.id),
     })
+
+    const addedChannel = await addDoc(channelDoc, {
+        name: "general",
+        serverRef: addedServer.id,
+        createdAt: Timestamp.fromDate(new Date()),
+        messages: [],
+    })
+
+    if (addedServer && addedChannel) {
+        store.dispatch(setIsLoading(false))
+        store.dispatch(setNewServerInfo({ serverName: "", serverPic: "" }))
+        store.dispatch(setUploadServerProfileImage(null))
+        store.dispatch(setCreateServerFormModal(false))
+        store.dispatch(setCreateServerModal(false))
+    }
 }
+
 export const handleJoinServer = async (serverId) => {
-    dispatch(setIsLoading(true))
+    store.dispatch(setIsLoading(true))
     try {
         const updateRef = doc(db, "servers", serverId);
         const joinSuccess = await updateDoc(updateRef, {
@@ -88,7 +99,7 @@ export const handleJoinServer = async (serverId) => {
         })
 
         if (joinSuccess) {
-            dispatch(setIsLoading(false))
+            store.dispatch(setIsLoading(false))
         }
     } catch (error) {
         console.error("Join server error:", error)
@@ -96,15 +107,12 @@ export const handleJoinServer = async (serverId) => {
 }
 
 export const handleDeleteServer = async () => {
-    setDeleteLoading(true);
+    store.dispatch(setIsLoading(true))
 
-    const parse = JSON.parse(localStorage.getItem(`${user.uid}`))
-    const newLocal = parse.filter(({ selectedServer }) => selectedServer != selectedServer.uid);
-    localStorage.setItem(`${user.uid}`, JSON.stringify(newLocal))
-
-    const serverRef = doc(db, "servers", selectedServer.uid)
-    const channelRef = query(collection(db, 'channels'), where('serverRef', '==', selectedServer.uid));
-    const messageRef = query(collection(db, 'messages'), where('serverRef', '==', selectedServer.uid));
+    const selectedServer = store.getState().userSelectStore.selectedServer;
+    const serverRef = doc(db, "servers", selectedServer)
+    const channelRef = query(collection(db, 'channels'), where('serverRef', '==', selectedServer));
+    const messageRef = query(collection(db, 'messages'), where('serverRef', '==', selectedServer));
 
     await getDocs(messageRef)
         .then((querySnapshot) => {
@@ -123,16 +131,16 @@ export const handleDeleteServer = async () => {
             querySnapshot.forEach((doc) => {
                 deleteDoc(doc.ref);
             });
-            setCurrChannelList([])
+            store.dispatch(setCurrChannelList([]))
         })
         .catch((error) => {
             console.error('Error deleting documents: ', error);
         });
 
     await deleteDoc(serverRef).then(() => {
-        setCurrentServer({ ...selectedServer, name: "" })
-        setDeleteLoading(false);
-        handleServerSettingsClose();
+        store.dispatch(setCurrServer({ name: "", id: "" }));
+        store.dispatch(setIsLoading(false));
+        store.dispatch(toggleServerSettings())
     });
 
 }

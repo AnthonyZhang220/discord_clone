@@ -4,6 +4,7 @@ const modalSlice = createSlice({
     name: "modal",
     initialState: {
         createChannelModal: false,
+        createVoiceChannelModal: false,
         createServerModal: false,
         createServerFormModal: false,
         joinServerModal: false,
@@ -12,6 +13,9 @@ const modalSlice = createSlice({
     reducers: {
         setCreateChannelModal: (state, action) => {
             state.createChannelModal = action.payload;
+        },
+        setCreateVoiceChannelModal: (state, action) => {
+            state.createVoiceChannelModal = action.payload;
         },
         setCreateServerModal: (state, action) => {
             state.createServerModal = action.payload;
@@ -27,5 +31,5 @@ const modalSlice = createSlice({
         },
     }
 })
-export const { setCreateChannelModal, setCreateServerModal, setCreateServerFormModal, setJoinServerModal, setInviteModal } = modalSlice.actions;
+export const { setCreateChannelModal, setCreateVoiceChannelModal, setCreateServerModal, setCreateServerFormModal, setJoinServerModal, setInviteModal } = modalSlice.actions;
 export default modalSlice.reducer;

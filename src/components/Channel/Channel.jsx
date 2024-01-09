@@ -1,7 +1,7 @@
 import React, { useId, useMemo, useEffect, useState, Fragment, useRef } from 'react'
 import { auth } from '../../firebase';
 import { db } from "../../firebase";
-import { onSnapshot, query, where, addDoc, collection, deleteDoc, doc, updateDoc, getDocs, QuerySnapshot, getDoc } from 'firebase/firestore';
+import { onSnapshot, query, where, collection } from 'firebase/firestore';
 
 import { ListItemText, ListItem, ListItemButton, ListItemAvatar } from '@mui/material'
 import { Avatar, Typography } from '@mui/material'
@@ -22,9 +22,9 @@ import UserFooter from './UserFooter/UserFooter';
 import VoiceControl from './VoiceControl/VoiceControl';
 
 import { FunctionTooltip } from '../CustomUIComponents';
-import { CreateChannelDialog, InviteDialog } from '../Modals/Modals';
+import { CreateChannelDialog, CreateVoiceChannelDialog, InviteDialog } from '../Modals/Modals';
 import { useDispatch, useSelector } from 'react-redux';
-import { setCreateChannelModal } from '../../redux/features/modalSlice';
+import { setCreateChannelModal, setCreateVoiceChannelModal } from '../../redux/features/modalSlice';
 import { setCurrChannelList, setCurrVoiceChannelList } from '../../redux/features/channelSlice';
 import { toggleServerSettings } from '../../redux/features/popoverSlice';
 import { handleSelectChannel } from '../../utils/handlers/channelHandlers';
@@ -33,7 +33,7 @@ import { handleJoinVoiceChannel } from '../../utils/handlers/voiceChannelHandler
 const Channel = () => {
     const channelHeaderRef = useRef(null);
     const dispatch = useDispatch()
-    const { createChannelModal, inviteModal } = useSelector((state) => state.modal)
+    const { createChannelModal, createVoiceChannelModal, inviteModal } = useSelector((state) => state.modal)
     const { user } = useSelector(state => state.auth)
     const { selectedServer, selectedChannel } = useSelector(state => state.userSelectStore)
     const { currVoiceChannel, currChannelList, currVoiceChannelList } = useSelector(state => state.channel)
@@ -129,7 +129,7 @@ const Channel = () => {
                             <Fragment>
                                 <Typography variant="body1" sx={{ m: 0.5 }} >Create Voice Channel</Typography>
                             </Fragment>} placement="top">
-                            <AddIcon onClick={(() => dispatch(setCreateChannelModal(true)))} />
+                            <AddIcon onClick={(() => dispatch(setCreateVoiceChannelModal(true)))} />
                         </FunctionTooltip>
                     </Box>
                 </Box>
@@ -146,11 +146,11 @@ const Channel = () => {
                                 </IconButton>
                             </Box>
                             {
-                                participants.map(({ displayName, profileURL, id }) => (
+                                participants.map(({ displayName, avatar, id }) => (
                                     <ListItem key={id} id={id} disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
                                         <ListItemButton>
                                             <ListItemAvatar sx={{ minWidth: "0", mr: 1, ml: "auto" }}>
-                                                <Avatar alt={displayName} src={profileURL} sx={{ width: 20, height: 20 }} />
+                                                <Avatar alt={displayName} src={avatar} sx={{ width: 20, height: 20 }} />
                                             </ListItemAvatar>
                                             <ListItemText primary={displayName} />
                                         </ListItemButton>
@@ -165,6 +165,7 @@ const Channel = () => {
             <UserFooter className="user-footer-container" />
             <InviteDialog selectedServer={selectedServer} inviteModal={inviteModal} />
             <CreateChannelDialog createChannelModal={createChannelModal} />
+            <CreateVoiceChannelDialog createVoiceChannelModal={createVoiceChannelModal} />
             {/* <Outlet /> */}
         </Box>
     )

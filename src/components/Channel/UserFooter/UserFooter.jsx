@@ -1,7 +1,6 @@
-import React, { createRef, useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 
-import { Box, ListItemText, ListItem, Badge, ListItemButton, Popover, Avatar, Divider, ClickAwayListener, Tooltip } from '@mui/material'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Box, Badge, Avatar, Tooltip } from '@mui/material'
 import HeadsetIcon from '@mui/icons-material/Headset';
 import HeadsetOffIcon from '@mui/icons-material/HeadsetOff';
 import MicIcon from '@mui/icons-material/Mic';
@@ -35,7 +34,7 @@ const UserFooter = () => {
                         <StatusList status={user.status} size={12} />
                     }
                 >
-                    <Avatar alt={user.displayName} sx={{ width: "30px", height: "30px" }} src={user.profileURL} className="avatar" />
+                    <Avatar alt={user.displayName} sx={{ width: "30px", height: "30px" }} src={user.avatar} className="avatar" />
                 </Badge>
                 <Box className="user-footer-details">
                     <Box className="username" sx={{ fontSize: 14 }}>

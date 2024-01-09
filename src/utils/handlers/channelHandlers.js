@@ -3,8 +3,7 @@ import { setNewChannelInfo, setCurrChannel } from "../../redux/features/channelS
 import { setSelectedChannel } from "../../redux/features/userSelectStoreSlice"
 import { setDirectMessageChannelRef, setIsFriendListPageOpen, setCurrDirectMessageChannelRef, setCurrDirectMessageChannel } from "../../redux/features/directMessageSlice"
 import { db } from "../../firebase"
-import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore"
-import { setDirectMessageList } from "../../redux/features/chatListSlice"
+import { arrayUnion, doc, getDoc, updateDoc, addDoc, Timestamp, collection } from "firebase/firestore"
 import { setIsVoiceChatPageOpen } from "../../redux/features/voiceChatSlice"
 
 export const handleCreateChannel = async (newChannelInfo) => {
@@ -25,7 +24,7 @@ export const handleCreateVoiceChannel = async (newChannelInfo) => {
         name: newChannelInfo.channelName,
         serverRef: store.getState().userSelectStore.selectedServer,
         createdAt: Timestamp.fromDate(new Date()),
-        messages: [],
+        participants: [],
     })
     if (doc) {
         store.dispatch(setNewChannelInfo({ channelName: "" }))

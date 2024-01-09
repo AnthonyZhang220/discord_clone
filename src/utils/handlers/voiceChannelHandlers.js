@@ -9,7 +9,7 @@ export const handleJoinVoiceChannel = async (name, channelId) => {
     const currUser = store.getState().auth.user;
     const participant = {
         id: currUser.id,
-        profileURL: currUser.profileURL,
+        avatar: currUser.avatar,
         displayName: currUser.displayName
     }
 
@@ -20,7 +20,6 @@ export const handleJoinVoiceChannel = async (name, channelId) => {
 
     store.dispatch(setCurrVoiceChannel({ name: name, id: channelId }))
     store.dispatch(setIsVoiceChatConnected(true))
-    return { uid: currUser.id, channel: channelId }
 }
 
 export function setUpFirebaseListener() {
@@ -34,7 +33,7 @@ export const handleLeaveVoiceChannel = async () => {
     const currUser = store.getState().auth.user;
     const participant = {
         id: currUser.id,
-        profileURL: currUser.profileURL,
+        avatar: currUser.avatar,
         displayName: currUser.displayName
     }
     const channelRef = doc(db, "voicechannels", voiceChannel.id)
