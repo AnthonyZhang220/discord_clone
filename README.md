@@ -27,8 +27,8 @@
   <img src = "./redux2.png" width=700>
 </p>
 ## Features
--Real-time communication/chat
--Server/Channel
+- Real-time communication/chat
+- Server/Channel
 
 <p align="center">
   <img src = "./discord_friend.png" width=700>
