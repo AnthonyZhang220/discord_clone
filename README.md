@@ -19,6 +19,10 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square)](http://commitizen.github.io/cz-cli/)
 
+## Redux State Management
+<p align="center">
+  <img src = "./laoma.gif" width=700>
+</p>
 ## Features
 -Real-time communication/chat
 -Server/Channel
@@ -28,18 +32,6 @@
 </p>
 <p align="center">
   <img src = "./laoma_hero.png" width=700>
-</p>
-<p align="center">
-  <img src = "./laoma_special.png" width=700>
-</p>
-<p align="center">
-  <img src = "./laoma_info.png" width=700>
-</p>
-<p align="center">
-  <img src = "./laoma_menu.png" width=700>
-</p>
-<p align="center">
-  <img src = "./laoma_checkout.png" width=700>
 </p>
 
 ## Feedback
