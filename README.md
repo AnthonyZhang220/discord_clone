@@ -20,12 +20,14 @@
 [![Commitizen friendly](https://img.shields.io/badge/commitizen-friendly-brightgreen.svg?style=flat-square)](http://commitizen.github.io/cz-cli/)
 
 ## Redux State Management
+
 <p align="center">
   <img src = "./redux1.png" width=700>
 </p>
 <p align="center">
   <img src = "./redux2.png" width=700>
 </p>
+
 ## Features
 - Real-time communication/chat
 - Server/Channel
