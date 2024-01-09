@@ -51,7 +51,7 @@ export default function AddFriend({ noActive }) {
                         You can add a friend with their unique ID.
                     </Typography>
                 </Box>
-                <Box className="add-friend-search-form" component="form" >
+                <Box className="add-friend-search-form" component="form" onSubmit={(e) => e.preventDefault()} >
                     <Box className="add-friend-search-inner">
                         <input className="add-friend-search-input" type="search" name='search' placeholder='Enter unique friend ID or their username' onChange={e => debounce(handleSearchFriend(e), 5000)} autoComplete='off'
                         />
