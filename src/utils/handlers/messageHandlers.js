@@ -1,49 +1,117 @@
 import store from "../../redux/store";
-import { setDirectMessage, setMe } from "../../redux/features/chatListSlice";
+import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { db, storage } from "../../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { setDraftDirectMessage, setDraftMessage } from "../../redux/features/draftSlice";
+import { setError } from "../../redux/features/errorSlice";
+import { bytesToMB } from "../bytesToMB";
 
 //add new message to db
-export const handleSubmitDirectMessage = async () => {
-
-    if (curDirectMessage.trim() == "") {
+export const handleSubmitDirectMessage = async (e) => {
+    e.preventDefault();
+    const user = store.getState().auth.user
+    const currDirectMessage = store.getState().draft.draftDirectMessage;
+    const currChannel = store.getState().channel.currChannel.id;
+    const currServer = store.getState().server.currServer.id
+    if (currDirectMessage.trim() == "") {
         return;
     }
-    const { uid, displayName, photoURL } = auth.currentUser;
+    const { id, displayName, avatar } = user;
 
     await addDoc(collection(db, "messages"), {
         type: "text",
-        content: draftDirectMessage,
+        content: currDirectMessage,
         fileName: "",
         userName: displayName,
-        avatar: photoURL,
+        avatar: avatar,
         createdAt: Timestamp.fromDate(new Date()),
-        channelRef: currentPrivateChannel.uid,
-        serverRef: currServer.uid,
-        userRef: uid,
+        channelRef: currChannel,
+        serverRef: currServer,
+        userRef: id,
     }).then(() => {
-        store.dispatch(setDirectMessage(""))
+        store.dispatch(setDraftDirectMessage(""))
     })
 }
 
 //add new message to db
-export const handleSubmitMessage = async () => {
-
-    if (draftMessage.trim() == "") {
+export const handleSubmitMessage = async (e) => {
+    e.preventDefault();
+    const user = store.getState().auth.user
+    const currMessage = store.getState().draft.draftMessage;
+    const currChannel = store.getState().channel.currChannel.id;
+    const currServer = store.getState().server.currServer.id
+    if (currMessage.trim() == "") {
         return;
     }
 
-    const { uid, displayName, photoURL } = auth.currentUser;
+    const { id, displayName, avatar } = user;
 
     await addDoc(collection(db, "messages"), {
         type: "text",
-        content: draftMessage,
+        content: currMessage,
         fileName: "",
         displayName: displayName,
-        avatar: photoURL,
+        avatar: avatar,
         createdAt: Timestamp.fromDate(new Date()),
-        channelRef: currentChannel.uid,
-        serverRef: currServer.uid,
-        userRef: uid,
+        channelRef: currChannel,
+        serverRef: currServer,
+        userRef: id,
     }).then(() => {
         store.dispatch(setDraftMessage(""))
     })
+}
+
+
+
+export const handleUploadFile = async (e) => {
+    const user = store.getState().auth.user;
+
+    const fileUploaded = e.target.files[0]
+
+    const fileSize = fileUploaded.size;
+    const fileType = fileUploaded.type;
+    const fileName = fileUploaded.name;
+
+    const mb = bytesToMB(fileSize);
+
+    if (!fileUploaded) {
+        return;
+    }
+
+    if (mb > 50) {
+        store.dispatch(setError("File", "File exceeds 50MB."))
+        return;
+    }
+
+    // if(fileType !== ){
+    //     setFileError(true);
+    //     setFileErrorMessage("File format unsupported.")
+    //     return;
+    // }
+
+    // setFileUpload(fileUploaded)
+    const date = new Date();
+    const timeString = date.toISOString();
+
+
+    const messageMediaRef = ref(storage, `messages/${user.id}/${fileName}-${timeString}`)
+    const uploadProgress = await uploadBytes(messageMediaRef, fileUploaded)
+    const url = await getDownloadURL(messageMediaRef)
+
+    const currChannel = store.getState().channel.currChannel.id;
+    const currServer = store.getState().server.currServer.id;
+    await addDoc(collection(db, "messages"), {
+        type: fileType,
+        content: url,
+        fileName: fileName,
+        userName: user.displayName,
+        avatar: user.avatar,
+        createdAt: Timestamp.fromDate(new Date()),
+        channelRef: currChannel,
+        serverRef: currServer,
+        userRef: user.id,
+    }).then(() => {
+
+    })
+
 }

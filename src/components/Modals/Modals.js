@@ -10,11 +10,12 @@ import { Button, InputLabel, FormControl, Box, InputBase, InputAdornment, Modal,
 import AddIcon from '@mui/icons-material/Add';
 import { InfoInput } from '../CustomUIComponents';
 import { useDispatch, useSelector } from "react-redux";
-import { setCreateChannelModal, setCreateServerFormModal, setCreateServerModal, setInviteModal, setJoinServerModal } from '../../redux/features/modalSlice';
+import { setCreateChannelModal, setCreateVoiceChannelModal, setCreateServerFormModal, setCreateServerModal, setInviteModal, setJoinServerModal } from '../../redux/features/modalSlice';
 import { copyToClip } from "../../utils/copyToClip"
 import { setNewServerInfo, setUploadFileLocationURL, setJoinServerId, setUploadServerProfileImage } from "../../redux/features/serverSlice";
 import { setNewChannelInfo } from "../../redux/features/channelSlice";
 import { handleCreateServer, handleJoinServer } from "../../utils/handlers/serverHandlers";
+import { handleCreateVoiceChannel, handleCreateChannel } from "../../utils/handlers/channelHandlers";
 import styled from "@emotion/styled";
 
 
@@ -131,7 +132,7 @@ export function CreateServerDialog({ createServerFormModal }) {
             <DialogActions sx={{ backgroundColor: "#f2f3f5" }}>
                 <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => dispatch(setCreateServerFormModal(false))}>Back</Button>
                 <LoadingButton
-                    onClick={() => handleCreateServer(user, newServerInfo)}
+                    onClick={() => handleCreateServer(newServerInfo)}
                     loading={isLoading}
                     variant="contained"
                 >
@@ -225,7 +226,9 @@ export function InviteDialog({ inviteModal }) {
         </Dialog>
     )
 }
-export function CreateChannelDialog({ currentServer, createChannelModal }) {
+
+
+export function CreateChannelDialog({ createChannelModal }) {
     const dispatch = useDispatch();
     const { newChannelInfo } = useSelector((state) => state.channel)
 
@@ -259,7 +262,48 @@ export function CreateChannelDialog({ currentServer, createChannelModal }) {
             </DialogContent>
             <DialogActions>
                 <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => dispatch(setCreateChannelModal(false))}>Cancel</Button>
-                <Button variant='contained' onClick={() => handleCreateChannel(currentServer, newChannelInfo)}>Create Channel</Button>
+                <Button variant='contained' onClick={() => handleCreateChannel(newChannelInfo)}>Create Channel</Button>
+            </DialogActions>
+        </Dialog>
+
+    )
+}
+
+export function CreateVoiceChannelDialog({ createVoiceChannelModal }) {
+    const dispatch = useDispatch();
+    const { newChannelInfo } = useSelector((state) => state.channel)
+
+    return (
+        <Dialog className="Create-Channel-Modal" open={createVoiceChannelModal} onClose={() => dispatch(setCreateChannelModal(false))} PaperProps={{
+            style: {
+                textAlign: "start",
+                backgroundColor: "#313338",
+                width: "440px"
+            }
+        }}>
+            <DialogTitle sx={{ color: "#ffffff" }} variant='h3'>Create Voice Channel</DialogTitle>
+            <DialogContent>
+                <Box component="form">
+                    <FormControl variant="standard" required fullWidth>
+                        <InputLabel shrink sx={{
+                            color: "#ffffff"
+                        }}>
+                            CHANNEL NAME
+                        </InputLabel>
+                        <BootstrapInput
+                            id="name"
+                            name="name"
+                            variant="outlined"
+                            autoComplete="off"
+                            onChange={e => dispatch(setNewChannelInfo({ channelName: e.target.value }))}
+                            placeholder="new-channel"
+                        />
+                    </FormControl>
+                </Box>
+            </DialogContent>
+            <DialogActions>
+                <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => dispatch(setCreateVoiceChannelModal(false))}>Cancel</Button>
+                <Button variant='contained' onClick={() => handleCreateVoiceChannel(newChannelInfo)}>Create Channel</Button>
             </DialogActions>
         </Dialog>
 

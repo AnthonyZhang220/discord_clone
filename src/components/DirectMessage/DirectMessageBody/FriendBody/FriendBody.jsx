@@ -1,39 +1,29 @@
-import React, { memo, useState, useMemo, useEffect } from 'react'
-
-import { Box, List, SvgIcon, Button, Divider, Typography, ListItemButton, ListItemText, ListItem, } from '@mui/material';
-
-import FriendIcon from "./friend.svg"
-import GroupDMIcon from "./groupdm.svg"
-import InboxIcon from '@mui/icons-material/Inbox';
-
-import FriendActive from './AddFriend/FriendActive/FriendActive';
+import React, { useState } from 'react'
+import { Box } from '@mui/material';
+import FriendActive from './FriendActive/FriendActive';
 import FriendList from './FriendList/FriendList';
 import SearchIcon from '@mui/icons-material/Search';
 
 import AddFriend from './AddFriend/AddFriend';
+import { useSelector } from 'react-redux';
+import { handleSearchFriend } from '../../../../utils/handlers/searchHandlers';
 import "./FriendBody.scss";
 
 
 export default function FriendBody() {
-
-    const handleSearch = (e) => {
-        const searchTerm = e.target.value;
-    }
-
-    const [category, setCategory] = useState("online");
+    const { friendFilter, friendList } = useSelector(state => state.directMessage)
     const [noActive, setNoActive] = useState(true);
-
 
     return (
         <>
             {
-                category === "addfriend" ?
-                    <AddFriend handleSearch={handleSearch} noActive={noActive} /> :
+                friendFilter === "addfriend" ?
+                    <AddFriend noActive={noActive} /> :
                     <Box className="content">
                         <Box className="friend-main-content" component="main">
                             <Box className="friend-search-form" >
                                 <Box className="friend-search-inner" component="form">
-                                    <input className="friend-search-input" type="search" name='search' placeholder='Search' onChange={e => handleSearch(e)} autoComplete='off'
+                                    <input className="friend-search-input" type="search" name='search' placeholder='Search' onChange={e => handleSearchFriend(e)} autoComplete='off'
                                     />
                                     <SearchIcon />
                                 </Box>
@@ -46,7 +36,7 @@ export default function FriendBody() {
                                 </Box>
                             </Box>
                         </Box>
-                        <FriendActive />
+                        <FriendActive noActive={noActive} friendList={friendList} />
                     </Box>
             }
         </>

@@ -17,7 +17,7 @@ import './LoginPage.scss'
 import { useDispatch } from 'react-redux'
 import { signInWithOAuth } from '../../utils/authentication'
 
-export function RegisterPage({ currentUser, setCurrentUser }) {
+export function RegisterPage() {
     const navigate = useNavigate();
 
     const [newUser, setNewUser] = React.useState(
@@ -51,13 +51,13 @@ export function RegisterPage({ currentUser, setCurrentUser }) {
                 setDoc(userRef, {
                     displayName: newUser.username,
                     email: newUser.email,
-                    profileURL: "",
+                    avatar: "",
                     userId: user.uid,
                     createdAt: Timestamp.fromDate(new Date()),
                     status: "online",
                     friends: [],
                 }).then((doc) => {
-                    setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+                    setCurrentUser({ name: doc.data().displayName, avatar: doc.data().avatar, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
 
                     navigate("../channels")
                 })
@@ -156,7 +156,7 @@ export default function LoginPage({ setCurrentUser }) {
         const userRef = doc(db, "users", result.user.uid);
 
         getDoc(userRef).then((doc) => {
-            setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+            setCurrentUser({ name: doc.data().displayName, avatar: doc.data().avatar, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
             navigate("/channels")
         })
         // ...

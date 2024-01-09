@@ -1,18 +1,14 @@
-import React, { useMemo, useEffect, useState, Fragment } from "react";
+import React, { useEffect, Fragment } from "react";
 
-import { Box, IconButton, Input, Typography, SvgIcon, List, ListItem, ListItemButton, ListItemText, ListItemAvatar, Badge, Avatar } from "@mui/material";
+import { Box, Typography, SvgIcon, ListItem, ListItemButton, ListItemText } from "@mui/material";
 
 import AddIcon from '@mui/icons-material/Add';
-import NumbersIcon from '@mui/icons-material/Numbers';
-import SettingsIcon from '@mui/icons-material/Settings';
 import UserFooter from "../../Channel/UserFooter/UserFooter";
-import { lighten, styled } from '@mui/material/styles';
-import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import { lighten } from '@mui/material/styles';
 import FriendIcon from '../DirectMessageBody/FriendBody/friend.svg'
 import { FunctionTooltip } from "../../CustomUIComponents";
-import StatusList from "../../StatusList";
 
-import { QuerySnapshot, onSnapshot, query, collection, where } from "firebase/firestore";
+import { onSnapshot, query, collection, where } from "firebase/firestore";
 import { db } from "../../../firebase";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsFriendListPageOpen, setDirectMessageChannelList, setDirectMessageChannelRefs } from "../../../redux/features/directMessageSlice";
@@ -71,7 +67,7 @@ function DirectMessageMenu() {
             </Box>
             <Box component="section" className="friend-menu-container">
                 <ListItem disablePadding>
-                    <ListItemButton sx={{ borderRadius: "4px", backgroundColor: isFriendListPageOpen ? lighten("#313338", 0.1) : "inherit" }} onClick={() => dispatch(setIsFriendListPageOpen(true))}>
+                    <ListItemButton className="friend-menu-open" sx={{ borderRadius: "4px", backgroundColor: isFriendListPageOpen ? lighten("#313338", 0.1) : "inherit" }} onClick={() => dispatch(setIsFriendListPageOpen(true))}>
                         <SvgIcon edge="start" component={FriendIcon} sx={{ mr: 1 }} />
                         <ListItemText primary="Friends" />
                     </ListItemButton>

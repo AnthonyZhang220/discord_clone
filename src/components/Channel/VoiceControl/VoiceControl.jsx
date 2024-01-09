@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { SvgIcon, Box, Badge, Avatar, Tooltip, IconButton, Typog, SvgIconraphy, Typography, Link, Breadcrumbs } from '@mui/material'
+import { SvgIcon, Box, Tooltip, IconButton, Typography, Link, Breadcrumbs } from '@mui/material'
 import DisconnectIcon from "./disconnect.svg"
 import LatencyIcon from "./latency.svg"
 import { darken } from '@mui/material'
@@ -13,7 +13,7 @@ import ScreenShareIcon from '@mui/icons-material/ScreenShare';
 import "./VoiceControl.scss"
 
 
-export default function VoiceControl({ }) {
+export default function VoiceControl() {
     const { isMuted, isDeafen, isCameraOn, isScreenSharingOn, isVoiceChatConnected, connectionState, latency } = useSelector(state => state.voiceChat)
     const { currVoiceChannel } = useSelector(state => state.channel)
     const { currServer } = useSelector(state => state.server)

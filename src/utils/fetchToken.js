@@ -1,16 +1,30 @@
 import axios from "axios";
 
-export const fetchToken = async (config) => {
-    return new Promise(function (resolve) {
-        if (config.channel) {
-            axios.get(config.serverUrl + '/rtc/' + config.channel + '/1/uid/' + "0" + '/?expiry=' + config.ExpireTime)
-                .then(
-                    response => {
-                        resolve(response.data.rtcToken);
-                    })
-                .catch(error => {
-                    console.log(error);
-                });
+export default async function fetchRTCToken(config, channelName) {
+    if (config.serverUrl !== "") {
+        try {
+            const bodyData = {
+                tokenType: "rtc",
+                channel: channelName,
+                role: "publisher",
+                uid: 0,
+                expire: 3600,
+            };
+
+            const bodyString = JSON.stringify(bodyData);
+            const getUrl = `${config.serverUrl}/rtc/${channelName}/publisher/rtc/0`;
+            const postUrl = `${config.serverUrl}/getToken`
+            const response = await fetch(getUrl, {
+                method: "GET",
+            });
+            const data = await response.json();
+            console.log("RTC token fetched from server: ", data.rtcToken);
+            return data.rtcToken;
+        } catch (error) {
+            console.error(error);
+            throw error;
         }
-    });
+    } else {
+        return config.rtcToken;
+    }
 }

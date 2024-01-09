@@ -1,10 +1,13 @@
-import React from 'react'
-
+import React, { useState } from 'react'
 import { Box, Typography, List, ListItem, FormControl, InputAdornment, InputLabel, InputBase, Button, Divider } from '@mui/material'
-import FriendActive from './FriendActive/FriendActive'
+import FriendActive from '../FriendActive/FriendActive'
 import SearchIcon from '@mui/icons-material/Search';
 import styled from '@emotion/styled';
-
+import { useSelector } from 'react-redux';
+import { LoadingButton } from '@mui/lab';
+import { handleSearchFriend } from '../../../../../utils/handlers/searchHandlers';
+import { debounce } from '../../../../../utils/handlers/searchHandlers';
+import FriendTab from '../FriendTab/FriendTab';
 import "./AddFriend.scss"
 
 
@@ -23,11 +26,15 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function AddFriend({ user, handleSearch, friendList, noActive }) {
-
+export default function AddFriend({ noActive }) {
+    const { user } = useSelector(state => state.auth)
+    const { friendList, queryFriendList } = useSelector(state => state.directMessage)
+    const [loading, setLoading] = useState(false);
     const [copyed, setCopyed] = React.useState(false);
     const copyToClip = () => {
-        navigator.clipboard.writeText(user.uid).then(() => {
+        setLoading(true)
+        navigator.clipboard.writeText(user.id).then(() => {
+            setLoading(false)
             setCopyed(true);
         })
     }
@@ -46,7 +53,7 @@ export default function AddFriend({ user, handleSearch, friendList, noActive }) 
                 </Box>
                 <Box className="add-friend-search-form" component="form" >
                     <Box className="add-friend-search-inner">
-                        <input className="add-friend-search-input" type="search" name='search' placeholder='Enter a unique friend ID' onChange={e => handleSearch(e)} autoComplete='off'
+                        <input className="add-friend-search-input" type="search" name='search' placeholder='Enter unique friend ID or their username' onChange={e => debounce(handleSearchFriend(e), 5000)} autoComplete='off'
                         />
                         <SearchIcon />
                     </Box>
@@ -62,16 +69,35 @@ export default function AddFriend({ user, handleSearch, friendList, noActive }) 
                             name="name"
                             variant="outlined"
                             autoComplete="off"
-                            defaultValue={user.uid}
+                            defaultValue={user.id}
                             readOnly
                             sx={{ marginTop: "16px" }}
                             endAdornment={
                                 <InputAdornment position="end">
-                                    <Button onClick={() => copyToClip()}>Copy</Button>
+                                    <LoadingButton
+                                        onClick={() => copyToClip()}
+                                        loading={loading}
+                                        variant='contained'
+                                    >
+                                        {
+                                            copyed ?
+                                                <span>Copied!</span>
+                                                :
+                                                <span>Copy</span>
+                                        }
+                                    </LoadingButton>
                                 </InputAdornment>
                             }
                         />
                     </FormControl>
+                </Box>
+                <Divider variant='middle'></Divider>
+                <Box>
+                    {
+                        queryFriendList?.map(({ displayName, status, avatar, id }) => (
+                            <FriendTab displayName={displayName} avatar={avatar} id={id} status={status} key={id} />
+                        ))
+                    }
                 </Box>
             </Box>
             <FriendActive firendList={friendList} noActive={noActive} />

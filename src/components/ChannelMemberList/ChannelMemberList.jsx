@@ -79,7 +79,7 @@ function ChannelMemberList() {
                                     </ListSubheader>
                                 }>
                                     {
-                                        memberList?.filter(member => online(member.status) === true).map(({ displayName, profileURL, status, id }) => (
+                                        memberList?.filter(member => online(member.status) === true).map(({ displayName, avatar, status, id }) => (
                                             <ListItem key={id} disablePadding sx={{ opacity: 1 }} ref={ele => memberRefs.current[id] = ele}>
                                                 <ListItemButton onClick={() => handleOpenMemberDetail(id)}>
                                                     <ListItemAvatar >
@@ -90,7 +90,7 @@ function ChannelMemberList() {
                                                                 <StatusList status={status} size={15} />
                                                             }
                                                         >
-                                                            <Avatar alt={displayName} src={profileURL} />
+                                                            <Avatar alt={displayName} src={avatar} />
                                                         </Badge>
                                                     </ListItemAvatar>
                                                     <ListItemText primary={displayName} />
@@ -108,7 +108,7 @@ function ChannelMemberList() {
                                     </ListSubheader>
                                 }>
                                     {
-                                        memberList?.filter(member => online(member.status) === false).map(({ displayName, profileURL, id }) => (
+                                        memberList?.filter(member => online(member.status) === false).map(({ displayName, avatar, id }) => (
                                             <ListItem key={id} disablePadding sx={{ opacity: 0.3 }} ref={ele => memberRefs.current[id] = ele}>
                                                 <ListItemButton onClick={() => handleOpenMemberDetail(id)}>
                                                     <ListItemAvatar >
@@ -119,7 +119,7 @@ function ChannelMemberList() {
                                                                 <StatusList size={15} />
                                                             }
                                                         >
-                                                            <Avatar alt={displayName} src={profileURL} />
+                                                            <Avatar alt={displayName} src={avatar} />
                                                         </Badge>
                                                     </ListItemAvatar>
                                                     <ListItemText primary={displayName} />

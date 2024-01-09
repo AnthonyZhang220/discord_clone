@@ -2,15 +2,17 @@ import React, { useRef } from 'react'
 import { Box } from '@mui/material'
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { useSelector } from 'react-redux';
+import "./VoiceChat.scss"
 import { AgoraManager } from '../../contexts/agora/agoraManager';
 import AgoraConfig from '../../contexts/agora/config';
+import AgoraRTC, { AgoraRTCProvider, useRTCClient } from 'agora-rtc-react';
 
-import "./VoiceChat.scss"
 
 
 
 const VoiceChat = ({ currVoiceChannel }) => {
-    const { agoraEngine, agoraConfig, isVoiceChatConnected } = useSelector(state => state.voiceChat)
+    const { agoraConfig, isVoiceChatConnected } = useSelector(state => state.voiceChat)
+    const agoraEngine = useRTCClient(AgoraRTC.createClient({ codec: "vp8", mode: AgoraConfig.selectedProduct }))
     return (
         <Box className="voicechat-container">
             <Box className="voicechat-wrapper">
@@ -19,7 +21,9 @@ const VoiceChat = ({ currVoiceChannel }) => {
                         <Box className="voicechat-grid">
                             {
                                 isVoiceChatConnected &&
-                                <AgoraManager config={AgoraConfig} />
+                                <AgoraRTCProvider client={agoraEngine}>
+                                    <AgoraManager config={AgoraConfig} ></AgoraManager>
+                                </AgoraRTCProvider>
                             }
                         </Box>
                     </Box>

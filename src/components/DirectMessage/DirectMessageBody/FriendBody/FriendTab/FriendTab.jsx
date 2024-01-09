@@ -6,12 +6,12 @@ import { Box, Divider, ListItem, ListItemButton, ListItemAvatar, Badge, Avatar, 
 import { handleCurrDirectMessageChannel } from "../../../../../utils/handlers/channelHandlers";
 import StatusList from '../../../../StatusList';
 
-export default function FriendTab({ displayName, profileURL, status, id, createdAt }) {
+export default function FriendTab({ displayName, avatar, status, id, createdAt }) {
     return (
         <>
             <Divider variant="fullWidth" flexItem sx={{ backgroundColor: "#3d3f44" }} />
             <ListItem className="friend-list-item" sx={{ p: 0, m: 0 }} key={id}>
-                <ListItemButton className="friend-list-item-button" onClick={() => handleCurrDirectMessageChannel(id, status, displayName, profileURL, createdAt)}>
+                <ListItemButton className="friend-list-item-button" onClick={() => handleCurrDirectMessageChannel(id, status, displayName, avatar, createdAt)}>
                     <ListItemAvatar>
                         <Badge
                             overlap="circular"
@@ -20,7 +20,7 @@ export default function FriendTab({ displayName, profileURL, status, id, created
                                 <StatusList status={status} size={12} />
                             }
                         >
-                            <Avatar alt={displayName} src={profileURL} />
+                            <Avatar alt={displayName} src={avatar} />
                         </Badge>
                     </ListItemAvatar>
                     <ListItemText primary={displayName}
@@ -30,7 +30,7 @@ export default function FriendTab({ displayName, profileURL, status, id, created
                             <React.Fragment>
                                 <Typography variant="body1" sx={{ m: 0.5 }} >Message</Typography>
                             </React.Fragment>} placement="top">
-                            <FriendMessageIconButton edge="end" onClick={() => handleCurrDirectMessageChannel(id, status, displayName, profileURL, createdAt)}>
+                            <FriendMessageIconButton edge="end" onClick={() => handleCurrDirectMessageChannel(id, status, displayName, avatar, createdAt)}>
                                 <ChatIcon />
                             </FriendMessageIconButton>
                         </FunctionTooltip>

@@ -1,14 +1,12 @@
 import React from "react"
-import { Box, List, SvgIcon, Button, Divider, Typography, ListItemButton, ListItemText, ListItem, } from '@mui/material';
+import { Box, SvgIcon, Button, Divider, Typography } from '@mui/material';
 
 import FriendIcon from "../DirectMessageBody/FriendBody/friend.svg"
 import GroupDMIcon from "../DirectMessageBody/FriendBody/groupdm.svg"
 import InboxIcon from '@mui/icons-material/Inbox';
 import NumbersIcon from '@mui/icons-material/Numbers';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import InputLabel from '@mui/material/InputLabel';
-import { TextFieldProps } from '@mui/material/TextField';
-import AlternateEmailIcon from '@mui/icons-material/AlternateEmail';
+
 import { Stack } from '@mui/material';
 
 import StatusList from '../../StatusList';
@@ -41,18 +39,18 @@ export const FriendHeader = () => {
                 <SvgIcon component={FriendIcon} inheritViewBox sx={{ color: "#8a8e94", marginRight: "6px", alignItems: "baseline" }} />
                 <Typography variant="h3" className="friend-main-header-text">Friends</Typography>
                 <Divider orientation='vertical' variant='fullWidth' sx={{ backgroundColor: "#3e4046", m: "0 8px", width: "1px", flex: "0 0 auto", height: "24px" }} />
-                <Box className="friend-main-header-button">
+                <Box>
                     <Stack direction="row" spacing={1}>
-                        <Button className={`${friendFilter === "online" ? "active" : ""}`} onClick={() => dispatch(setFriendFilter("online"))} disableRipple>
+                        <Button className={`friend-main-header-button ${friendFilter === "online" ? "active" : ""}`} onClick={() => dispatch(setFriendFilter("online"))} disableRipple>
                             Online
                         </Button>
-                        <Button className={`${friendFilter === "all" ? "active" : ""}`} onClick={() => dispatch(setFriendFilter("all"))} disableRipple>
+                        <Button className={`friend-main-header-button ${friendFilter === "all" ? "active" : ""}`} onClick={() => dispatch(setFriendFilter("all"))} disableRipple>
                             All
                         </Button>
-                        <Button className={`${friendFilter === "pending" ? "active" : ""}`} onClick={() => dispatch(setFriendFilter("pending"))} disableRipple>
+                        <Button className={`friend-main-header-button ${friendFilter === "pending" ? "active" : ""}`} onClick={() => dispatch(setFriendFilter("pending"))} disableRipple>
                             Pending
                         </Button>
-                        <Button className={`${friendFilter === "blocked" ? "active" : ""}`} onClick={() => dispatch(setFriendFilter("blocked"))} disableRipple>
+                        <Button className={`friend-main-header-button ${friendFilter === "blocked" ? "active" : ""}`} onClick={() => dispatch(setFriendFilter("blocked"))} disableRipple>
                             Blocked
                         </Button>
                         <Button className={`addfriend-button ${friendFilter === "addfriend" ? "active" : ""}`} variant='contained' onClick={() => dispatch(setFriendFilter("addfriend"))} disableRipple>

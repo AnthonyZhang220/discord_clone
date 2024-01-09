@@ -4,6 +4,7 @@ import { lighten } from "@mui/material";
 import { ListItem, ListItemButton, ListItemText, ListItemAvatar, Badge, Avatar } from "@mui/material";
 import { handleCurrDirectMessageChannel } from "../../../../utils/handlers/channelHandlers";
 import StatusList from "../../../StatusList";
+import "./DirectMessageList.scss"
 
 export const DirectMessageList = ({ id, status, displayName, avatar, createdAt }) => {
     const { currDirectMessageChannel, isFriendListPageOpen } = useSelector(state => state.directMessage)

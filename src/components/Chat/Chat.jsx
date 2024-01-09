@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, Fragment, useRef } from 'react'
 //send meesage to db
-import { addDoc, collection, QuerySnapshot, Timestamp } from "firebase/firestore";
-import { uploadBytes, getDownloadURL, ref } from 'firebase/storage';
+import { collection } from "firebase/firestore";
 //query get chat message from db
 import {
     doc,
@@ -13,7 +12,6 @@ import {
     limitToLast,
 } from "firebase/firestore";
 import { db, storage } from "../../firebase";
-import { bytesToMB } from '../../utils/bytesToMB';
 
 
 //material ui comp
@@ -29,16 +27,12 @@ import { Divider } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { InputAdornment } from '@mui/material';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import InputLabel from '@mui/material/InputLabel';
-import { TextFieldProps } from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import InputBase from '@mui/material/InputBase';
 import { ClickAwayListener } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import NumbersIcon from '@mui/icons-material/Numbers';
-import Snackbar from '@mui/material/Snackbar';
 import ChannelMemberList from '../ChannelMemberList/ChannelMemberList';
-import { Alert } from '@mui/material';
 import './Chat.scss'
 
 
@@ -48,7 +42,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setDraftMessage } from '../../redux/features/draftSlice';
 import { setIsMemberListOpen } from '../../redux/features/memberListSlice';
 import { setCurrChannel } from '../../redux/features/channelSlice';
-
+import { handleSubmitMessage } from '../../utils/handlers/messageHandlers';
+import { setMessageList } from '../../redux/features/chatListSlice';
+import { handleUploadFile } from '../../utils/handlers/messageHandlers';
 // const URL = 'http://localhost:3000';
 // export const socket = io(URL);
 
@@ -56,7 +52,6 @@ export default function Chat() {
 
     const formRef = useRef();
     const chatScroller = useRef();
-    const [chatList, setChatList] = useState([]);
     const [openUpload, setOpenUpload] = useState(false);
     const dispatch = useDispatch();
     const { selectedServer, selectedChannel } = useSelector(state => state.userSelectStore)
@@ -64,6 +59,7 @@ export default function Chat() {
     const { user } = useSelector(state => state.auth)
     const { isMemberListOpen } = useSelector(state => state.memberList)
     const { draftMessage } = useSelector(state => state.draft)
+    const { messageList } = useSelector(state => state.chatList)
 
 
     const handleUploadOpen = () => {
@@ -123,7 +119,7 @@ export default function Chat() {
                     previousDate = convertDateDivider(chatMessage.createdAt)
                 });
 
-                dispatch(setChatList(chatList))
+                dispatch(setMessageList(chatList))
                 //scroll new message
             });
         }
@@ -132,7 +128,7 @@ export default function Chat() {
 
     }, [selectedChannel]);
 
-    const ChatItem = useMemo(() => ({ content, userName, avatar, createdAt, type, fileName, dividerDate }) => {
+    const ChatItem = useMemo(() => ({ content, displayName, avatar, createdAt, type, fileName, dividerDate }) => {
         const FormatChat = () => {
             if (type.indexOf("image/") != -1) {
                 return <img alt={content} src={content} style={{ maxHeight: "350px", aspectRatio: "auto", borderRadius: "8px", maxWidth: "550px" }} />
@@ -160,7 +156,6 @@ export default function Chat() {
             }
         }
 
-
         return (
             <Fragment>
                 {
@@ -171,11 +166,11 @@ export default function Chat() {
                             <ListItem className="message" sx={{ p: 0, m: 0 }}>
                                 <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
                                     <ListItemAvatar>
-                                        <Avatar alt={userName} src={avatar} />
+                                        <Avatar alt={displayName} src={avatar} />
                                     </ListItemAvatar>
                                     <ListItemText primary={
                                         <Fragment>
-                                            {userName}
+                                            {displayName}
                                             <Typography
                                                 sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
                                                 component="span"
@@ -228,7 +223,7 @@ export default function Chat() {
                 }
             </Fragment>
         )
-    }, [chatList])
+    }, [messageList])
 
 
     const ChatList = useMemo(() => {
@@ -255,14 +250,14 @@ export default function Chat() {
                     <Typography variant="body2">This is the start of the #{currChannel.name} channel.</Typography>
                 </ListItem>
                 {
-                    chatList?.map(({ content, userName, avatar, createdAt, type, fileName, dividerDate }, index) => (
-                        <ChatItem className="message" content={content} userName={userName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} dividerDate={dividerDate} />
+                    messageList?.map(({ content, displayName, avatar, createdAt, type, fileName, dividerDate }, index) => (
+                        <ChatItem className="message" content={content} displayName={displayName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} dividerDate={dividerDate} />
                     ))
                 }
                 <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
             </List>
         )
-    }, [chatList])
+    }, [messageList, currChannel.id])
 
     return (
         <Box className="chat-container">
@@ -292,7 +287,7 @@ export default function Chat() {
                             </Box>
                         </Box>
                     </Box>
-                    <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleAddMessage(e)} sx={{
+                    <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleSubmitMessage(e)} sx={{
                         position: "relative",
                         msFlexPositive: "false",
                         flexShrink: "0",
