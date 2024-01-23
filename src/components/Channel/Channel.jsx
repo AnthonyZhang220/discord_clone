@@ -29,6 +29,7 @@ import { setCurrChannelList, setCurrVoiceChannelList } from '../../redux/feature
 import { toggleServerSettings } from '../../redux/features/popoverSlice';
 import { handleSelectChannel } from '../../utils/handlers/channelHandlers';
 import { handleJoinVoiceChannel } from '../../utils/handlers/voiceChannelHandlers';
+import { setIsVoiceChatConnected } from '../../redux/features/voiceChatSlice';
 
 const Channel = () => {
     const channelHeaderRef = useRef(null);
@@ -136,7 +137,7 @@ const Channel = () => {
                 <Box component="ul" className="channel-list-text">
                     {currVoiceChannelList.map(({ name, id, participants }) => (
                         <Box key={id}>
-                            <Box key={id} id={id} component="li" className={`channel channel-text ${id === currVoiceChannel.uid ? "active" : ""}`} onClick={() => {
+                            <Box key={id} id={id} component="li" className={`channel channel-text ${id === currVoiceChannel.id ? "active" : ""}`} onClick={() => {
                                 handleJoinVoiceChannel(name, id)
                             }}>
                                 <VolumeUpIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />

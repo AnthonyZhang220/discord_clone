@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { Box, List, ListItem, ListItemAvatar, ListItemButton, ListItemText, Typography, Avatar, Badge, ListSubheader } from '@mui/material'
 
-import { doc, getDoc } from 'firebase/firestore';
+import { QuerySnapshot, doc, getDoc, onSnapshot, query, collection, where } from 'firebase/firestore';
 import { db } from '../../firebase';
 import StatusList from '../StatusList';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,19 +23,17 @@ function ChannelMemberList() {
             const serverRef = doc(db, "servers", selectedServer)
             const serverDoc = await getDoc(serverRef)
             const memberIds = serverDoc.data().members;
-            let fetchedMemberList = [];
-            let fetchedMemberRefs = [];
+            
+            const q = query(collection(db, "users"), where("id", "in", memberIds))
+            const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+                let fetchedMemberList = [];
+                QuerySnapshot.forEach((doc) => {
+                    fetchedMemberList.push(doc.data())
+                })
+                dispatch(setMemberList(fetchedMemberList))
+            })
 
-
-            for (let i = 0; i < memberIds.length; ++i) {
-                const userRef = doc(db, "users", memberIds[i])
-                const userDoc = await getDoc(userRef)
-                fetchedMemberList.push(userDoc.data())
-                fetchedMemberRefs.push(memberIds[i])
-            }
-
-            setMemberRef(fetchedMemberRefs)
-            dispatch(setMemberList(fetchedMemberList))
+            setMemberRef(memberIds)
         }
     }
 

@@ -5,7 +5,9 @@ import { setCurrVoiceChannel } from "../../redux/features/channelSlice";
 import { setIsVoiceChatConnected, setIsVoiceChatPageOpen } from "../../redux/features/voiceChatSlice";
 
 export const handleJoinVoiceChannel = async (name, channelId) => {
+    store.dispatch(setIsVoiceChatConnected(true))
     store.dispatch(setIsVoiceChatPageOpen(true))
+    const currServerName = store.getState().server.currServer.name;
     const currUser = store.getState().auth.user;
     const participant = {
         id: currUser.id,
@@ -17,9 +19,8 @@ export const handleJoinVoiceChannel = async (name, channelId) => {
     const channelDoc = await updateDoc(channelRef, {
         participants: arrayUnion(participant)
     })
+    store.dispatch(setCurrVoiceChannel({ name: name, id: channelId, serverName: currServerName }))
 
-    store.dispatch(setCurrVoiceChannel({ name: name, id: channelId }))
-    store.dispatch(setIsVoiceChatConnected(true))
 }
 
 export function setUpFirebaseListener() {
@@ -28,6 +29,7 @@ export function setUpFirebaseListener() {
 
 
 export const handleLeaveVoiceChannel = async () => {
+    store.dispatch(setIsVoiceChatConnected(false))
     store.dispatch(setIsVoiceChatPageOpen(false))
     const voiceChannel = store.getState().channel.currVoiceChannel;
     const currUser = store.getState().auth.user;

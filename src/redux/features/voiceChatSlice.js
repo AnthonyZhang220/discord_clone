@@ -4,7 +4,7 @@ import { createSlice } from '@reduxjs/toolkit';
 const voiceChatSlice = createSlice({
     name: 'voiceChat',
     initialState: {
-        isMuted: true,
+        isMicOn: true,
         isDeafen: false,
         isCameraOn: false,
         isScreenSharingOn: false,
@@ -17,14 +17,14 @@ const voiceChatSlice = createSlice({
         localTracks: null,
         currAgoraUID: null,
         screenTrack: null,
-        connectionState: {},
+        connectionState: "",
         latency: null,
         // Add other voice chat-related state here
     },
     reducers: {
         // Add other voice chat-related reducers here
-        setIsMuted: (state, action) => {
-            state.isMuted = action.payload;
+        setIsMicOn: (state, action) => {
+            state.isMicOn = action.payload;
         },
         setIsDeafen: (state, action) => {
             state.isDeafen = action.payload;
@@ -67,13 +67,13 @@ const voiceChatSlice = createSlice({
         },
         setLatency: (state, action) => {
             state.latency = action.payload;
-        }
+        },
     },
 });
 
 export const {
     setIsCameraOn,
-    setIsMuted,
+    setIsMicOn,
     setIsDeafen,
     setIsSharingOn,
     setIsVoiceChatConnected,

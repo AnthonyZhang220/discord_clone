@@ -100,15 +100,12 @@ export async function signOut() {
     }
 }
 
-export async function changeStatus(status, user) {
-    const userObj = JSON.parse(localStorage.getItem(`${user.uid}`))
+export async function changeStatus(status) {
+    const user = store.getState().auth.user;
+    store.dispatch(setUser({ ...user, status: status }))
 
-    localStorage.setItem(`${user.uid}`, JSON.stringify({ ...userObj, status: status }))
-
-    const updateSuccess = await updateDoc(doc(db, "users", user.uid), {
+    const updateSuccess = await updateDoc(doc(db, "users", user.id), {
         status: status
     })
-    if (updateSuccess) {
-        store.dispatch(setUser({ ...user, status: status }))
-    }
+
 }
