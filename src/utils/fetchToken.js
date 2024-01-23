@@ -1,30 +1,20 @@
 import axios from "axios";
+import store from "../redux/store";
 
 export default async function fetchRTCToken(config, channelName) {
-    if (config.serverUrl !== "") {
-        try {
-            const bodyData = {
-                tokenType: "rtc",
-                channel: channelName,
-                role: "publisher",
-                uid: 0,
-                expire: 3600,
-            };
-
-            const bodyString = JSON.stringify(bodyData);
-            const getUrl = `${config.serverUrl}/rtc/${channelName}/publisher/rtc/0`;
-            const postUrl = `${config.serverUrl}/getToken`
-            const response = await fetch(getUrl, {
-                method: "GET",
-            });
-            const data = await response.json();
-            console.log("RTC token fetched from server: ", data.rtcToken);
-            return data.rtcToken;
-        } catch (error) {
-            console.error(error);
-            throw error;
+    const userId = store.getState().auth.user.id;
+    return new Promise(function (resolve) {
+        if (channelName) {
+            const url = `${config.serverUrl}/rtc/${channelName}/publisher/uid/0/?expiry=${config.tokenExpiryTime}`
+            console.log(url)
+            axios.get(url).then(
+                response => {
+                    console.log(response.data.rtcToken)
+                    resolve(response.data.rtcToken);
+                })
+                .catch(error => {
+                    console.log(error);
+                });
         }
-    } else {
-        return config.rtcToken;
-    }
+    });
 }

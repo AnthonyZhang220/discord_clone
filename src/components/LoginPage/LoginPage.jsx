@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Box, Typography, FormHelperText, Button, SvgIcon, FormLabel } from '@mui/material'
 
 import { auth, db } from '../../firebase'
@@ -16,11 +16,12 @@ import GithubButton from "./github.svg"
 import './LoginPage.scss'
 import { useDispatch } from 'react-redux'
 import { signInWithOAuth } from '../../utils/authentication'
+import { setUser } from '../../redux/features/authSlice'
 
 export function RegisterPage() {
     const navigate = useNavigate();
 
-    const [newUser, setNewUser] = React.useState(
+    const [newUser, setNewUser] = useState(
         {
             email: "",
             username: "",
@@ -52,12 +53,12 @@ export function RegisterPage() {
                     displayName: newUser.username,
                     email: newUser.email,
                     avatar: "",
-                    userId: user.uid,
+                    id: user.uid,
                     createdAt: Timestamp.fromDate(new Date()),
                     status: "online",
                     friends: [],
                 }).then((doc) => {
-                    setCurrentUser({ name: doc.data().displayName, avatar: doc.data().avatar, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+                    dispatch(setUser({ displayName: doc.data().displayName, avatar: doc.data().avatar, id: doc.data().id, createdAt: doc.data().createdAt.seconds, status: doc.data().status }))
 
                     navigate("../channels")
                 })
@@ -137,10 +138,10 @@ export function ResetPasswordPage() {
 
 
 
-export default function LoginPage({ setCurrentUser }) {
+export default function LoginPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [emailSignInInfo, setEmailSignInInfo] = React.useState({ email: "", password: "" })
+    const [emailSignInInfo, setEmailSignInInfo] = useState({ email: "", password: "" })
 
     const handleResetPassword = () => {
         sendPasswordResetEmail(auth, emailSignInInfo.email)
@@ -151,12 +152,12 @@ export default function LoginPage({ setCurrentUser }) {
     }
     const emailSignIn = async () => {
         const result = await signInWithEmailAndPassword(auth, emailSignInInfo.email, emailSignInInfo.password)
-
+        console.log(result)
 
         const userRef = doc(db, "users", result.user.uid);
 
         getDoc(userRef).then((doc) => {
-            setCurrentUser({ name: doc.data().displayName, avatar: doc.data().avatar, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+            dispatch(setUser({ displayName: doc.data().displayName, avatar: doc.data().avatar, id: doc.data().id, createdAt: doc.data().createdAt.seconds, status: doc.data().status }))
             navigate("/channels")
         })
         // ...

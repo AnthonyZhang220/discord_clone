@@ -97,7 +97,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             title={
                                 <React.Fragment>
                                     <ListItem sx={{ pl: 1, pr: 1 }}>
-                                        <MenuListItemButton onClick={() => changeStatus("online", user)} sx={{
+                                        <MenuListItemButton onClick={() => changeStatus("online")} sx={{
                                             "&:hover": {
                                                 backgroundColor: "#5865f2",
                                                 borderRadius: "4px",
@@ -109,7 +109,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                     </ListItem>
                                     <Divider sx={{ backgroundColor: "white", mt: 0.5, mb: 0.5 }} variant="middle" />
                                     <ListItem sx={{ pl: 1, pr: 1 }}>
-                                        <MenuListItemButton onClick={() => changeStatus("idle", user)} sx={{
+                                        <MenuListItemButton onClick={() => changeStatus("idle")} sx={{
                                             "&:hover": {
                                                 backgroundColor: "#5865f2",
                                                 borderRadius: "4px",
@@ -120,7 +120,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                         </MenuListItemButton>
                                     </ListItem>
                                     <ListItem sx={{ pl: 1, pr: 1 }}>
-                                        <MenuListItemButton onClick={() => changeStatus("donotdisturb", user)} sx={{
+                                        <MenuListItemButton onClick={() => changeStatus("donotdisturb")} sx={{
                                             "&:hover": {
                                                 backgroundColor: "#5865f2",
                                                 borderRadius: "4px",
@@ -135,7 +135,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                         </MenuListItemButton>
                                     </ListItem>
                                     <ListItem sx={{ pl: 1, pr: 1 }}>
-                                        <MenuListItemButton onClick={() => changeStatus("invisible", user)} sx={{
+                                        <MenuListItemButton onClick={() => changeStatus("invisible")} sx={{
                                             "&:hover": {
                                                 backgroundColor: "#5865f2",
                                                 borderRadius: "4px",

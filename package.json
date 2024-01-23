@@ -29,7 +29,6 @@
     "@reduxjs/toolkit": "^2.0.1",
     "@svgr/webpack": "^7.0.0",
     "agora-rtc-react": "^2.0.0",
-    "agora-rtc-sdk-ng": "^4.17.2",
     "axios": "^1.4.0",
     "babel-loader": "^9.1.2",
     "browserify-zlib": "^0.2.0",
