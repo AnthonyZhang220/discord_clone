@@ -7,9 +7,9 @@ import { Badge, Divider } from '@mui/material';
 import { MenuListItemButton } from '../../../../CustomUIComponents';
 import StatusList from '../../../../StatusList';
 
-import "./UserSidebar.scss";
+import "./UserSideBar.scss";
 
-export default function UserSidebar({ currDirectMessageChannel }) {
+export const UserSideBar = ({ currDirectMessageChannel }) => {
 
     return (
         <Box className="userSidebar-container">
