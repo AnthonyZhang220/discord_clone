@@ -22,10 +22,10 @@ import { setDraftDirectMessage } from '../../../../redux/features/draftSlice';
 import { convertDate, convertTime, convertDateDivider } from '../../../../utils/formatter';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDirectMessageList } from '../../../../redux/features/chatListSlice';
-import UserSidebar from './UserSideBar/UserSideBar';
-import './PrivateChat.scss'
+import { UserSideBar } from './UserSideBar/UserSideBar';
 import { handleSubmitDirectMessage } from '../../../../utils/handlers/messageHandlers';
 import { handleUploadFile } from '../../../../utils/handlers/messageHandlers';
+import './PrivateChat.scss'
 
 export default function PrivateChat() {
     const formRef = useRef();
@@ -288,7 +288,7 @@ export default function PrivateChat() {
                 </Box>
             </Box>
             {
-                isDirectMessageSidebarOpen && <UserSidebar currDirectMessageChannel={currDirectMessageChannel} />
+                isDirectMessageSidebarOpen && <UserSideBar currDirectMessageChannel={currDirectMessageChannel} />
             }
         </Box>
     )
