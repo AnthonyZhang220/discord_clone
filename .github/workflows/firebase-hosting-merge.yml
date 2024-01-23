@@ -37,5 +37,8 @@ jobs:
           databaseURL: "${{secrets.DATABASE_URL}}"
           storeageBucket: "${{secrets.STORAGE_BUCKET}}"
           appId: "${{secrets.FIREBASE_APP_ID}}"
+          agoraAppId: "${{secrets.AGORA_APP_ID}}"
+          agoraAppCerti: "${{secrets.AGORA_APP_CERTIFI}}"
+          serverURL: "${{secrets.SERVER_URL}}"
           channelId: live
           projectId: discordclone-95fc0
