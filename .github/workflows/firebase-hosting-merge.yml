@@ -32,5 +32,10 @@ jobs:
         with:
           repoToken: "${{ secrets.GITHUB_TOKEN }}"
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_DISCORDCLONE_95FC0 }}"
+          apiKey: "${{secrets.FIREBASE_API_KEY}}"
+          authDomain: "${{secrets.AUTH_DOMAIN}}"
+          databaseURL: "${{secrets.DATABASE_URL}}"
+          storeageBucket: "${{secrets.STORAGE_BUCKET}}"
+          appId: "${{secrets.FIREBASE_APP_ID}}"
           channelId: live
           projectId: discordclone-95fc0
