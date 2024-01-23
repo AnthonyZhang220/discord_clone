@@ -4,12 +4,12 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
 import { Badge, Divider } from '@mui/material';
-import { MenuListItemButton } from '../../../../CustomUIComponents';
-import StatusList from '../../../../StatusList';
+import { MenuListItemButton } from '../../../CustomUIComponents';
+import StatusList from '../../../StatusList';
 
-import "./UserSideBar.scss";
+import "./UserSidebar.scss";
 
-export const UserSideBar = ({ currDirectMessageChannel }) => {
+const UserSidebar = ({ currDirectMessageChannel }) => {
 
     return (
         <Box className="userSidebar-container">
@@ -60,3 +60,5 @@ export const UserSideBar = ({ currDirectMessageChannel }) => {
         </Box>
     )
 }
+
+export default UserSidebar;
