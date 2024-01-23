@@ -9,7 +9,7 @@ import StatusList from '../../../StatusList';
 
 import "./UserSidebar.scss";
 
-const UserSidebar = ({ currDirectMessageChannel }) => {
+export const UserSidebar = ({ currDirectMessageChannel }) => {
 
     return (
         <Box className="userSidebar-container">
@@ -61,4 +61,3 @@ const UserSidebar = ({ currDirectMessageChannel }) => {
     )
 }
 
-export default UserSidebar;

@@ -23,7 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setDirectMessageList } from '../../../../redux/features/chatListSlice';
 import { handleSubmitDirectMessage } from '../../../../utils/handlers/messageHandlers';
 import { handleUploadFile } from '../../../../utils/handlers/messageHandlers';
-import UserSidebar from '../UserSideBar/UserSideBar';
+import { UserSidebar } from '../UserSidebar/UserSidebar';
 
 import './PrivateChat.scss'
 
