@@ -54,19 +54,19 @@ export const MemberDetailPopover = ({ memberRef }) => {
                         <StatusList status={memberDetail.status} />
                     }
                 >
-                    <Avatar alt={memberDetail.name} sx={{ width: "80px", height: "80px" }} src={memberDetail.avatar} imgProps={{ crossOrigin: "" }} />
+                    <Avatar alt={memberDetail.displayName} sx={{ width: "80px", height: "80px" }} src={memberDetail.avatar} imgProps={{ crossOrigin: "" }} />
                 </Badge>
             </Box>
             <Box className="member-detail-list" sx={{ backgroundColor: "#111214" }}>
                 <ListItem dense>
                     <MemberListItemButton>
-                        <ListItemText primary={memberDetail.name} primaryTypographyProps={{ variant: "h3" }} />
+                        <ListItemText primary={memberDetail.displayName} primaryTypographyProps={{ variant: "h3" }} />
                     </MemberListItemButton>
                 </ListItem>
                 <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
                 <ListItem dense>
                     <MemberListItemButton>
-                        <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(memberDetail.createdAt * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
+                        <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(memberDetail.createdAt?.seconds * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
                             style: {
                                 color: "white"
                             }

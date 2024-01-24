@@ -27,13 +27,9 @@ const VoiceChat = () => {
         <AgoraClient>
             <Box className="voicechat-container">
                 <Box className="voicechat-wrapper">
-                    <Box className="callContainer">
-                        <Box className="videoGridWrapper">
-                            <Box className="voicechat-grid">
-                                <AgoraManager config={AgoraConfig}>
-                                </AgoraManager>
-                            </Box>
-                        </Box>
+                    <Box className="voicechat-grid">
+                        <AgoraManager config={AgoraConfig}>
+                        </AgoraManager>
                     </Box>
                 </Box>
                 <Box className="voicechat-control">
@@ -44,31 +40,33 @@ const VoiceChat = () => {
                         </Box>
                     </Box>
                     <Box className="gradient-bottom">
-                        <Fab onClick={() => toggleCamera()}>
-                            {isCameraOn ?
-                                <Tooltip title="Turn on Camera">
-                                    <VideocamRoundedIcon />
-                                </Tooltip>
-                                :
-                                <Tooltip title="Turn Off Camera">
-                                    <VideocamOffRoundedIcon />
-                                </Tooltip>
-                            }
-                        </Fab>
-                        <Fab onClick={() => toggleMic()}>
-                            {isMicOn ?
-                                <Tooltip title="Mute">
-                                    <MicRoundedIcon />
-                                </Tooltip>
-                                :
-                                <Tooltip title="Unmute">
-                                    <MicOffRoundedIcon />
-                                </Tooltip>
-                            }
-                        </Fab>
-                        <Fab color="error" onClick={() => handleLeaveVoiceChannel()}>
-                            <CallEndRoundedIcon />
-                        </Fab>
+                        <Box className="fab-group">
+                            <Fab onClick={() => toggleCamera()}>
+                                {isCameraOn ?
+                                    <Tooltip title="Turn on Camera">
+                                        <VideocamRoundedIcon />
+                                    </Tooltip>
+                                    :
+                                    <Tooltip title="Turn Off Camera">
+                                        <VideocamOffRoundedIcon />
+                                    </Tooltip>
+                                }
+                            </Fab>
+                            <Fab onClick={() => toggleMic()}>
+                                {isMicOn ?
+                                    <Tooltip title="Mute">
+                                        <MicRoundedIcon />
+                                    </Tooltip>
+                                    :
+                                    <Tooltip title="Unmute">
+                                        <MicOffRoundedIcon />
+                                    </Tooltip>
+                                }
+                            </Fab>
+                            <Fab color="error" onClick={() => handleLeaveVoiceChannel()}>
+                                <CallEndRoundedIcon />
+                            </Fab>
+                        </Box>
                     </Box>
                 </Box>
             </Box>

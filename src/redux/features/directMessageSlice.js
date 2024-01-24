@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const directMessageSlice = createSlice({
     name: "directMessage",
     initialState: {
-        isDirectMessagePageOpen: true,
+        isDirectMessagePageOpen: false,
         currDirectMessageChannel: {},
         currDirectMessageChannelRef: "",
         friendFilter: "",

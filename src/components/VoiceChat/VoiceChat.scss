@@ -2,6 +2,7 @@
 
 .voicechat-container {
 	background: #121212;
+	padding: 60px 0;
 	min-width: 0;
 	min-height: 0;
 	display: -webkit-box;
@@ -16,7 +17,6 @@
 	-webkit-box-flex: 1;
 	-ms-flex: 1 1 auto;
 	flex: 1 1 auto;
-	z-index: 5;
 
 	&:hover {
 		.voicechat-control {
@@ -25,7 +25,6 @@
 		}
 	}
 
-	
 	.voicechat-wrapper {
 		display: -webkit-box;
 		display: -ms-flexbox;
@@ -36,36 +35,22 @@
 		flex: 0 0 auto;
 		z-index: 2;
 		height: 100%;
-		
-		.callContainer {
-			-webkit-box-flex: 1;
-			-ms-flex: 1 1 auto;
-			flex: 1 1 auto;
-			overflow: hidden;
-			
 
-			.videoGridWrapper {
-				.voicechat-grid {
-					contain: layout;
-					width: 100%;
-					overflow: hidden;
-
-					display: grid;
-					grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
-					grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-				}
-			}
-
+		.voicechat-grid {
+			display: grid;
+			grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
+			grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+			width: 100%;
+			height: 100%;
 		}
 	}
+
 	.voicechat-control {
-		pointer-events: none;
 		position: absolute;
 		top: 0;
 		right: 0;
 		bottom: 0;
 		left: 0;
-		padding: 0 16px 16px;
 		display: -webkit-box;
 		display: -ms-flexbox;
 		display: flex;
@@ -125,10 +110,9 @@
 
 		.gradient-bottom {
 			flex: 0 0 57px;
-			padding: 0 20px 0 20px;
+			padding: 0 1rem;
 			background: transparent;
 			align-items: center;
-			box-shadow: 0 1px 0 #212326, inset 0 -1px 0 rgba(0, 0, 0, 0.1);
 			transition: background 0.15s ease;
 			position: relative;
 			display: -webkit-box;
@@ -137,6 +121,7 @@
 			-webkit-box-align: center;
 			-ms-flex-align: center;
 			align-items: center;
+			justify-content: center;
 			min-width: 0;
 			width: 100%;
 			-webkit-box-flex: 0;
@@ -144,6 +129,15 @@
 			font-size: 16px;
 			line-height: 20px;
 			cursor: default;
+
+			.fab-group {
+				max-width: 300px;
+				margin: 0 auto;
+
+				button {
+					margin: 0.5rem;
+				}
+			}
 		}
 	}
 }
