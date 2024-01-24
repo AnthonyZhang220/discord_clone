@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, Fragment } from 'react'
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import Chat from './components/Chat/Chat'
 import ServerList from './components/ServerList/ServerList'
 import Channel from './components/Channel/Channel'
@@ -13,11 +14,13 @@ import VoiceChat from './components/VoiceChat/VoiceChat'
 import { useDispatch, useSelector } from 'react-redux'
 import ThemeContextProvider from './contexts/ThemeContextProvider'
 import CssBaseline from '@mui/material/CssBaseline';
-import { listenToAuthStateChange } from './utils/authentication'
 import DirectMessageMenu from "./components/DirectMessage/DirectMessageMenu/DirectMessageMenu";
 import DirectMessageBody from './components/DirectMessage/DirectMessageBody/DirectMessageBody';
-
-
+import PageNotFound from './components/PageNotFound/PageNotFound'
+import { onAuthStateChanged } from 'firebase/auth'
+import { getSelectStore } from './utils/userSelectStore'
+import { setUser, setIsLoggedIn } from './redux/features/authSlice'
+import { getBannerColor } from './utils/getBannerColor'
 import "./App.scss";
 
 function App() {
@@ -26,9 +29,45 @@ function App() {
     const { isVoiceChatPageOpen } = useSelector(state => state.voiceChat)
     const { currVoiceChannel } = useSelector(state => state.channel)
 
+    const navigate = useNavigate();
+
     useEffect(() => {
-        listenToAuthStateChange();
-        return listenToAuthStateChange;
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userRef = doc(db, "users", user.uid);
+                const userDoc = await getDoc(userRef);
+
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    console.log("userData", userData)
+                    dispatch(setUser({ ...userData }))
+                } else {
+                    const userDoc = await setDoc(userRef, {
+                        displayName: user.displayName,
+                        email: user.email ? user.email : "",
+                        avatar: user.photoURL,
+                        id: user.uid,
+                        createdAt: Timestamp.fromDate(new Date()),
+                        status: "online",
+                        friends: [],
+                        bannerColor: await getBannerColor(user.photoURL)
+                    })
+                    if (userDoc) {
+                        dispatch(setUser(userDoc))
+                    }
+                }
+                getSelectStore()
+                dispatch(setIsLoggedIn(true))
+                navigate("/channels")
+            } else {
+                updateDoc(doc(db, "users", user.uid))
+                dispatch(setUser(null))
+                dispatch(setIsLoggedIn(false))
+                navigate("/")
+            }
+        })
+
+        return unsubscribe;
     }, [auth])
 
     return (
@@ -75,6 +114,7 @@ function App() {
                             } />
                     </Route>
                 </Route>
+                <Route path="*" element={<PageNotFound />} />
             </Routes>
         </ThemeContextProvider>
     )

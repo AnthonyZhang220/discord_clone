@@ -19,6 +19,7 @@ const voiceChatSlice = createSlice({
         screenTrack: null,
         connectionState: "",
         latency: null,
+        isLoading: false,
         // Add other voice chat-related state here
     },
     reducers: {
@@ -68,6 +69,9 @@ const voiceChatSlice = createSlice({
         setLatency: (state, action) => {
             state.latency = action.payload;
         },
+        setIsLoading: (state, action) => {
+            state.isLoading = action.payload;
+        }
     },
 });
 
@@ -88,14 +92,10 @@ export const {
     setIsVoiceChatPageOpen,
     setConnectionState,
     setLatency,
+    setIsLoading,
 } = voiceChatSlice.actions;
 export default voiceChatSlice.reducer;
 
-
-export const handleUserSubscribe = async (user, mediaType) => {
-    const id = user.uid
-    await agoraEngine.subscribe(user, mediaType)
-}
 
 export const handleVolume = (volumes) => {
     setRemoteUsers((previousUsers) => {

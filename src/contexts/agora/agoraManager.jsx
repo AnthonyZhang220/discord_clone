@@ -1,7 +1,7 @@
-import AgoraRTC, { LocalVideoTrack, RemoteUser, useJoin, useLocalCameraTrack, useLocalMicrophoneTrack, usePublish, useRTCClient, useRemoteUsers, useClientEvent, useCurrentUID, useVolumeLevel, useNetworkQuality, useConnectionState, useIsConnected, AgoraRTCProvider, RemoteVideoTrack, LocalAudioTrack, RemoteAudioTrack } from "agora-rtc-react";
+import AgoraRTC, { LocalVideoTrack, RemoteUser, useJoin, useLocalCameraTrack, useLocalMicrophoneTrack, usePublish, useRTCClient, useRemoteUsers, useClientEvent, useCurrentUID, useVolumeLevel, useNetworkQuality, useConnectionState, useIsConnected, AgoraRTCProvider, RemoteVideoTrack, LocalAudioTrack, RemoteAudioTrack, useRemoteAudioTracks, useRemoteVideoTracks } from "agora-rtc-react";
 import { Box } from "@mui/material";
 import React, { useEffect, useState, createContext, useContext, useMemo } from "react";
-import { setIsVoiceChatConnected, setRemoteUsers, setAgoraEngine, setAgoraConfig, setIsCameraOn, setLatency, setConnectionState } from "../../redux/features/voiceChatSlice";
+import { setIsVoiceChatConnected, setRemoteUsers, setAgoraEngine, setAgoraConfig, setIsCameraOn, setLatency, setConnectionState, setIsLoading } from "../../redux/features/voiceChatSlice";
 import { useDispatch, useSelector } from "react-redux";
 import VoiceChatTile from "../../components/VoiceChat/VoiceChatTile/VoiceChatTile";
 import fetchRTCToken from "../../utils/fetchToken";
@@ -34,33 +34,13 @@ export const AgoraManager = ({ config, children }) => {
     //local
     const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack(isMicOn);
     const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack(isCameraOn);
-    usePublish([localMicrophoneTrack, localCameraTrack], isCameraOn || isMicOn);
+    usePublish([localMicrophoneTrack, localCameraTrack]);
 
     //remote
     const remoteUsers = useRemoteUsers();
 
-
-
-
-
-    useEffect(() => {
-        console.error("isConnected", isConnected)
-
-        console.error("isLoading", isLoading)
-        console.error("error", error)
-        console.error("data", data)
-
-    }, [isConnected, isLoading, error, data])
-
-    useEffect(() => {
-        console.log("isLoadingCam", isLoadingCam);
-        console.log("localCameraTrack", localCameraTrack);
-    }, [isLoadingCam, localCameraTrack]);
-
     //remote
     // const publishedUsers = remoteUsers.filter(user => user.hasAudio || user.hasVideo);
-    // const { videoTracks } = useRemoteVideoTracks(remoteUsers);
-    // const { audioTracks } = useRemoteAudioTracks(remoteUsers);
     // audioTracks.map(track => track.play());
 
     // useEffect(() => {
@@ -83,7 +63,6 @@ export const AgoraManager = ({ config, children }) => {
 
     useEffect(() => {
         dispatch(setConnectionState(connectionState))
-        console.log(connectionState)
     }, [connectionState])
 
     useClientEvent(agoraClient, "token-privilege-will-expire", () => {
@@ -103,8 +82,11 @@ export const AgoraManager = ({ config, children }) => {
 
     useEffect(() => {
         dispatch(setLatency(networkQuality.delay))
-        console.log(networkQuality.delay)
     }, [networkQuality.delay])
+
+    useEffect(() => {
+        dispatch(setIsLoading(isLoading))
+    }, [isLoading])
 
 
     useEffect(() => {
@@ -116,32 +98,19 @@ export const AgoraManager = ({ config, children }) => {
 
     useEffect(() => {
         console.log(remoteUsers)
-    }, [remoteUsers.length])
+    }, [remoteUsers])
 
     const deviceLoading = isLoadingMic || isLoadingCam;
     if (deviceLoading) return <div>Loading devices.//.</div>
 
     return (
-        <Box id="videos">
-            <Box className="vid" style={{ height: 300, width: 600 }}>
-                {isCameraOn ?
-                    <LocalVideoTrack track={localCameraTrack} play={isCameraOn} muted={isCameraOn ? false : true} />
-                    : <VoiceChatTile user={localUser} hasAudio={isMicOn} hasVideo={isCameraOn} volume={volume} />
-                }
-            </Box>
-            {remoteUsers.map((remoteUser) => (
-                <Box className="vid" style={{ height: 300, width: 600 }} key={remoteUser.uid}>
-                    {
-                        remoteUser.hasVideo ?
-                            <>
-                                <RemoteVideoTrack track={remoteUser.videoTrack} play={true} />
-                                <RemoteAudioTrack track={remoteUser.audioTrack} play />
-                            </>
-                            :
-                            <VoiceChatTile user={remoteUser} hasAudio={remoteUser.hasAudio} hasVideo={remoteUser.hasVideo} />
-                    }
-                </Box>
-            ))}
-        </Box>
+        <>
+            <VoiceChatTile localUser={true} videoTrack={localCameraTrack} audioTrack={localMicrophoneTrack} user={localUser} hasAudio={isMicOn} hasVideo={isCameraOn} volume={volume} />
+            {
+                remoteUsers.map((remoteUser) => (
+                    <VoiceChatTile key={remoteUser.uid} localUser={false} user={remoteUser} videoTrack={remoteUser.videoTrack} audioTrack={remoteUser.audioTrack} hasAudio={remoteUser.hasAudio} hasVideo={remoteUser.hasVideo} />
+                ))
+            }
+        </>
     )
 }

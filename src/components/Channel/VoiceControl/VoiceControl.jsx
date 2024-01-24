@@ -22,7 +22,7 @@ export default function VoiceControl() {
             <Box className="voice-control-upper">
                 <Box className="voice-control-details" sx={{ marginRight: "auto" }}>
                     <Box className="voice-control-status" sx={{ color: connectionState !== "DISCONNECTED" ? "#23a459" : "white" }}>
-                        <Tooltip arrow sx={{ background: latency < 100 ? "#23a55a" : latency < 300 ? "#f0b132" : "#f23f42", color: "whitesmoke" }} title={
+                        <Tooltip arrow sx={{ background: latency < 100 ? "#23a55a" : latency < 100 ? "#f0b132" : "#f23f42", color: "whitesmoke" }} title={
                             <React.Fragment>
                                 <Typography variant='body2'>
                                     {latency} ms

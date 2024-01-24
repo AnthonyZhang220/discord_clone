@@ -1,12 +1,11 @@
 import store from "../redux/store";
-import { onAuthStateChanged, signInWithRedirect } from 'firebase/auth';
+import { signInWithRedirect } from 'firebase/auth';
 import { auth, db } from "../firebase";
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { FacebookAuthProvider, TwitterAuthProvider, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
 import { redirect } from 'react-router-dom';
-import { getSelectStore } from "./userSelectStore";
 import { setIsLoggedIn, setUser } from "../redux/features/authSlice";
-import { getBannerColor } from "./getBannerColor";
+
 
 
 const GoogleProvider = new GoogleAuthProvider();
@@ -34,48 +33,6 @@ export const signInWithOAuth = (provider) => async () => {
         }
     } catch (error) {
         console.error(`Error signing in with ${provider}`, error)
-    }
-}
-
-export async function listenToAuthStateChange() {
-    try {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userRef);
-
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    console.log("userData", userData)
-                    store.dispatch(setUser(userData))
-                } else {
-                    const userDoc = await setDoc(userRef, {
-                        displayName: user.displayName,
-                        email: user.email ? user.email : "",
-                        avatar: user.photoURL,
-                        id: user.uid,
-                        createdAt: Timestamp.fromDate(new Date()),
-                        status: "online",
-                        friends: [],
-                        bannerColor: await getBannerColor(user.photoURL)
-                    })
-                    if (userDoc) {
-                        store.dispatch(setUser(userDoc))
-                    }
-                }
-                getSelectStore(user.uid)
-                store.dispatch(setIsLoggedIn(true))
-                redirect("/channels")
-            } else {
-                updateDoc(doc(db, "users", user.uid))
-                store.dispatch(setUser(null))
-                store.dispatch(setIsLoggedIn(false))
-                redirect("/")
-            }
-        })
-    } catch (error) {
-        store.dispatch(setError("Auth", error))
-        console.error("Auth Slice", error)
     }
 }
 

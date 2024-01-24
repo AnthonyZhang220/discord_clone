@@ -25,6 +25,9 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
     const { userDetailPopover } = useSelector((state) => state.popover)
     const { user } = useSelector((state) => state.auth)
 
+    useEffect(() => {
+        console.log(user.bannerColor)
+    }, [user.bannerColor])
     return (
         <Popover
             className='user-detail-paper'
@@ -57,7 +60,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             <rect></rect>
                             <circle></circle>
                         </mask>
-                        <foreignObject className="user-detail-object">
+                        <foreignObject className="user-detail-object" sx={{ background: user.bannerColor?.toString() }}>
                             <Box sx={{ height: "100px", width: "100%", transition: "background-color 0.1s" }}>
                             </Box>
                         </foreignObject>
@@ -82,7 +85,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                     <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
                     <ListItem dense>
                         <MenuListItemButton>
-                            <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(user.createdAt * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
+                            <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(user.createdAt?.seconds * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
                                 style: {
                                     color: "white"
                                 }
