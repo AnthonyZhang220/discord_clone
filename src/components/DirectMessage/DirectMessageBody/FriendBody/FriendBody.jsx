@@ -6,7 +6,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import AddFriend from './AddFriend/AddFriend';
 import { useSelector } from 'react-redux';
-import { handleSearchFriend } from '../../../../utils/handlers/searchHandlers';
+import { handleSearchFriend } from '../../../../handlers/searchHandlers';
 import "./FriendBody.scss";
 
 

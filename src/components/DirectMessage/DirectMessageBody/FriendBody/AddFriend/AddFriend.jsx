@@ -5,8 +5,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import styled from '@emotion/styled';
 import { useSelector } from 'react-redux';
 import { LoadingButton } from '@mui/lab';
-import { handleSearchFriend } from '../../../../../utils/handlers/searchHandlers';
-import { debounce } from '../../../../../utils/handlers/searchHandlers';
+import { handleSearchFriend } from '../../../../../handlers/searchHandlers';
+import { debounce } from '../../../../../handlers/searchHandlers';
 import FriendTab from '../FriendTab/FriendTab';
 import "./AddFriend.scss"
 

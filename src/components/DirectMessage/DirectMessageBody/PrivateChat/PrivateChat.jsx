@@ -21,8 +21,8 @@ import { setDraftDirectMessage } from '../../../../redux/features/draftSlice';
 import { convertDate, convertTime, convertDateDivider } from '../../../../utils/formatter';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDirectMessageList } from '../../../../redux/features/chatListSlice';
-import { handleSubmitDirectMessage } from '../../../../utils/handlers/messageHandlers';
-import { handleUploadFile } from '../../../../utils/handlers/messageHandlers';
+import { handleSubmitDirectMessage } from '../../../../handlers/messageHandlers';
+import { handleUploadFile } from '../../../../handlers/messageHandlers';
 import { UserSidebar } from '../UserSidebar/UserSidebar';
 
 import './PrivateChat.scss'

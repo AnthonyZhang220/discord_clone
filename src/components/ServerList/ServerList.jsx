@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { CreateServerDialog, JoinServerDialog, ServerDialog } from '../Modals/Modals';
 
-import { handleSelectServer } from '../../utils/handlers/serverHandlers';
+import { handleSelectServer } from '../../handlers/serverHandlers';
 import { setCreateServerModal } from '../../redux/features/modalSlice';
 import { setCurrServerList } from '../../redux/features/serverSlice';
 import "./ServerList.scss"
@@ -29,7 +29,7 @@ const ServerList = () => {
 
     // Get list of servers that belong to the current user
     useEffect(() => {
-        if (user.id) {
+        if (user) {
             const q = query(collection(db, 'servers'), where('members', 'array-contains', user.id));
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 const userServers = [];
@@ -43,7 +43,7 @@ const ServerList = () => {
                 dispatch(setCurrServerList(userServers))
             });
         }
-    }, [user.id]);
+    }, [user]);
 
     useEffect(() => {
         if (isDirectMessagePageOpen) {

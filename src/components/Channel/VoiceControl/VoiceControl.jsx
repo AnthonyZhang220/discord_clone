@@ -7,8 +7,8 @@ import SignalCellularAltRoundedIcon from '@mui/icons-material/SignalCellularAltR
 import CallEndRoundedIcon from '@mui/icons-material/CallEndRounded';
 import VideocamRoundedIcon from '@mui/icons-material/VideocamRounded';
 import ScreenShareRoundedIcon from '@mui/icons-material/ScreenShareRounded';
-import { toggleScreenShare, toggleCamera } from '../../../utils/handlers/voiceControlHandlers'
-import { handleLeaveVoiceChannel } from '../../../utils/handlers/voiceChannelHandlers'
+import { toggleScreenShare, toggleCamera } from '../../../handlers/voiceControlHandlers'
+import { handleLeaveVoiceChannel } from '../../../handlers/voiceChannelHandlers'
 
 import "./VoiceControl.scss"
 

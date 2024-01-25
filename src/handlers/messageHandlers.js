@@ -1,10 +1,10 @@
-import store from "../../redux/store";
+import store from "../redux/store";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
-import { db, storage } from "../../firebase";
+import { db, storage } from "../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { setDraftDirectMessage, setDraftMessage } from "../../redux/features/draftSlice";
-import { setError } from "../../redux/features/errorSlice";
-import { bytesToMB } from "../bytesToMB";
+import { setDraftDirectMessage, setDraftMessage } from "../redux/features/draftSlice";
+import { setError } from "../redux/features/errorSlice";
+import { bytesToMB } from "../utils/bytesToMB";
 
 //add new message to db
 export const handleSubmitDirectMessage = async (e) => {

@@ -1,5 +1,5 @@
-import store from "../../redux/store";
-import { setIsCameraOn, setIsScreenSharingOn, setIsMicOn, setIsDeafen } from "../../redux/features/voiceChatSlice";
+import store from "../redux/store";
+import { setIsCameraOn, setIsScreenSharingOn, setIsMicOn, setIsDeafen } from "../redux/features/voiceChatSlice";
 
 export const toggleCamera = () => {
     if (store.getState().voiceChat.isCameraOn) {

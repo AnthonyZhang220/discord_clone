@@ -6,7 +6,7 @@ import Popper, { PopperPlacementType } from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 import { ListItem, ListItemButton, Popover, Typography } from '@mui/material'
 import { toggleServerSettings } from "../../../redux/features/popoverSlice";
-import { handleInviteToServer, handleDeleteServer } from "../../../utils/handlers/serverHandlers";
+import { handleInviteToServer, handleDeleteServer } from "../../../handlers/serverHandlers";
 import PersonAddAlt1Icon from '@mui/icons-material/PersonAddAlt1';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useDispatch, useSelector } from "react-redux";

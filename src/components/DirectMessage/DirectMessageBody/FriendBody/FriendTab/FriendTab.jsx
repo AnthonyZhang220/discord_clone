@@ -3,7 +3,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { FunctionTooltip, FriendMessageIconButton } from '../../../../CustomUIComponents';
 import { Box, Divider, ListItem, ListItemButton, ListItemAvatar, Badge, Avatar, ListItemText, Typography } from "@mui/material";
-import { handleCurrDirectMessageChannel } from "../../../../../utils/handlers/channelHandlers";
+import { handleCurrDirectMessageChannel } from "../../../../../handlers/channelHandlers";
 import StatusList from '../../../../StatusList';
 
 export default function FriendTab({ displayName, avatar, status, id, createdAt }) {
