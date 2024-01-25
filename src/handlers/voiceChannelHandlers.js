@@ -1,8 +1,8 @@
-import store from "../../redux/store";
-import { db } from "../../firebase";
+import store from "../redux/store";
+import { db } from "../firebase";
 import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import { setCurrVoiceChannel } from "../../redux/features/channelSlice";
-import { setIsVoiceChatConnected, setIsVoiceChatPageOpen } from "../../redux/features/voiceChatSlice";
+import { setCurrVoiceChannel } from "../redux/features/channelSlice";
+import { setIsVoiceChatConnected, setIsVoiceChatPageOpen } from "../redux/features/voiceChatSlice";
 
 export const handleJoinVoiceChannel = async (name, channelId) => {
     store.dispatch(setIsVoiceChatConnected(true))

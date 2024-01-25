@@ -21,6 +21,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { getSelectStore } from './utils/userSelectStore'
 import { setUser, setIsLoggedIn } from './redux/features/authSlice'
 import { getBannerColor } from './utils/getBannerColor'
+import Error from './components/Error/Error'
 import "./App.scss";
 
 function App() {
@@ -60,7 +61,6 @@ function App() {
                 dispatch(setIsLoggedIn(true))
                 navigate("/channels")
             } else {
-                updateDoc(doc(db, "users", user.uid))
                 dispatch(setUser(null))
                 dispatch(setIsLoggedIn(false))
                 navigate("/")
@@ -73,6 +73,7 @@ function App() {
     return (
         <ThemeContextProvider>
             <CssBaseline />
+            <Error />
             <Routes>
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/reset" element={<ResetPasswordPage />} />

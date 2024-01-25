@@ -3,13 +3,11 @@ import { createSlice } from "@reduxjs/toolkit";
 const errorSlice = createSlice({
     name: "error",
     initialState: {
-        errorTypeMessage: null,
-        errorReason: null,
+        error: null,
     },
     reducers: {
         setError: (state, action) => {
-            state.errorTypeMessage = action.payload.type;
-            state.errorReason = action.payload.message;
+            state.error = action.payload;
         }
     },
 })

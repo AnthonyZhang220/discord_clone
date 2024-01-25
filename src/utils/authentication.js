@@ -40,7 +40,7 @@ export async function signOut() {
     try {
         const signOutSuccess = await auth.signOut()
         if (signOutSuccess) {
-            const userRef = doc(db, "users", user.uid)
+            const userRef = doc(db, "users", user.id)
             const updateSuccess = await updateDoc(userRef, {
                 status: "offline"
             })

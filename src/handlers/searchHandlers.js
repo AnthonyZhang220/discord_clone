@@ -1,7 +1,7 @@
 import { where, collection, query, getDocs, or } from "firebase/firestore";
-import { db } from "../../firebase";
-import store from "../../redux/store";
-import { setQueryFriendList } from "../../redux/features/directMessageSlice";
+import { db } from "../firebase";
+import store from "../redux/store";
+import { setQueryFriendList } from "../redux/features/directMessageSlice";
 
 export const handleSearchFriend = async (e) => {
     e.preventDefault();

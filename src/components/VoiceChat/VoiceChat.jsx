@@ -13,8 +13,8 @@ import HeadsetOffIcon from '@mui/icons-material/HeadsetOff';
 import CallEndRoundedIcon from '@mui/icons-material/CallEndRounded';
 import MicRoundedIcon from '@mui/icons-material/MicRounded';
 import MicOffRoundedIcon from '@mui/icons-material/MicOffRounded';
-import { toggleScreenShare, toggleCamera, toggleMic } from '../../utils/handlers/voiceControlHandlers';
-import { handleLeaveVoiceChannel } from '../../utils/handlers/voiceChannelHandlers';
+import { toggleScreenShare, toggleCamera, toggleMic } from '../../handlers/voiceControlHandlers';
+import { handleLeaveVoiceChannel } from '../../handlers/voiceChannelHandlers';
 import { useSelector } from 'react-redux';
 
 import "./VoiceChat.scss"

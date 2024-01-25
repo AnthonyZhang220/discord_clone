@@ -27,8 +27,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setCreateChannelModal, setCreateVoiceChannelModal } from '../../redux/features/modalSlice';
 import { setCurrChannelList, setCurrVoiceChannelList } from '../../redux/features/channelSlice';
 import { toggleServerSettings } from '../../redux/features/popoverSlice';
-import { handleSelectChannel } from '../../utils/handlers/channelHandlers';
-import { handleJoinVoiceChannel } from '../../utils/handlers/voiceChannelHandlers';
+import { handleSelectChannel } from '../../handlers/channelHandlers';
+import { handleJoinVoiceChannel } from '../../handlers/voiceChannelHandlers';
 import { setIsVoiceChatConnected } from '../../redux/features/voiceChatSlice';
 
 const Channel = () => {

@@ -2,7 +2,7 @@ import React from "react"
 import { useSelector } from "react-redux";
 import { lighten } from "@mui/material";
 import { ListItem, ListItemButton, ListItemText, ListItemAvatar, Badge, Avatar } from "@mui/material";
-import { handleCurrDirectMessageChannel } from "../../../../utils/handlers/channelHandlers";
+import { handleCurrDirectMessageChannel } from "../../../../handlers/channelHandlers";
 import StatusList from "../../../StatusList";
 import "./DirectMessageList.scss"
 

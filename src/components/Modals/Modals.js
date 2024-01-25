@@ -14,8 +14,8 @@ import { setCreateChannelModal, setCreateVoiceChannelModal, setCreateServerFormM
 import { copyToClip } from "../../utils/copyToClip"
 import { setNewServerInfo, setUploadFileLocationURL, setJoinServerId, setUploadServerProfileImage } from "../../redux/features/serverSlice";
 import { setNewChannelInfo } from "../../redux/features/channelSlice";
-import { handleCreateServer, handleJoinServer } from "../../utils/handlers/serverHandlers";
-import { handleCreateVoiceChannel, handleCreateChannel } from "../../utils/handlers/channelHandlers";
+import { handleCreateServer, handleJoinServer } from "../../handlers/serverHandlers";
+import { handleCreateVoiceChannel, handleCreateChannel } from "../../handlers/channelHandlers";
 import styled from "@emotion/styled";
 
 

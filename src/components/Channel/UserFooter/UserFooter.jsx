@@ -14,7 +14,7 @@ import { UserDetailPopover } from "./UserDetailPopover/UserDetailPopover";
 import "./UserFooter.scss"
 import { useDispatch, useSelector } from "react-redux";
 import { setUserDetailPopover } from "../../../redux/features/popoverSlice";
-import { toggleDeafen, toggleMic } from "../../../utils/handlers/voiceControlHandlers";
+import { toggleDeafen, toggleMic } from "../../../handlers/voiceControlHandlers";
 
 
 const UserFooter = () => {

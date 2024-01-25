@@ -1,10 +1,10 @@
-import store from "../../redux/store"
-import { setNewChannelInfo, setCurrChannel } from "../../redux/features/channelSlice"
-import { setSelectedChannel } from "../../redux/features/userSelectStoreSlice"
-import { setDirectMessageChannelRef, setIsFriendListPageOpen, setCurrDirectMessageChannelRef, setCurrDirectMessageChannel } from "../../redux/features/directMessageSlice"
-import { db } from "../../firebase"
+import store from "../redux/store"
+import { setNewChannelInfo, setCurrChannel } from "../redux/features/channelSlice"
+import { setSelectedChannel } from "../redux/features/userSelectStoreSlice"
+import { setDirectMessageChannelRef, setIsFriendListPageOpen, setCurrDirectMessageChannelRef, setCurrDirectMessageChannel } from "../redux/features/directMessageSlice"
+import { db } from "../firebase"
 import { arrayUnion, doc, getDoc, updateDoc, addDoc, Timestamp, collection } from "firebase/firestore"
-import { setIsVoiceChatPageOpen } from "../../redux/features/voiceChatSlice"
+import { setIsVoiceChatPageOpen } from "../redux/features/voiceChatSlice"
 
 export const handleCreateChannel = async (newChannelInfo) => {
     const doc = await addDoc(collection(db, "channels"), {

@@ -42,9 +42,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { setDraftMessage } from '../../redux/features/draftSlice';
 import { setIsMemberListOpen } from '../../redux/features/memberListSlice';
 import { setCurrChannel } from '../../redux/features/channelSlice';
-import { handleSubmitMessage } from '../../utils/handlers/messageHandlers';
+import { handleSubmitMessage } from '../../handlers/messageHandlers';
 import { setMessageList } from '../../redux/features/chatListSlice';
-import { handleUploadFile } from '../../utils/handlers/messageHandlers';
+import { handleUploadFile } from '../../handlers/messageHandlers';
 // const URL = 'http://localhost:3000';
 // export const socket = io(URL);
 
