@@ -1,40 +1,40 @@
-import AgoraRTC, { LocalVideoTrack, RemoteUser, useJoin, useLocalCameraTrack, useLocalMicrophoneTrack, usePublish, useRTCClient, useRemoteUsers, useClientEvent, useCurrentUID, useVolumeLevel, useNetworkQuality, useConnectionState, useIsConnected, AgoraRTCProvider, RemoteVideoTrack, LocalAudioTrack, RemoteAudioTrack, useRemoteAudioTracks, useRemoteVideoTracks } from "agora-rtc-react";
+import { useJoin, useLocalCameraTrack, useLocalMicrophoneTrack, usePublish, useRTCClient, useRemoteUsers, useClientEvent, useCurrentUID, useVolumeLevel, useNetworkQuality, useConnectionState, useRTCScreenShareClient, useLocalScreenTrack, } from "agora-rtc-react";
 import { Box } from "@mui/material";
-import React, { useEffect, useState, createContext, useContext, useMemo } from "react";
-import { setIsVoiceChatConnected, setRemoteUsers, setAgoraEngine, setAgoraConfig, setIsCameraOn, setLatency, setConnectionState, setIsLoading } from "../../redux/features/voiceChatSlice";
+import React, { useEffect, useMemo } from "react";
+import { setIsVoiceChatConnected, setLatency, setConnectionState, setIsVoiceChatLoading } from "../../redux/features/voiceChatSlice";
 import { useDispatch, useSelector } from "react-redux";
 import VoiceChatTile from "../../components/VoiceChat/VoiceChatTile/VoiceChatTile";
 import fetchRTCToken from "../../utils/fetchToken";
-import AgoraConfig from "./config";
+import { handleLeaveVoiceChannel } from "../../handlers/voiceChannelHandlers";
 
 export const AgoraManager = ({ config, children }) => {
     const dispatch = useDispatch()
     const { user } = useSelector(state => state.auth)
-    const { isMicOn, isDeafen, isCameraOn, agoraConfig, isVoiceChatConnected } = useSelector(state => state.voiceChat)
+    const { isMicOn, isDeafen, isCameraOn, agoraConfig, isVoiceChatConnected, isScreenSharingOn } = useSelector(state => state.voiceChat)
     const { currVoiceChannel } = useSelector(state => state.channel)
 
     const localUser = useMemo(() => user, [user.avatar, user.displayName])
     const agoraClient = useRTCClient();
+    const agoraShareClient = useRTCScreenShareClient();
     const currAgoraUID = useCurrentUID();
     const connectionState = useConnectionState();
     const networkQuality = useNetworkQuality();
     const volume = useVolumeLevel(localMicrophoneTrack)
 
+    const { screenTrack, screenShareError } = useLocalScreenTrack(isScreenSharingOn, {}, "disable")
+
     const { isConnected, isLoading, error, data } = useJoin(
-        async () => {
-            const token = await fetchRTCToken(config, currVoiceChannel.id)
-            return {
-                appid: config.appId,
-                channel: currVoiceChannel.id,
-                uid: user.id,
-                token: token ? token : null,
-            }
+        {
+            appid: agoraConfig.appid,
+            channel: agoraConfig.channel,
+            uid: agoraConfig.uid,
+            token: agoraConfig.token,
         }, isVoiceChatConnected)
 
     //local
     const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack(isMicOn);
     const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack(isCameraOn);
-    usePublish([localMicrophoneTrack, localCameraTrack]);
+    usePublish([localMicrophoneTrack, localCameraTrack, screenTrack]);
 
     //remote
     const remoteUsers = useRemoteUsers();
@@ -51,15 +51,15 @@ export const AgoraManager = ({ config, children }) => {
     //     dispatch(setAgoraEngine(agoraClient))
     // }, [agoraClient])
 
-    // useEffect(() => {
-    //     console.log("isConnected", isConnected)
-    //     console.log("data", data)
-    //     if (isConnected) {
-    //         dispatch(setIsVoiceChatConnected(true))
-    //     } else {
-    //         dispatch(setIsVoiceChatConnected(false))
-    //     }
-    // }, [isConnected])
+    useEffect(() => {
+        console.log("isConnected", isConnected)
+        console.log("data", data)
+        if (isConnected) {
+            dispatch(setIsVoiceChatConnected(true))
+        } else {
+            dispatch(setIsVoiceChatConnected(false))
+        }
+    }, [isConnected])
 
     useEffect(() => {
         dispatch(setConnectionState(connectionState))
@@ -85,14 +85,16 @@ export const AgoraManager = ({ config, children }) => {
     }, [networkQuality.delay])
 
     useEffect(() => {
-        dispatch(setIsLoading(isLoading))
+        dispatch(setIsVoiceChatLoading(isLoading))
     }, [isLoading])
 
 
     useEffect(() => {
         return () => {
+            screenTrack?.close();
             localCameraTrack?.close();
             localMicrophoneTrack?.close();
+            handleLeaveVoiceChannel();
         }
     }, [])
 
@@ -106,6 +108,9 @@ export const AgoraManager = ({ config, children }) => {
     return (
         <>
             <VoiceChatTile localUser={true} videoTrack={localCameraTrack} audioTrack={localMicrophoneTrack} user={localUser} hasAudio={isMicOn} hasVideo={isCameraOn} volume={volume} />
+            {isScreenSharingOn &&
+                <VoiceChatTile localUser={true} videoTrack={screenTrack} user={localUser} hasVideo={isScreenSharingOn} />
+            }
             {
                 remoteUsers.map((remoteUser) => (
                     <VoiceChatTile key={remoteUser.uid} localUser={false} user={remoteUser} videoTrack={remoteUser.videoTrack} audioTrack={remoteUser.audioTrack} hasAudio={remoteUser.hasAudio} hasVideo={remoteUser.hasVideo} />

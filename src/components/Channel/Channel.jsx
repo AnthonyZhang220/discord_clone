@@ -1,7 +1,7 @@
 import React, { useId, useMemo, useEffect, useState, Fragment, useRef } from 'react'
 import { auth } from '../../firebase';
 import { db } from "../../firebase";
-import { onSnapshot, query, where, collection } from 'firebase/firestore';
+import { onSnapshot, query, where, collection, doc, getDoc } from 'firebase/firestore';
 
 import { ListItemText, ListItem, ListItemButton, ListItemAvatar } from '@mui/material'
 import { Avatar, Typography } from '@mui/material'
@@ -29,7 +29,7 @@ import { setCurrChannelList, setCurrVoiceChannelList } from '../../redux/feature
 import { toggleServerSettings } from '../../redux/features/popoverSlice';
 import { handleSelectChannel } from '../../handlers/channelHandlers';
 import { handleJoinVoiceChannel } from '../../handlers/voiceChannelHandlers';
-import { setIsVoiceChatConnected } from '../../redux/features/voiceChatSlice';
+import { setCurrServer } from '../../redux/features/serverSlice';
 
 const Channel = () => {
     const channelHeaderRef = useRef(null);
@@ -40,7 +40,7 @@ const Channel = () => {
     const { currVoiceChannel, currChannelList, currVoiceChannelList } = useSelector(state => state.channel)
     const { currServer } = useSelector(state => state.server)
     const { serverSettingsPopover } = useSelector(state => state.popover)
-    const { isVoiceChatConnected } = useSelector(state => state.voiceChat)
+    const { isVoiceChatConnected, isVoiceChatLoading } = useSelector(state => state.voiceChat)
 
     //get channel list by server UID
     useEffect(() => {
@@ -70,6 +70,15 @@ const Channel = () => {
             })
         }
 
+    }, [selectedServer])
+
+    useEffect(() => {
+        if (selectedServer) {
+            const serverRef = doc(db, "servers", selectedServer)
+            getDoc(serverRef).then((doc) => {
+                dispatch(setCurrServer({ name: doc.data().name, id: doc.data().id }))
+            })
+        }
     }, [selectedServer])
 
     return (
@@ -162,7 +171,7 @@ const Channel = () => {
                     ))}
                 </Box>
             </Box>
-            {isVoiceChatConnected && <VoiceControl />}
+            {(isVoiceChatConnected || isVoiceChatLoading) && <VoiceControl />}
             <UserFooter className="user-footer-container" />
             <InviteDialog selectedServer={selectedServer} inviteModal={inviteModal} />
             <CreateChannelDialog createChannelModal={createChannelModal} />

@@ -9,6 +9,7 @@ const voiceChatSlice = createSlice({
         isCameraOn: false,
         isScreenSharingOn: false,
         isVoiceChatConnected: false,
+        isVoiceChatLoading: false,
         isVoiceChatPageOpen: false,
         agoraEngine: null,
         agoraConfig: {},
@@ -19,7 +20,6 @@ const voiceChatSlice = createSlice({
         screenTrack: null,
         connectionState: "",
         latency: null,
-        isLoading: false,
         // Add other voice chat-related state here
     },
     reducers: {
@@ -69,8 +69,8 @@ const voiceChatSlice = createSlice({
         setLatency: (state, action) => {
             state.latency = action.payload;
         },
-        setIsLoading: (state, action) => {
-            state.isLoading = action.payload;
+        setIsVoiceChatLoading: (state, action) => {
+            state.isVoiceChatLoading = action.payload;
         }
     },
 });
@@ -92,7 +92,7 @@ export const {
     setIsVoiceChatPageOpen,
     setConnectionState,
     setLatency,
-    setIsLoading,
+    setIsVoiceChatLoading,
 } = voiceChatSlice.actions;
 export default voiceChatSlice.reducer;
 

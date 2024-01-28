@@ -45,7 +45,7 @@ export const UserSidebar = ({ currDirectMessageChannel }) => {
                             <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
                             <ListItem dense>
                                 <MenuListItemButton>
-                                    <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(currDirectMessageChannel.createdAt * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
+                                    <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(currDirectMessageChannel.createdAt?.seconds * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
                                         style: {
                                             color: "white"
                                         }

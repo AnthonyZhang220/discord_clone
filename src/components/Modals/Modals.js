@@ -11,7 +11,6 @@ import AddIcon from '@mui/icons-material/Add';
 import { InfoInput } from '../CustomUIComponents';
 import { useDispatch, useSelector } from "react-redux";
 import { setCreateChannelModal, setCreateVoiceChannelModal, setCreateServerFormModal, setCreateServerModal, setInviteModal, setJoinServerModal } from '../../redux/features/modalSlice';
-import { copyToClip } from "../../utils/copyToClip"
 import { setNewServerInfo, setUploadFileLocationURL, setJoinServerId, setUploadServerProfileImage } from "../../redux/features/serverSlice";
 import { setNewChannelInfo } from "../../redux/features/channelSlice";
 import { handleCreateServer, handleJoinServer } from "../../handlers/serverHandlers";
@@ -188,8 +187,18 @@ export function JoinServerDialog({ joinServerModal }) {
 
 //invite people
 export function InviteDialog({ inviteModal }) {
+    const [loading, setLoading] = useState(false);
+    const [copied, setCopied] = useState(false);
     const dispatch = useDispatch();
     const { currServer } = useSelector((state) => state.server)
+
+    const copyToClip = () => {
+        setLoading(true)
+        navigator.clipboard.writeText(currServer.id).then(() => {
+            setLoading(false)
+            setCopied(true);
+        })
+    }
     return (
         <Dialog className="Create-Channel-Modal" open={inviteModal} onClose={() => dispatch(setInviteModal(false))} PaperProps={{
             style: {
@@ -216,7 +225,18 @@ export function InviteDialog({ inviteModal }) {
                             readOnly
                             endAdornment={
                                 <InputAdornment position="end">
-                                    <Button onClick={() => copyToClip(currServer.id)}>Copy</Button>
+                                    <LoadingButton
+                                        onClick={() => copyToClip()}
+                                        loading={loading}
+                                        variant='contained'
+                                    >
+                                        {
+                                            copied ?
+                                                <span>Copied!</span>
+                                                :
+                                                <span>Copy</span>
+                                        }
+                                    </LoadingButton>
                                 </InputAdornment>
                             }
                         />
@@ -231,7 +251,7 @@ export function InviteDialog({ inviteModal }) {
 export function CreateChannelDialog({ createChannelModal }) {
     const dispatch = useDispatch();
     const { newChannelInfo } = useSelector((state) => state.channel)
-
+    const { isLoading } = useSelector(state => state.load)
     return (
         <Dialog className="Create-Channel-Modal" open={createChannelModal} onClose={() => dispatch(setCreateChannelModal(false))} PaperProps={{
             style: {
@@ -262,7 +282,13 @@ export function CreateChannelDialog({ createChannelModal }) {
             </DialogContent>
             <DialogActions>
                 <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => dispatch(setCreateChannelModal(false))}>Cancel</Button>
-                <Button variant='contained' onClick={() => handleCreateChannel(newChannelInfo)}>Create Channel</Button>
+                <LoadingButton
+                    onClick={() => handleCreateChannel(newChannelInfo)}
+                    loading={isLoading}
+                    variant="contained"
+                >
+                    <span>Create Channel</span>
+                </LoadingButton>
             </DialogActions>
         </Dialog>
 
@@ -272,6 +298,7 @@ export function CreateChannelDialog({ createChannelModal }) {
 export function CreateVoiceChannelDialog({ createVoiceChannelModal }) {
     const dispatch = useDispatch();
     const { newChannelInfo } = useSelector((state) => state.channel)
+    const { isLoading } = useSelector((state) => state.load)
 
     return (
         <Dialog className="Create-Channel-Modal" open={createVoiceChannelModal} onClose={() => dispatch(setCreateChannelModal(false))} PaperProps={{
@@ -303,7 +330,13 @@ export function CreateVoiceChannelDialog({ createVoiceChannelModal }) {
             </DialogContent>
             <DialogActions>
                 <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => dispatch(setCreateVoiceChannelModal(false))}>Cancel</Button>
-                <Button variant='contained' onClick={() => handleCreateVoiceChannel(newChannelInfo)}>Create Channel</Button>
+                <LoadingButton
+                    onClick={() => handleCreateVoiceChannel(newChannelInfo)}
+                    loading={isLoading}
+                    variant="contained"
+                >
+                    <span>Create Channel</span>
+                </LoadingButton>
             </DialogActions>
         </Dialog>
 
