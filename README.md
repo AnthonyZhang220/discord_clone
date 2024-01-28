@@ -1,13 +1,12 @@
-<h1 align="center"> Discord Clone</h1> <br>
+# Discord Clone
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-## Table of Contents
-- [Introduction](#introduction)
-- [Desciption](#description)
-- [Why?](#why)
-- [Feedback](#feedback)
-- [Build Process](#build-process)
+## Demo
+![Demo Link](https://discordclone-95fc0.web.app/)
+-Test Account: test@gmail
+-Test Password: test123
+-Test Username: TestUser
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 ## Description
@@ -25,7 +24,6 @@ I have been using Discord since 2017, and I absolutely love it. It was created u
 
 ### Real-time communication/chat
 ### Server/Channel
-
 <p align="center">
   <img src = "./discord_friend.png" width=700>
 </p>
@@ -43,5 +41,5 @@ If there's anything you'd like to chat about, please feel free to join my discor
 
 - Clone or download the repo
 - `npm install` to install dependencies
-- create a `.env` file for firebase and agora SDK for environment variables
+- create a `.env` file for Firebase and Agora SDK for environment variables
 - `npm start` to start the packager and run the app on localhost:3000
