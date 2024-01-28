@@ -5,8 +5,11 @@ import { setDirectMessageChannelRef, setIsFriendListPageOpen, setCurrDirectMessa
 import { db } from "../firebase"
 import { arrayUnion, doc, getDoc, updateDoc, addDoc, Timestamp, collection } from "firebase/firestore"
 import { setIsVoiceChatPageOpen } from "../redux/features/voiceChatSlice"
+import { setIsLoading } from "../redux/features/loadSlice"
+import { setCreateChannelModal, setCreateVoiceChannelModal } from "../redux/features/modalSlice"
 
 export const handleCreateChannel = async (newChannelInfo) => {
+    store.dispatch(setIsLoading(true))
     const doc = await addDoc(collection(db, "channels"), {
         name: newChannelInfo.channelName,
         serverRef: store.getState().userSelectStore.selectedServer,
@@ -15,11 +18,14 @@ export const handleCreateChannel = async (newChannelInfo) => {
     })
     if (doc) {
         store.dispatch(setNewChannelInfo({ channelName: "" }))
+        store.dispatch(setIsLoading(false))
+        store.dispatch(setCreateChannelModal(false))
         // handleChannelModalClose();
     }
 }
 
 export const handleCreateVoiceChannel = async (newChannelInfo) => {
+    store.dispatch(setIsLoading(true))
     const doc = await addDoc(collection(db, "voicechannels"), {
         name: newChannelInfo.channelName,
         serverRef: store.getState().userSelectStore.selectedServer,
@@ -28,6 +34,8 @@ export const handleCreateVoiceChannel = async (newChannelInfo) => {
     })
     if (doc) {
         store.dispatch(setNewChannelInfo({ channelName: "" }))
+        store.dispatch(setIsLoading(false))
+        store.dispatch(setCreateVoiceChannelModal(false))
         // handleChannelModalClose();
     }
 }

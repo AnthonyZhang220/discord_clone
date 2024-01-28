@@ -11,6 +11,7 @@ import userSelectStoreSlice from "./features/userSelectStoreSlice";
 import chatListSlice from "./features/chatListSlice";
 import memberListSlice from "./features/memberListSlice";
 import directMessageSlice from "./features/directMessageSlice";
+import loadSlice from "./features/loadSlice";
 
 const rootReducer = combineReducers({
     auth: authSlice,
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
     userSelectStore: userSelectStoreSlice,
     memberList: memberListSlice,
     directMessage: directMessageSlice,
+    load: loadSlice,
 })
 
 const store = configureStore({

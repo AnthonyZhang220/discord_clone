@@ -10,7 +10,6 @@ const serverSlice = createSlice({
         joinServerId: "",
         uploadServerProfileImage: null,
         uploadFileLocationURL: "",
-        isLoading: false,
     },
     reducers: {
         setCurrServer: (state, action) => {
@@ -31,13 +30,10 @@ const serverSlice = createSlice({
         setUploadFileLocationURL: (state, action) => {
             state.uploadFileLocationURL = action.payload;
         },
-        setIsLoading: (state, action) => {
-            state.isLoading = action.payload;
-        }
     }
 })
 
-export const { setCurrServer, setCurrServerList, setNewServerInfo, setUploadFileLocationURL, setJoinServerId, setUploadServerProfileImage, setIsLoading } = serverSlice.actions;
+export const { setCurrServer, setCurrServerList, setNewServerInfo, setUploadFileLocationURL, setJoinServerId, setUploadServerProfileImage } = serverSlice.actions;
 
 export default serverSlice.reducer;
 

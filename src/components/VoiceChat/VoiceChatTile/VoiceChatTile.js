@@ -17,8 +17,8 @@ function VoiceChatTile({ user, volume, hasVideo, hasAudio, videoTrack, audioTrac
                 {
                     localUser ?
                         <>
-                            <LocalVideoTrack track={videoTrack} play={hasVideo} muted={!hasVideo} />
-                            <LocalAudioTrack track={audioTrack} play={false} muted={!hasAudio} />
+                            <LocalVideoTrack track={videoTrack} play={hasVideo} disabled={!hasVideo} />
+                            <LocalAudioTrack track={audioTrack} play={false} disabled={!hasAudio} />
                         </>
                         :
                         <div id={user.uid}>

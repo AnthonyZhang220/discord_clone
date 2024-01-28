@@ -29,7 +29,7 @@ const ServerList = () => {
 
     // Get list of servers that belong to the current user
     useEffect(() => {
-        if (user) {
+        if (user.id) {
             const q = query(collection(db, 'servers'), where('members', 'array-contains', user.id));
             const unsubscribe = onSnapshot(q, (snapshot) => {
                 const userServers = [];
