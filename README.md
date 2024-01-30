@@ -3,7 +3,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 ## Demo
-![Demo Link](https://discordclone-95fc0.web.app/)
+[Demo Link](https://discordclone-95fc0.web.app/)
 -Test Account: test@gmail
 -Test Password: test123
 -Test Username: TestUser
