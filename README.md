@@ -4,7 +4,7 @@
 
 ## Demo
 [Demo Link](https://discordclone-95fc0.web.app/)
--Test Account: test@gmail
+-Test Account: test123@gmail.com
 -Test Password: test123
 -Test Username: TestUser
 
