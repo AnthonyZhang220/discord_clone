@@ -1,12 +1,10 @@
 import React, { useState, useEffect, useMemo, Fragment, useRef } from 'react'
-import MemberStatus from '../Channel/UserFooter/UserDetailPopover/MemberStatus/MemberStatus';
-
 //send meesage to db
-import { addDoc, collection, Timestamp } from "firebase/firestore";
-import { uploadBytes, getDownloadURL, ref } from 'firebase/storage';
-
+import { collection } from "firebase/firestore";
 //query get chat message from db
 import {
+    doc,
+    getDoc,
     query,
     orderBy,
     onSnapshot,
@@ -14,12 +12,10 @@ import {
     limitToLast,
 } from "firebase/firestore";
 import { db, storage } from "../../firebase";
-import { bytesToMB } from '../../utils/bytesToMB';
 
 
 //material ui comp
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import CssBaseline from '@mui/material/CssBaseline';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -31,110 +27,61 @@ import { Divider } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { InputAdornment } from '@mui/material';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import InputLabel from '@mui/material/InputLabel';
-import { TextFieldProps } from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
 import InputBase from '@mui/material/InputBase';
 import { ClickAwayListener } from '@mui/material';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import NumbersIcon from '@mui/icons-material/Numbers';
-import Snackbar from '@mui/material/Snackbar';
-import { Alert } from '@mui/material';
+import ChannelMemberList from '../ChannelMemberList/ChannelMemberList';
 import './Chat.scss'
 
 
-import { Outlet } from 'react-router-dom';
 import { FunctionTooltip } from '../CustomUIComponents';
-import { Message } from '@mui/icons-material';
-import { convertDate, convertDateDivider, convertTime } from '../../utils/dateConverter';
-import { useSelector } from 'react-redux';
-
+import { convertDate, convertDateDivider, convertTime } from '../../utils/formatter';
+import { useDispatch, useSelector } from 'react-redux';
+import { setDraftMessage } from '../../redux/features/draftSlice';
+import { setIsMemberListOpen } from '../../redux/features/memberListSlice';
+import { setCurrChannel } from '../../redux/features/channelSlice';
+import { handleSubmitMessage } from '../../handlers/messageHandlers';
+import { setMessageList } from '../../redux/features/chatListSlice';
+import { handleUploadFile } from '../../handlers/messageHandlers';
 // const URL = 'http://localhost:3000';
 // export const socket = io(URL);
 
-export default function Chat({ currentMessage, handleAddMessage, handleChatInfo }) {
-
+export default function Chat() {
 
     const formRef = useRef();
     const chatScroller = useRef();
-    const [chatList, setChatList] = useState([]);
-    const [openMember, setOpenMember] = useState(true);
     const [openUpload, setOpenUpload] = useState(false);
-    const [fileUpload, setFileUpload] = useState(null);
-    const [fileError, setFileError] = useState(false);
-    const [fileErrorMessage, setFileErrorMessage] = useState("");
+    const dispatch = useDispatch();
     const { selectedServer, selectedChannel } = useSelector(state => state.userSelectStore)
+    const { currChannel } = useSelector(state => state.channel)
     const { user } = useSelector(state => state.auth)
-    const handleShowMemberList = () => {
-        setOpenMember(!openMember)
-    }
+    const { isMemberListOpen } = useSelector(state => state.memberList)
+    const { draftMessage } = useSelector(state => state.draft)
+    const { messageList } = useSelector(state => state.chatList)
+
 
     const handleUploadOpen = () => {
         setOpenUpload(true)
     }
 
-    const handleUploadFile = async (e) => {
-
-        const fileUploaded = e.target.files[0]
-
-        const fileSize = fileUploaded.size;
-        const fileType = fileUploaded.type;
-        const fileName = fileUploaded.name;
-
-        const mb = bytesToMB(fileSize);
-
-        if (!fileUploaded) {
-            return;
+    useEffect(() => {
+        if (selectedChannel) {
+            const getChannelRef = async () => {
+                const channelRef = doc(db, "channels", selectedChannel || "");
+                const channelDoc = await getDoc(channelRef);
+                dispatch(setCurrChannel({ name: channelDoc.data().name, id: channelDoc.id }))
+            }
+            getChannelRef();
         }
-
-        if (mb > 50) {
-            setFileError(true);
-            setFileErrorMessage("File exceeds 50MB.")
-            return;
-        }
-
-        // if(fileType !== ){
-        //     setFileError(true);
-        //     setFileErrorMessage("File format unsupported.")
-        //     return;
-        // }
-
-        // setFileUpload(fileUploaded)
-        const date = new Date();
-        const timeString = date.toISOString();
-
-
-        const messageMediaRef = ref(storage, `messages/${user.uid}/${fileName}-${timeString}`)
-        const uploadProgress = await uploadBytes(messageMediaRef, fileUploaded)
-        const url = await getDownloadURL(messageMediaRef)
-
-
-        await addDoc(collection(db, "messages"), {
-            type: fileType,
-            content: url,
-            fileName: fileName,
-            userName: user.name,
-            avatar: user.profileURL,
-            createdAt: Timestamp.fromDate(new Date()),
-            channelRef: selectedChannel.uid,
-            serverRef: selectedServer.uid,
-            userRef: user.uid,
-        }).then(() => {
-            setOpenUpload(false);
-            setFileUpload(null);
-        })
-
-    }
-    const GroupChatbyPeopleAndDate = () => {
-
-    }
-    const [previousUserRef, setPreviousUserRef] = useState(null);
+    }, [selectedChannel])
 
     useEffect(() => {
         if (selectedChannel) {
             const q = query(
                 collection(db, "messages"),
-                where("channelRef", "==", selectedChannel.uid || ""),
+                where("channelRef", "==", selectedChannel || ""),
                 orderBy("createdAt"),
                 limitToLast(20)
             );
@@ -172,7 +119,7 @@ export default function Chat({ currentMessage, handleAddMessage, handleChatInfo 
                     previousDate = convertDateDivider(chatMessage.createdAt)
                 });
 
-                setChatList(chatList);
+                dispatch(setMessageList(chatList))
                 //scroll new message
             });
         }
@@ -181,10 +128,8 @@ export default function Chat({ currentMessage, handleAddMessage, handleChatInfo 
 
     }, [selectedChannel]);
 
-    const ChatItem = useMemo(() => ({ content, userName, avatar, createdAt, type, fileName, dividerDate }) => {
-
+    const ChatItem = useMemo(() => ({ content, displayName, avatar, createdAt, type, fileName, dividerDate }) => {
         const FormatChat = () => {
-
             if (type.indexOf("image/") != -1) {
                 return <img alt={content} src={content} style={{ maxHeight: "350px", aspectRatio: "auto", borderRadius: "8px", maxWidth: "550px" }} />
             } else if (type.indexOf("audio/") != -1) {
@@ -211,7 +156,6 @@ export default function Chat({ currentMessage, handleAddMessage, handleChatInfo 
             }
         }
 
-
         return (
             <Fragment>
                 {
@@ -222,11 +166,11 @@ export default function Chat({ currentMessage, handleAddMessage, handleChatInfo 
                             <ListItem className="message" sx={{ p: 0, m: 0 }}>
                                 <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
                                     <ListItemAvatar>
-                                        <Avatar alt={userName} src={avatar} />
+                                        <Avatar alt={displayName} src={avatar} />
                                     </ListItemAvatar>
                                     <ListItemText primary={
                                         <Fragment>
-                                            {userName}
+                                            {displayName}
                                             <Typography
                                                 sx={{ display: 'inline', color: "#b5bac1", fontSize: "0.8em" }}
                                                 component="span"
@@ -279,7 +223,7 @@ export default function Chat({ currentMessage, handleAddMessage, handleChatInfo 
                 }
             </Fragment>
         )
-    }, [chatList])
+    }, [messageList])
 
 
     const ChatList = useMemo(() => {
@@ -300,20 +244,20 @@ export default function Chat({ currentMessage, handleAddMessage, handleChatInfo 
                     </IconButton>
                 </ListItem>
                 <ListItem>
-                    <Typography variant='h3'>Welcome to #{selectedChannel.name}!</Typography>
+                    <Typography variant='h3'>Welcome to #{currChannel.name}!</Typography>
                 </ListItem>
                 <ListItem>
-                    <Typography variant="body2">This is the start of the #{selectedChannel.name} channel.</Typography>
+                    <Typography variant="body2">This is the start of the #{currChannel.name} channel.</Typography>
                 </ListItem>
                 {
-                    chatList?.map(({ content, userName, avatar, createdAt, type, fileName, dividerDate }, index) => (
-                        <ChatItem className="message" content={content} userName={userName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} dividerDate={dividerDate} />
+                    messageList?.map(({ content, displayName, avatar, createdAt, type, fileName, dividerDate }, index) => (
+                        <ChatItem className="message" content={content} displayName={displayName} fileName={fileName} avatar={avatar} createdAt={createdAt} type={type} key={index} dividerDate={dividerDate} />
                     ))
                 }
                 <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
             </List>
         )
-    }, [chatList])
+    }, [messageList, currChannel.id])
 
     return (
         <Box className="chat-container">
@@ -322,15 +266,15 @@ export default function Chat({ currentMessage, handleAddMessage, handleChatInfo 
                 <Box className="chat-header-name">
                     <NumbersIcon sx={{ color: "#8a8e94", marginRight: "6px", alignItems: "baseline" }} />
                     <Box component="span" variant="h3" className="chat-header-hashtag">
-                        {selectedChannel.name}
+                        {currChannel.name}
                     </Box>
                 </Box>
                 <Box className="chat-header-feature">
                     <FunctionTooltip title={
                         <Fragment>
-                            <Typography variant="body1" sx={{ m: 0.5 }} >{openMember ? "Hide Member List" : "Show Member List"}</Typography>
+                            <Typography variant="body1" sx={{ m: 0.5 }} >{isMemberListOpen ? "Hide Member List" : "Show Member List"}</Typography>
                         </Fragment>} placement="bottom">
-                        <PeopleAltIcon color="white" onClick={() => handleShowMemberList()} />
+                        <PeopleAltIcon color="white" onClick={() => dispatch(setIsMemberListOpen(!isMemberListOpen))} />
                     </FunctionTooltip>
                 </Box>
             </Box>
@@ -343,7 +287,7 @@ export default function Chat({ currentMessage, handleAddMessage, handleChatInfo 
                             </Box>
                         </Box>
                     </Box>
-                    <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleAddMessage(e)} sx={{
+                    <Box className="form" component="form" ref={formRef} onSubmit={(e) => handleSubmitMessage(e)} sx={{
                         position: "relative",
                         msFlexPositive: "false",
                         flexShrink: "0",
@@ -402,24 +346,16 @@ export default function Chat({ currentMessage, handleAddMessage, handleChatInfo 
                                 name="message"
                                 autoComplete='off'
                                 variant="outlined"
-                                onChange={(e) => handleChatInfo(e)}
-                                value={currentMessage}
-                                placeholder={`Message #${selectedChannel.name}`}
+                                onChange={(e) => dispatch(setDraftMessage(e.target.value))}
+                                value={draftMessage}
+                                placeholder={`Message #${currChannel.name}`}
                             />
                         </FormControl>
                     </Box>
                 </Box>
                 {
-                    openMember ?
-                        <MemberStatus />
-                        :
-                        null
+                    isMemberListOpen && <ChannelMemberList />
                 }
-                <Snackbar open={fileError} autoHideDuration={3000} onClose={() => setFileError(false)} anchorOrigin={{ vertical: "top", horizontal: "right" }}>
-                    <Alert onClose={() => setFileError(false)} severity="error" sx={{ width: '100%', fontWeight: "bold" }}>
-                        {fileErrorMessage}
-                    </Alert>
-                </Snackbar>
             </Box>
             {/* <Outlet /> */}
         </Box>

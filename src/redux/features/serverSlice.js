@@ -1,20 +1,22 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { uploadBytes, getDownloadURL } from "firebase/storage";
 
 
 const serverSlice = createSlice({
     name: "server",
     initialState: {
-        serverList: [],
+        currServer: {},
+        currServerList: [],
         newServerInfo: { serverName: null, serverPic: null },
         joinServerId: "",
         uploadServerProfileImage: null,
         uploadFileLocationURL: "",
-        isLoading: false,
     },
     reducers: {
-        setServerList: (state, action) => {
-            state.serverList = action.payload;
+        setCurrServer: (state, action) => {
+            state.currServer = action.payload;
+        },
+        setCurrServerList: (state, action) => {
+            state.currServerList = action.payload;
         },
         setNewServerInfo: (state, action) => {
             state.newServerInfo = action.payload;
@@ -28,13 +30,10 @@ const serverSlice = createSlice({
         setUploadFileLocationURL: (state, action) => {
             state.uploadFileLocationURL = action.payload;
         },
-        setIsLoading: (state, action) => {
-            state.isLoading = action.payload;
-        }
     }
 })
 
-export const { setServerList, setNewServerInfo, setUploadFileLocationURL, setJoinServerId, setUploadServerProfileImage, setIsLoading } = serverSlice.actions;
+export const { setCurrServer, setCurrServerList, setNewServerInfo, setUploadFileLocationURL, setJoinServerId, setUploadServerProfileImage } = serverSlice.actions;
 
 export default serverSlice.reducer;
 

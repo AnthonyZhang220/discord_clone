@@ -9,13 +9,11 @@ import SwapVertIcon from '@mui/icons-material/SwapVert';
 import {
     StatusMenu, MenuListItemButton
 } from "../../../CustomUIComponents";
-import "./UserDetailPopover.scss";
 import { useDispatch, useSelector } from "react-redux";
 import LogoutIcon from '@mui/icons-material/Logout';
 import { signOut } from "../../../../utils/authentication";
-import ColorThief from "colorthief"
-import StatusList from "../../../../utils/StatusList";
-import { statusFormat } from "../../../../utils/statusFormat";
+import StatusList from "../../../StatusList";
+import { statusFormat } from "../../../../utils/formatter";
 import { changeStatus } from "../../../../utils/authentication";
 import { setUserDetailPopover } from "../../../../redux/features/popoverSlice";
 
@@ -26,22 +24,10 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
     const dispatch = useDispatch();
     const { userDetailPopover } = useSelector((state) => state.popover)
     const { user } = useSelector((state) => state.auth)
-    const profileRef = useRef(null);
-    const [bannerColor, setBannerColor] = useState("")
 
     useEffect(() => {
-        if (profileRef.current) {
-            const colorthief = new ColorThief();
-            const banner = colorthief.getColor(profileRef.current)
-            const rgbColor = `rgb(${banner.join(", ")})`
-            setBannerColor(rgbColor)
-            console.log(banner)
-        }
-
-    }, [profileRef.current])
-
-
-
+        console.log(user.bannerColor)
+    }, [user.bannerColor])
     return (
         <Popover
             className='user-detail-paper'
@@ -74,8 +60,8 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             <rect></rect>
                             <circle></circle>
                         </mask>
-                        <foreignObject className="user-detail-object">
-                            <Box sx={{ backgroundColor: bannerColor, height: "100px", width: "100%", transition: "background-color 0.1s" }}>
+                        <foreignObject className="user-detail-object" sx={{ background: user.bannerColor?.toString() }}>
+                            <Box sx={{ height: "100px", width: "100%", transition: "background-color 0.1s" }}>
                             </Box>
                         </foreignObject>
                     </svg>
@@ -87,19 +73,19 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             <StatusList status={user.status} />
                         }
                     >
-                        <Avatar alt={user.name} sx={{ width: "80px", height: "80px" }} src={user.profileURL} imgProps={{ ref: profileRef, crossOrigin: "Anonymous" }} />
+                        <Avatar alt={user.displayName} sx={{ width: "80px", height: "80px" }} src={user.avatar} imgProps={{ crossOrigin: "Anonymous" }} />
                     </Badge>
                 </Box>
                 <Box className="user-detail-list" sx={{ backgroundColor: "#111214" }}>
                     <ListItem dense>
                         <MenuListItemButton>
-                            <ListItemText primary={user.name} primaryTypographyProps={{ variant: "h3" }} />
+                            <ListItemText primary={user.displayName} primaryTypographyProps={{ variant: "h3" }} />
                         </MenuListItemButton>
                     </ListItem>
                     <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
                     <ListItem dense>
                         <MenuListItemButton>
-                            <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(user.createdAt * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
+                            <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(user.createdAt?.seconds * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
                                 style: {
                                     color: "white"
                                 }
@@ -114,7 +100,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             title={
                                 <React.Fragment>
                                     <ListItem sx={{ pl: 1, pr: 1 }}>
-                                        <MenuListItemButton onClick={() => changeStatus("online", user)} sx={{
+                                        <MenuListItemButton onClick={() => changeStatus("online")} sx={{
                                             "&:hover": {
                                                 backgroundColor: "#5865f2",
                                                 borderRadius: "4px",
@@ -126,7 +112,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                     </ListItem>
                                     <Divider sx={{ backgroundColor: "white", mt: 0.5, mb: 0.5 }} variant="middle" />
                                     <ListItem sx={{ pl: 1, pr: 1 }}>
-                                        <MenuListItemButton onClick={() => changeStatus("idle", user)} sx={{
+                                        <MenuListItemButton onClick={() => changeStatus("idle")} sx={{
                                             "&:hover": {
                                                 backgroundColor: "#5865f2",
                                                 borderRadius: "4px",
@@ -137,7 +123,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                         </MenuListItemButton>
                                     </ListItem>
                                     <ListItem sx={{ pl: 1, pr: 1 }}>
-                                        <MenuListItemButton onClick={() => changeStatus("donotdisturb", user)} sx={{
+                                        <MenuListItemButton onClick={() => changeStatus("donotdisturb")} sx={{
                                             "&:hover": {
                                                 backgroundColor: "#5865f2",
                                                 borderRadius: "4px",
@@ -152,7 +138,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                         </MenuListItemButton>
                                     </ListItem>
                                     <ListItem sx={{ pl: 1, pr: 1 }}>
-                                        <MenuListItemButton onClick={() => changeStatus("invisible", user)} sx={{
+                                        <MenuListItemButton onClick={() => changeStatus("invisible")} sx={{
                                             "&:hover": {
                                                 backgroundColor: "#5865f2",
                                                 borderRadius: "4px",

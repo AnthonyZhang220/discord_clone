@@ -284,9 +284,13 @@ body {
 				-ms-flex-direction: column;
 				flex-direction: column;
 				.form-center {
-					.verticalSeparator,
-					.social-login {
-						// display: none;
+				}
+				.social-login {
+					.social-button {
+						svg {
+							height: 2rem;
+							width: 1rem;
+						}
 					}
 				}
 			}

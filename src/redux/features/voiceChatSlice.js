@@ -4,23 +4,40 @@ import { createSlice } from '@reduxjs/toolkit';
 const voiceChatSlice = createSlice({
     name: 'voiceChat',
     initialState: {
-        isSharingEnabled: false,
-        isMutedVideo: true,
+        isMicOn: true,
+        isDeafen: false,
+        isCameraOn: false,
+        isScreenSharingOn: false,
+        isVoiceChatConnected: false,
+        isVoiceChatLoading: false,
+        isVoiceChatPageOpen: false,
         agoraEngine: null,
+        agoraConfig: {},
         screenShareRef: null,
-        voiceConnected: false,
         remoteUsers: [],
         localTracks: null,
-        currentAgoraUID: null,
+        currAgoraUID: null,
         screenTrack: null,
+        connectionState: "",
+        latency: null,
         // Add other voice chat-related state here
     },
     reducers: {
-        setSharingEnabled: (state, action) => {
-            state.isSharingEnabled = action.payload;
+        // Add other voice chat-related reducers here
+        setIsMicOn: (state, action) => {
+            state.isMicOn = action.payload;
         },
-        setMutedVideo: (state, action) => {
-            state.isMutedVideo = action.payload;
+        setIsDeafen: (state, action) => {
+            state.isDeafen = action.payload;
+        },
+        setIsCameraOn: (state, action) => {
+            state.isCameraOn = action.payload;
+        },
+        setIsScreenSharingOn: (state, action) => {
+            state.isScreenSharingOn = action.payload;
+        },
+        setIsVoiceChatConnected: (state, action) => {
+            state.isVoiceChatConnected = action.payload;
         },
         setAgoraEngine: (state, action) => {
             state.agoraEngine = action.payload;
@@ -28,43 +45,57 @@ const voiceChatSlice = createSlice({
         setScreenShareRef: (state, action) => {
             state.screenShareRef = action.payload;
         },
-        setVoiceConnected: (state, action) => {
-            state.voiceConnected = action.payload;
-        },
         setRemoteUsers: (state, action) => {
             state.remoteUsers = action.payload;
         },
         setLocalTracks: (state, action) => {
             state.localTracks = action.payload;
         },
-        setCurrentAgoraUID: (state, action) => {
-            state.currentAgoraUID = action.payload;
+        setCurrAgoraUID: (state, action) => {
+            state.currAgoraUID = action.payload;
         },
         setScreenTrack: (state, action) => {
             state.screenTrack = action.payload;
         },
-        // Add other voice chat-related reducers here
+        setAgoraConfig: (state, action) => {
+            state.agoraConfig = action.payload;
+        },
+        setIsVoiceChatPageOpen: (state, action) => {
+            state.isVoiceChatPageOpen = action.payload;
+        },
+        setConnectionState: (state, action) => {
+            state.connectionState = action.payload;
+        },
+        setLatency: (state, action) => {
+            state.latency = action.payload;
+        },
+        setIsVoiceChatLoading: (state, action) => {
+            state.isVoiceChatLoading = action.payload;
+        }
     },
 });
 
 export const {
-    setSharingEnabled,
-    setMutedVideo,
+    setIsCameraOn,
+    setIsMicOn,
+    setIsDeafen,
+    setIsSharingOn,
+    setIsVoiceChatConnected,
+    setIsScreenSharingOn,
     setAgoraEngine,
     setScreenShareRef,
-    setVoiceConnected,
     setRemoteUsers,
     setLocalTracks,
     setCurrentAgoraUID,
     setScreenTrack,
+    setAgoraConfig,
+    setIsVoiceChatPageOpen,
+    setConnectionState,
+    setLatency,
+    setIsVoiceChatLoading,
 } = voiceChatSlice.actions;
 export default voiceChatSlice.reducer;
 
-
-export const handleUserSubscribe = async (user, mediaType) => {
-    const id = user.uid
-    await agoraEngine.subscribe(user, mediaType)
-}
 
 export const handleVolume = (volumes) => {
     setRemoteUsers((previousUsers) => {

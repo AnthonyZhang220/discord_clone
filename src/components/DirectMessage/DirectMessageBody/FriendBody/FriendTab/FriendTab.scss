@@ -1,0 +1,16 @@
+.friend-list-item {
+	opacity: 1;
+
+	.friend-list-item-button {
+		// background: #3d3f44;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+		border-radius: 8px;
+		border-color: transparent;
+
+		&:hover {
+			background-color: #3d3f44;
+			border-radius: 8px;
+		}
+	}
+}

@@ -10,11 +10,11 @@ import { Button, InputLabel, FormControl, Box, InputBase, InputAdornment, Modal,
 import AddIcon from '@mui/icons-material/Add';
 import { InfoInput } from '../CustomUIComponents';
 import { useDispatch, useSelector } from "react-redux";
-import { setCreateChannelModal, setCreateServerFormModal, setCreateServerModal, setInviteModal, setJoinServerModal } from '../../redux/features/modalSlice';
-import { copyToClip } from "../../utils/copyToClip"
+import { setCreateChannelModal, setCreateVoiceChannelModal, setCreateServerFormModal, setCreateServerModal, setInviteModal, setJoinServerModal } from '../../redux/features/modalSlice';
 import { setNewServerInfo, setUploadFileLocationURL, setJoinServerId, setUploadServerProfileImage } from "../../redux/features/serverSlice";
 import { setNewChannelInfo } from "../../redux/features/channelSlice";
-import { handleCreateServer, handleJoinServer } from "../../utils/serverHandlers";
+import { handleCreateServer, handleJoinServer } from "../../handlers/serverHandlers";
+import { handleCreateVoiceChannel, handleCreateChannel } from "../../handlers/channelHandlers";
 import styled from "@emotion/styled";
 
 
@@ -123,7 +123,7 @@ export function CreateServerDialog({ createServerFormModal }) {
                             variant="outlined"
                             autoComplete='off'
                             onChange={e => dispatch(setNewServerInfo({ ...newServerInfo, serverName: e.target.value }))}
-                            placeholder={`${user.name}'s Server`}
+                            placeholder={`${user.displayName}'s Server`}
                         />
                     </FormControl>
                 </Box>
@@ -131,7 +131,7 @@ export function CreateServerDialog({ createServerFormModal }) {
             <DialogActions sx={{ backgroundColor: "#f2f3f5" }}>
                 <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => dispatch(setCreateServerFormModal(false))}>Back</Button>
                 <LoadingButton
-                    onClick={() => handleCreateServer(user, newServerInfo)}
+                    onClick={() => handleCreateServer(newServerInfo)}
                     loading={isLoading}
                     variant="contained"
                 >
@@ -187,8 +187,18 @@ export function JoinServerDialog({ joinServerModal }) {
 
 //invite people
 export function InviteDialog({ inviteModal }) {
+    const [loading, setLoading] = useState(false);
+    const [copied, setCopied] = useState(false);
     const dispatch = useDispatch();
-    const { selectedServer } = useSelector((state) => state.userSelectStore)
+    const { currServer } = useSelector((state) => state.server)
+
+    const copyToClip = () => {
+        setLoading(true)
+        navigator.clipboard.writeText(currServer.id).then(() => {
+            setLoading(false)
+            setCopied(true);
+        })
+    }
     return (
         <Dialog className="Create-Channel-Modal" open={inviteModal} onClose={() => dispatch(setInviteModal(false))} PaperProps={{
             style: {
@@ -197,7 +207,7 @@ export function InviteDialog({ inviteModal }) {
                 width: "440px"
             }
         }}>
-            <DialogTitle sx={{ color: "#ffffff" }} variant='h3'>Invite friends to {selectedServer.serverName}</DialogTitle>
+            <DialogTitle sx={{ color: "#ffffff" }} variant='h3'>Invite friends to {currServer.name}</DialogTitle>
             <DialogContent>
                 <Box component="form">
                     <FormControl variant="standard" required fullWidth>
@@ -211,11 +221,22 @@ export function InviteDialog({ inviteModal }) {
                             name="name"
                             variant="outlined"
                             autoComplete="off"
-                            defaultValue={selectedServer.id}
+                            defaultValue={currServer.id}
                             readOnly
                             endAdornment={
                                 <InputAdornment position="end">
-                                    <Button onClick={() => copyToClip(selectedServer.id)}>Copy</Button>
+                                    <LoadingButton
+                                        onClick={() => copyToClip()}
+                                        loading={loading}
+                                        variant='contained'
+                                    >
+                                        {
+                                            copied ?
+                                                <span>Copied!</span>
+                                                :
+                                                <span>Copy</span>
+                                        }
+                                    </LoadingButton>
                                 </InputAdornment>
                             }
                         />
@@ -225,10 +246,12 @@ export function InviteDialog({ inviteModal }) {
         </Dialog>
     )
 }
-export function CreateChannelDialog({ currentServer, createChannelModal }) {
+
+
+export function CreateChannelDialog({ createChannelModal }) {
     const dispatch = useDispatch();
     const { newChannelInfo } = useSelector((state) => state.channel)
-
+    const { isLoading } = useSelector(state => state.load)
     return (
         <Dialog className="Create-Channel-Modal" open={createChannelModal} onClose={() => dispatch(setCreateChannelModal(false))} PaperProps={{
             style: {
@@ -259,7 +282,61 @@ export function CreateChannelDialog({ currentServer, createChannelModal }) {
             </DialogContent>
             <DialogActions>
                 <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => dispatch(setCreateChannelModal(false))}>Cancel</Button>
-                <Button variant='contained' onClick={() => handleCreateChannel(currentServer, newChannelInfo)}>Create Channel</Button>
+                <LoadingButton
+                    onClick={() => handleCreateChannel(newChannelInfo)}
+                    loading={isLoading}
+                    variant="contained"
+                >
+                    <span>Create Channel</span>
+                </LoadingButton>
+            </DialogActions>
+        </Dialog>
+
+    )
+}
+
+export function CreateVoiceChannelDialog({ createVoiceChannelModal }) {
+    const dispatch = useDispatch();
+    const { newChannelInfo } = useSelector((state) => state.channel)
+    const { isLoading } = useSelector((state) => state.load)
+
+    return (
+        <Dialog className="Create-Channel-Modal" open={createVoiceChannelModal} onClose={() => dispatch(setCreateChannelModal(false))} PaperProps={{
+            style: {
+                textAlign: "start",
+                backgroundColor: "#313338",
+                width: "440px"
+            }
+        }}>
+            <DialogTitle sx={{ color: "#ffffff" }} variant='h3'>Create Voice Channel</DialogTitle>
+            <DialogContent>
+                <Box component="form">
+                    <FormControl variant="standard" required fullWidth>
+                        <InputLabel shrink sx={{
+                            color: "#ffffff"
+                        }}>
+                            CHANNEL NAME
+                        </InputLabel>
+                        <BootstrapInput
+                            id="name"
+                            name="name"
+                            variant="outlined"
+                            autoComplete="off"
+                            onChange={e => dispatch(setNewChannelInfo({ channelName: e.target.value }))}
+                            placeholder="new-channel"
+                        />
+                    </FormControl>
+                </Box>
+            </DialogContent>
+            <DialogActions>
+                <Button variant='text' sx={{ marginRight: "auto", color: "#4e5058" }} onClick={() => dispatch(setCreateVoiceChannelModal(false))}>Cancel</Button>
+                <LoadingButton
+                    onClick={() => handleCreateVoiceChannel(newChannelInfo)}
+                    loading={isLoading}
+                    variant="contained"
+                >
+                    <span>Create Channel</span>
+                </LoadingButton>
             </DialogActions>
         </Dialog>
 

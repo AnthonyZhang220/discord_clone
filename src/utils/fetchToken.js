@@ -1,13 +1,17 @@
 import axios from "axios";
+import store from "../redux/store";
 
-export const fetchToken = async (config) => {
+export default async function fetchRTCToken(config, channelName) {
+    const userId = store.getState().auth.user.id;
     return new Promise(function (resolve) {
-        if (config.channel) {
-            axios.get(config.serverUrl + '/rtc/' + config.channel + '/1/uid/' + "0" + '/?expiry=' + config.ExpireTime)
-                .then(
-                    response => {
-                        resolve(response.data.rtcToken);
-                    })
+        if (channelName) {
+            const url = `${config.serverUrl}/rtc/${channelName}/publisher/uid/0/?expiry=${config.tokenExpiryTime}`
+            console.log(url)
+            axios.get(url).then(
+                response => {
+                    console.log(response.data.rtcToken)
+                    resolve(response.data.rtcToken);
+                })
                 .catch(error => {
                     console.log(error);
                 });

@@ -1,32 +1,40 @@
-import { combineReducers, configureStore, applyMiddleware, Tuple } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import authSlice from "./features/authSlice";
 import draftSlice from "./features/draftSlice";
-import directMessageSlice from "./features/directMessageSlice";
 import channelSlice from "./features/channelSlice";
 import serverSlice from "./features/serverSlice";
 import voiceChatSlice from "./features/voiceChatSlice";
 import modalSlice from "./features/modalSlice"
 import popoverSlice from "./features/popoverSlice";
-import controlSlice from "./features/controlSlice";
 import errorSlice from "./features/errorSlice";
 import userSelectStoreSlice from "./features/userSelectStoreSlice";
+import chatListSlice from "./features/chatListSlice";
+import memberListSlice from "./features/memberListSlice";
+import directMessageSlice from "./features/directMessageSlice";
+import loadSlice from "./features/loadSlice";
 
 const rootReducer = combineReducers({
     auth: authSlice,
-    draftSlice: draftSlice,
-    directMessage: directMessageSlice,
+    draft: draftSlice,
+    chatList: chatListSlice,
     channel: channelSlice,
     server: serverSlice,
     voiceChat: voiceChatSlice,
     modal: modalSlice,
     popover: popoverSlice,
-    control: controlSlice,
     error: errorSlice,
     userSelectStore: userSelectStoreSlice,
+    memberList: memberListSlice,
+    directMessage: directMessageSlice,
+    load: loadSlice,
 })
 
 const store = configureStore({
     reducer: rootReducer,
+    middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware({
+            serializableCheck: false,
+        })
 })
 
 export default store;

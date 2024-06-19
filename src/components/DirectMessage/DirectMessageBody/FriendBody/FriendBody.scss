@@ -1,0 +1,192 @@
+@import "../../../../App.scss";
+
+.content::before {
+	content: "";
+	position: absolute;
+	display: block;
+	top: -1px;
+	left: 0;
+	right: 0;
+	height: 1px;
+	-webkit-box-shadow: var(--elevation-low);
+	box-shadow: var(--elevation-low);
+	z-index: 1;
+	pointer-events: none;
+}
+
+.content {
+	min-width: 0;
+	min-height: 0;
+	-webkit-box-flex: 1;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: row;
+	flex-direction: row;
+	-webkit-box-pack: stretch;
+	-ms-flex-pack: stretch;
+	justify-content: stretch;
+	-webkit-box-align: stretch;
+	-ms-flex-align: stretch;
+	align-items: stretch;
+	position: relative;
+	color: hsl(240, 2%, 88%);
+
+	.friend-main-content {
+		position: relative;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		-webkit-box-orient: vertical;
+		-webkit-box-direction: normal;
+		-ms-flex-direction: column;
+		flex-direction: column;
+		min-width: 0;
+		min-height: 0;
+		-webkit-box-flex: 1;
+		-ms-flex: 1 1 auto;
+		flex: 1 1 auto;
+		background: var(--bg-overlay-chat, var(--background-primary));
+
+		.friend-search-form {
+			-webkit-box-flex: 0;
+			-ms-flex: none;
+			flex: none;
+			margin: 16px 20px 8px 30px;
+
+			border-radius: 4px;
+			overflow: hidden;
+
+			.friend-search-inner {
+				position: relative;
+				-webkit-box-orient: horizontal;
+				-webkit-box-direction: normal;
+				-ms-flex-direction: row;
+				flex-direction: row;
+				-ms-flex-wrap: wrap;
+				flex-wrap: wrap;
+				padding: 1px;
+				min-width: 0;
+				-webkit-box-align: center;
+				-ms-flex-align: center;
+				align-items: center;
+
+				-webkit-box-sizing: border-box;
+				box-sizing: border-box;
+				display: -webkit-box;
+				display: -ms-flexbox;
+				display: flex;
+				-webkit-box-flex: 1;
+				-ms-flex: 1 1 auto;
+				flex: 1 1 auto;
+
+				background-color: #1e1f22;
+				color: hsl(240, 2%, 88%);
+
+				.friend-search-input {
+					background-color: transparent;
+					color: inherit;
+					font-size: 16px;
+					line-height: 32px;
+					height: 30px;
+					padding: 0 8px;
+
+					-webkit-box-sizing: border-box;
+					box-sizing: border-box;
+					background: transparent;
+					border: none;
+					resize: none;
+					-webkit-box-flex: 1;
+					-ms-flex: 1;
+					flex: 1;
+					min-width: 48px;
+					margin: 1px;
+					-webkit-appearance: none;
+					-moz-appearance: none;
+					appearance: none;
+				}
+			}
+		}
+		.friendListWrapper {
+			position: relative;
+			-webkit-box-flex: 1;
+			-ms-flex: 1 1 auto;
+			flex: 1 1 auto;
+			min-height: 0;
+			min-width: 0;
+			z-index: 0;
+
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: flex;
+
+			.scroller {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				right: 0;
+
+				box-sizing: border-box;
+				min-height: 0;
+				-webkit-box-flex: 1;
+				flex: 1 1 auto;
+
+				overflow-y: scroll;
+				overflow-x: hidden;
+				overflow-anchor: none;
+
+				.scroller-content {
+					position: relative;
+					-webkit-box-orient: vertical;
+					-webkit-box-direction: normal;
+					-ms-flex-direction: column;
+					flex-direction: column;
+					-webkit-box-pack: end;
+					-ms-flex-pack: end;
+					justify-content: flex-end;
+					-webkit-box-align: stretch;
+					-ms-flex-align: stretch;
+					align-items: stretch;
+					min-height: 100%;
+
+					.scrollerInner {
+						min-height: 0;
+
+						list-style: none;
+
+						display: block;
+						list-style-type: decimal;
+						margin-block-start: 1em;
+						margin-block-end: 1em;
+						margin-inline-start: 0px;
+						margin-inline-end: 0px;
+						padding-inline-start: 40px;
+						color: hsl(240, 2%, 88%);
+
+						.message {
+							position: relative;
+							outline: none;
+							color: hsl(240, 2%, 88%);
+						}
+
+						.scrollerSpacer {
+							display: block;
+							height: 30px;
+							width: 1px;
+							-webkit-box-flex: 0;
+							-ms-flex: 0 0 auto;
+							flex: 0 0 auto;
+							pointer-events: none;
+							color: hsl(240, 2%, 88%);
+						}
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Box, Typography, FormHelperText, Button, SvgIcon, FormLabel } from '@mui/material'
 
 import { auth, db } from '../../firebase'
@@ -14,13 +14,15 @@ import TwitterButton from "./twitter.svg"
 import GithubButton from "./github.svg"
 
 import './LoginPage.scss'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { signInWithOAuth } from '../../utils/authentication'
+import { setUser } from '../../redux/features/authSlice'
+import { setError } from '../../redux/features/errorSlice'
 
-export function RegisterPage({ currentUser, setCurrentUser }) {
+export function RegisterPage() {
     const navigate = useNavigate();
 
-    const [newUser, setNewUser] = React.useState(
+    const [newUser, setNewUser] = useState(
         {
             email: "",
             username: "",
@@ -51,13 +53,13 @@ export function RegisterPage({ currentUser, setCurrentUser }) {
                 setDoc(userRef, {
                     displayName: newUser.username,
                     email: newUser.email,
-                    profileURL: "",
-                    userId: user.uid,
+                    avatar: "",
+                    id: user.uid,
                     createdAt: Timestamp.fromDate(new Date()),
                     status: "online",
                     friends: [],
                 }).then((doc) => {
-                    setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
+                    dispatch(setUser({ displayName: doc.data().displayName, avatar: doc.data().avatar, id: doc.data().id, createdAt: doc.data().createdAt.seconds, status: doc.data().status }))
 
                     navigate("../channels")
                 })
@@ -137,10 +139,10 @@ export function ResetPasswordPage() {
 
 
 
-export default function LoginPage({ setCurrentUser }) {
+export default function LoginPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [emailSignInInfo, setEmailSignInInfo] = React.useState({ email: "", password: "" })
+    const [emailSignInInfo, setEmailSignInInfo] = useState({ email: "", password: "" })
 
     const handleResetPassword = () => {
         sendPasswordResetEmail(auth, emailSignInInfo.email)
@@ -150,15 +152,19 @@ export default function LoginPage({ setCurrentUser }) {
             })
     }
     const emailSignIn = async () => {
-        const result = await signInWithEmailAndPassword(auth, emailSignInInfo.email, emailSignInInfo.password)
+        try {
+            const result = await signInWithEmailAndPassword(auth, emailSignInInfo.email, emailSignInInfo.password)
+            const userRef = doc(db, "users", result.user.uid);
+            getDoc(userRef).then((doc) => {
+                dispatch(setUser({ displayName: doc.data().displayName, avatar: doc.data().avatar, id: doc.data().id, createdAt: doc.data().createdAt.seconds, status: doc.data().status }))
+                dispatch(setError(null))
+                navigate("/channels")
+            })
 
-
-        const userRef = doc(db, "users", result.user.uid);
-
-        getDoc(userRef).then((doc) => {
-            setCurrentUser({ name: doc.data().displayName, profileURL: doc.data().profileURL, uid: doc.data().userId, createdAt: doc.data().createdAt.seconds, status: doc.data().status })
-            navigate("/channels")
-        })
+        } catch (error) {
+            setEmailSignInInfo({ ...emailSignInInfo, password: "" })
+            dispatch(setError({ type: error.name, reason: error.code }))
+        }
         // ...
     }
 
@@ -191,11 +197,11 @@ export default function LoginPage({ setCurrentUser }) {
                         <Box className="input-position">
                             <Box className="form-group">
                                 <FormLabel component="div" className="input-placeholder" required={true}>Email</FormLabel>
-                                <input required={true} name="email" className="form-style" style={{ marginBottom: "20px" }} onChange={e => handleEmailSignInForm(e)} />
+                                <input required={true} type="email" name="email" className="form-style" style={{ marginBottom: "20px" }} value={emailSignInInfo.email} onChange={e => handleEmailSignInForm(e)} />
                             </Box>
                             <Box className="form-group">
                                 <FormLabel component="div" required={true} id="outlined-weight-helper-text" className="input-placeholder">Password</FormLabel>
-                                <input required={true} name="password" className="form-style" onChange={e => handleEmailSignInForm(e)} />
+                                <input required={true} type="password" name="password" className="form-style" value={emailSignInInfo.password} onChange={e => handleEmailSignInForm(e)} />
                             </Box>
                         </Box>
                         <Box className="password-container"><Button className="link" onClick={handleResetPassword}>Forgot your password?</Button></Box>
