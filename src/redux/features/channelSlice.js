@@ -1,19 +1,26 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addDoc, collection } from "firebase/firestore";
 
 const channelSlice = createSlice({
     name: "channel",
     initialState: {
-        channelList: [],
-        voiceChannelList: [],
+        currChannel: { name: "", id: "" },
+        currChannelList: [],
+        currVoiceChannel: {},
+        currVoiceChannelList: [],
         newChannelInfo: { channelName: null },
     },
     reducers: {
-        setChannelList: (state, action) => {
-            state.channelList = action.payload;
+        setCurrChannel: (state, action) => {
+            state.currChannel = action.payload;
         },
-        setVoiceChannelList: (state, action) => {
-            state.voiceChannelList = action.payload;
+        setCurrChannelList: (state, action) => {
+            state.currChannelList = action.payload;
+        },
+        setCurrVoiceChannel: (state, action) => {
+            state.currVoiceChannel = action.payload;
+        },
+        setCurrVoiceChannelList: (state, action) => {
+            state.currVoiceChannelList = action.payload;
         },
         setNewChannelInfo: (state, action) => {
             state.newChannelInfo = action.payload;
@@ -21,22 +28,5 @@ const channelSlice = createSlice({
     }
 })
 
-export const { setNewChannelInfo, setChannelList, setVoiceChannelList } = channelSlice.actions;
-
-export const handleCreateChannel = (currentServer, newChannelInfo) => async (dispatch) => {
-    await addDoc(collection(db, "channels"), {
-        name: newChannelInfo.channelName,
-        serverRef: currentServer.uid,
-        createdAt: Timestamp.fromDate(new Date()),
-        messages: [],
-    }).then(() => {
-        dispatch(setNewChannelInfo({ channelName: "" }))
-        // handleChannelModalClose();
-
-    })
-
-}
-
-
-
+export const { setNewChannelInfo, setCurrChannelList, setCurrVoiceChannelList, setCurrChannel, setCurrVoiceChannel } = channelSlice.actions;
 export default channelSlice.reducer;

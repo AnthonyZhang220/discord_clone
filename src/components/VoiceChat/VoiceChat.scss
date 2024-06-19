@@ -1,0 +1,143 @@
+@import "../../App.scss";
+
+.voicechat-container {
+	background: #121212;
+	padding: 60px 0;
+	min-width: 0;
+	min-height: 0;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
+	flex-direction: column;
+	position: relative;
+	overflow: hidden;
+	-webkit-box-flex: 1;
+	-ms-flex: 1 1 auto;
+	flex: 1 1 auto;
+
+	&:hover {
+		.voicechat-control {
+			transition: all 0.5s;
+			opacity: 1;
+		}
+	}
+
+	.voicechat-wrapper {
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		position: relative;
+		-webkit-box-flex: 0;
+		-ms-flex: 0 0 auto;
+		flex: 0 0 auto;
+		z-index: 2;
+		height: 100%;
+
+		.voicechat-grid {
+			display: grid;
+			grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
+			grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+			width: 100%;
+			height: 100%;
+		}
+	}
+
+	.voicechat-control {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+		-webkit-box-orient: vertical;
+		-webkit-box-direction: normal;
+		-ms-flex-direction: column;
+		flex-direction: column;
+		-webkit-box-pack: justify;
+		-ms-flex-pack: justify;
+		justify-content: space-between;
+		z-index: 10;
+		opacity: 0;
+
+		.gradient-top {
+			flex: 0 0 57px;
+			padding: 0 20px 0 20px;
+			background: transparent;
+			border-bottom: 1px solid darken($menu-bg, 2.5%);
+			align-items: center;
+			box-shadow: 0 1px 0 darken($channels-bg, 4.1%),
+				inset 0 -1px 0 rgba(#000, 0.1);
+			transition: background 0.15s ease;
+
+			position: relative;
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-align: center;
+			-ms-flex-align: center;
+			align-items: center;
+			min-width: 0;
+			width: 100%;
+			-webkit-box-flex: 0;
+			-ms-flex: 0 0 auto;
+			// flex: 0 0 auto;
+			// height: 48px;
+			// padding: 0 8px;
+			font-size: 16px;
+			line-height: 20px;
+			cursor: default;
+
+			.voicechat-header-title {
+				position: relative;
+				-webkit-box-flex: 1;
+				-ms-flex: 1 1 auto;
+				flex: 1 1 auto;
+				display: -webkit-box;
+				display: -ms-flexbox;
+				display: flex;
+				-webkit-box-align: center;
+				-ms-flex-align: center;
+				align-items: center;
+				min-width: 0;
+				overflow: hidden;
+			}
+		}
+
+		.gradient-bottom {
+			flex: 0 0 57px;
+			padding: 0 1rem;
+			background: transparent;
+			align-items: center;
+			transition: background 0.15s ease;
+			position: relative;
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-align: center;
+			-ms-flex-align: center;
+			align-items: center;
+			justify-content: center;
+			min-width: 0;
+			width: 100%;
+			-webkit-box-flex: 0;
+			-ms-flex: 0 0 auto;
+			font-size: 16px;
+			line-height: 20px;
+			cursor: default;
+
+			.fab-group {
+				max-width: 300px;
+				margin: 0 auto;
+
+				button {
+					margin: 0.5rem;
+				}
+			}
+		}
+	}
+}

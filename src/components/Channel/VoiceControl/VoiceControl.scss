@@ -3,16 +3,16 @@
 	align-items: center;
 	margin-top: auto;
 	background: #232428;
-	padding: 0 8px;
-	font-size: 14px;
-	height: 104px;
+	padding: 0.5rem;
+	font-size: 0.75rem;
 	-webkit-box-align: center;
 	margin-bottom: auto;
 	flex-direction: column;
 
 	.voice-control-upper {
 		display: flex;
-		flex-direction: row;
+		justify-content: space-between;
+		width: 100%;
 
 		.voice-control-details {
 			display: flex;
@@ -34,11 +34,13 @@
 				display: flex;
 			}
 		}
+		.voice-control-disconnected {
+		}
 	}
 
 	.voice-control-lower {
 		// padding-left: 8px;
-		padding-top: 4px;
+		padding: 0.25rem;
 		-webkit-user-select: text;
 		-moz-user-select: text;
 		-ms-user-select: text;
@@ -46,16 +48,16 @@
 		-webkit-box-flex: 1;
 		-ms-flex-positive: 1;
 		// flex-grow: 1;
-		margin-right: 4px;
 		min-width: 0;
-	}
 
-	.voice-control-controls {
-		display: flex;
-		flex: 1 1 auto;
-
-		.voice-control-button {
-			padding: 0 2px 0 2px;
+		.voice-control-buttons {
+			display: flex;
+			justify-content: space-around;
+	
+			.voice-control-button {
+				padding: 0 2px 0 2px;
+			}
 		}
 	}
+
 }

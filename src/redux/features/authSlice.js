@@ -5,22 +5,18 @@ const authSlice = createSlice({
     name: 'auth',
     initialState: {
         user: {},
-        defaultServer: {},
-        defaultChannel: {},
+        isLoggedIn: false,
     },
     reducers: {
         setUser: (state, action) => {
             state.user = action.payload;
         },
-        setDefaultServer: (state, action) => {
-            state.defaultServer = action.payload;
-        },
-        setDefaultChannel: (state, action) => {
-            state.defaultChannel = action.payload;
+        setIsLoggedIn: (state, action) => {
+            state.isLoggedIn = action.payload
         }
         // Add other auth-related reducers here
     },
 });
 
-export const { setUser, setDefaultChannel, setDefaultServer } = authSlice.actions;
+export const { setUser, setIsLoggedIn } = authSlice.actions;
 export default authSlice.reducer;

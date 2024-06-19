@@ -1,0 +1,51 @@
+.voicechat-tile {
+	position: relative;
+	height: 100%;
+	width: 100%;
+
+	.video-wrapper {
+		position: absolute;
+		height: 100%;
+		width: 100%;
+
+		video {
+			border-radius: 1rem;
+		}
+	}
+
+	.video-overlay {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		width: 100%;
+		height: 100%;
+
+		.overlay-container {
+			position: relative;
+			width: 100%;
+			height: 100%;
+			.overlay-avatar {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+			.overlay-bottom {
+				position: absolute;
+				bottom: 0;
+				left: 50%;
+				transform: translate(-50%, 0%);
+
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				width: 100%;
+
+				div {
+					margin: 0.5rem;
+				}
+			}
+		}
+	}
+}

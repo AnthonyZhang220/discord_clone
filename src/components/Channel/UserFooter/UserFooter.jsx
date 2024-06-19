@@ -1,7 +1,6 @@
-import React, { createRef, useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 
-import { Box, ListItemText, ListItem, Badge, ListItemButton, Popover, Avatar, Divider, ClickAwayListener, Tooltip } from '@mui/material'
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { Box, Badge, Avatar, Tooltip } from '@mui/material'
 import HeadsetIcon from '@mui/icons-material/Headset';
 import HeadsetOffIcon from '@mui/icons-material/HeadsetOff';
 import MicIcon from '@mui/icons-material/Mic';
@@ -10,19 +9,19 @@ import MicOffIcon from '@mui/icons-material/MicOff';
 
 import IconButton from '@mui/material/IconButton';
 import SettingsIcon from '@mui/icons-material/Settings';
-import StatusList from '../../../utils/StatusList';
+import StatusList from '../../StatusList';
 import { UserDetailPopover } from "./UserDetailPopover/UserDetailPopover";
 import "./UserFooter.scss"
 import { useDispatch, useSelector } from "react-redux";
 import { setUserDetailPopover } from "../../../redux/features/popoverSlice";
-import { toggleVoice, toggleHeadphone } from "../../../utils/voiceControl";
+import { toggleDeafen, toggleMic } from "../../../handlers/voiceControlHandlers";
 
 
 const UserFooter = () => {
 
     const userAvatarRef = useRef(null);
     const dispatch = useDispatch();
-    const { isMuted, isDeafen } = useSelector((state) => state.control)
+    const { isMicOn, isDeafen } = useSelector((state) => state.voiceChat)
     const { user } = useSelector((state) => state.auth)
 
     return (
@@ -35,7 +34,7 @@ const UserFooter = () => {
                         <StatusList status={user.status} size={12} />
                     }
                 >
-                    <Avatar alt={user.displayName} sx={{ width: "30px", height: "30px" }} src={user.profileURL} className="avatar" />
+                    <Avatar alt={user.displayName} sx={{ width: "30px", height: "30px" }} src={user.avatar} className="avatar" />
                 </Badge>
                 <Box className="user-footer-details">
                     <Box className="username" sx={{ fontSize: 14 }}>
@@ -47,20 +46,20 @@ const UserFooter = () => {
             <UserDetailPopover userAvatarRef={userAvatarRef} />
             <Box className="user-footer-controls button-group">
                 {
-                    isMuted ?
-                        <Tooltip title="Unmute" placement='top'>
-                            <IconButton className="user-footer-button" aria-label="Mute" color="error" onClick={() => {
-                                dispatch(toggleVoice(isMuted))
-                            }}>
-                                <MicOffIcon sx={{ height: 20, width: 20 }} />
+                    isMicOn ?
+                        <Tooltip title="Mute" placement='top'>
+                            <IconButton className="user-footer-button" aria-label="Mute" color="success" onClick={() => {
+                                toggleMic()
+                            }} >
+                                <MicIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
                         </Tooltip>
                         :
-                        <Tooltip title="Mute" placement='top'>
-                            <IconButton className="user-footer-button" aria-label="Mute" color="success" onClick={() => {
-                                dispatch(toggleVoice(isMuted))
-                            }} >
-                                <MicIcon sx={{ height: 20, width: 20 }} />
+                        <Tooltip title="Unmute" placement='top'>
+                            <IconButton className="user-footer-button" aria-label="Mute" color="error" onClick={() => {
+                                toggleMic()
+                            }}>
+                                <MicOffIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
                         </Tooltip>
                 }
@@ -68,7 +67,7 @@ const UserFooter = () => {
                     isDeafen ?
                         <Tooltip title="Undefen" placement='top'>
                             <IconButton className="user-footer-button" aria-label="Defen" color="error" onClick={() =>
-                                dispatch(toggleHeadphone(isDeafen))
+                                toggleDeafen()
                             } >
                                 <HeadsetOffIcon sx={{ height: 20, width: 20 }} />
                             </IconButton>
@@ -76,7 +75,7 @@ const UserFooter = () => {
                         :
                         <Tooltip title="Defen" placement='top'>
                             <IconButton className="user-footer-button" aria-label="Defen" color="success" onClick={() =>
-                                dispatch(toggleHeadphone(isDeafen))
+                                toggleDeafen()
                             }
                             >
                                 <HeadsetIcon sx={{ height: 20, width: 20 }} />

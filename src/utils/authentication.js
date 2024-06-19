@@ -1,11 +1,10 @@
 import store from "../redux/store";
-import { onAuthStateChanged, signInWithRedirect } from 'firebase/auth';
+import { signInWithRedirect } from 'firebase/auth';
 import { auth, db } from "../firebase";
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { FacebookAuthProvider, TwitterAuthProvider, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
 import { redirect } from 'react-router-dom';
-import { getSelectStore } from "./getSelectStore";
-import { setUser } from "../redux/features/authSlice";
+import { setIsLoggedIn, setUser } from "../redux/features/authSlice";
 
 
 
@@ -37,56 +36,19 @@ export const signInWithOAuth = (provider) => async () => {
     }
 }
 
-export async function listenToAuthStateChange() {
-    try {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userRef);
-
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    store.dispatch(setUser(userData))
-                } else {
-                    const userDoc = await setDoc(userRef, {
-                        displayName: user.displayName,
-                        email: user.email ? user.email : "",
-                        profileURL: user.photoURL,
-                        userId: user.uid,
-                        createdAt: Timestamp.fromDate(new Date()),
-                        status: "online",
-                        friends: [],
-                    })
-                    if (userDoc) {
-                        store.dispatch(setUser(userDoc))
-                    }
-                }
-                getSelectStore(user.uid)
-                redirect("/channels")
-            } else {
-                updateDoc(doc(db, "users", user.uid))
-                store.dispatch(setUser(null))
-                redirect("/")
-            }
-        })
-    } catch (error) {
-        store.dispatch(setError("Auth", error))
-        console.error("Auth Slice", error)
-    }
-}
-
 export async function signOut() {
     try {
         const signOutSuccess = await auth.signOut()
         if (signOutSuccess) {
-            const userRef = doc(db, "users", user.uid)
+            const userRef = doc(db, "users", user.id)
             const updateSuccess = await updateDoc(userRef, {
                 status: "offline"
             })
 
             if (updateSuccess) {
-                store.dispatch(setUser({ displayName: null, profileURL: null, uid: null, createdAt: null }))
-                return redirect("/")
+                store.dispatch(setUser({ displayName: null, avatar: null, uid: null, createdAt: null }))
+                store.dispatch(setIsLoggedIn(false))
+                redirect("/")
             }
         }
     } catch (error) {
@@ -95,15 +57,12 @@ export async function signOut() {
     }
 }
 
-export async function changeStatus(status, user) {
-    const userObj = JSON.parse(localStorage.getItem(`${user.uid}`))
+export async function changeStatus(status) {
+    const user = store.getState().auth.user;
+    store.dispatch(setUser({ ...user, status: status }))
 
-    localStorage.setItem(`${user.uid}`, JSON.stringify({ ...userObj, status: status }))
-
-    const updateSuccess = await updateDoc(doc(db, "users", user.uid), {
+    const updateSuccess = await updateDoc(doc(db, "users", user.id), {
         status: status
     })
-    if (updateSuccess) {
-        store.dispatch(setUser({ ...user, status: status }))
-    }
+
 }

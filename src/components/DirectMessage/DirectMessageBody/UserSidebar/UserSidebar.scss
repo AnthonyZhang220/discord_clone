@@ -1,0 +1,26 @@
+.userSidebar-container {
+	position: relative;
+	width: 340px;
+	height: 100%;
+	background-color: #2b2d31;
+
+	.userSidebar-memberlist-wrapper {
+		-webkit-box-pack: center;
+		-ms-flex-pack: center;
+		justify-content: center;
+		position: relative;
+		max-height: 100%;
+		display: -webkit-box;
+		display: -ms-flexbox;
+		display: flex;
+
+		.userSidebar-memberlist {
+			width: 340px;
+			padding: 0 12px 12px;
+			-webkit-box-flex: 0;
+			-ms-flex: 0 0 auto;
+			flex: 0 0 auto;
+			height: auto;
+		}
+	}
+}

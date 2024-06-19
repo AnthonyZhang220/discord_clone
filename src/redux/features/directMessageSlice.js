@@ -1,53 +1,56 @@
-// privateChannelSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const directMessageSlice = createSlice({
-    name: 'directMessage',
+    name: "directMessage",
     initialState: {
-        curDirectMessage: null,
-        channelRef: '',
-        directMessages: [],
-        draftDirectMessage: "",
-        // Add other private channel-related state here
+        isDirectMessagePageOpen: false,
+        currDirectMessageChannel: {},
+        currDirectMessageChannelRef: "",
+        friendFilter: "",
+        friendList: [],
+        friendIdList: [],
+        directMessageChannelRefs: {},
+        directMessageChannelList: [],
+        isFriendListPageOpen: false,
+        isDirectMessageSidebarOpen: false,
+        queryFriendList: [],
     },
     reducers: {
-        setDraftDirectMessage: (state, action) => {
-            state.draftDirectMessage = action.payload;
+        setIsDirectMessagePageOpen: (state, action) => {
+            state.isDirectMessagePageOpen = action.payload;
         },
-        setDirectMessageRef: (state, action) => {
-            state.channelRef = action.payload;
+        setCurrDirectMessageChannel: (state, action) => {
+            state.currDirectMessageChannel = action.payload;
         },
-        setDirectMessage: (state, action) => {
-            state.directMessages = action.payload;
+        setFriendFilter: (state, action) => {
+            state.friendFilter = action.payload;
         },
-        // Add other private channel-related reducers here
-    },
-});
-
-export const {
-    setDraftDirectMessage, setDirectMessage, setDirectMessageRef
-} = directMessageSlice.actions;
-export default directMessageSlice.reducer;
-
-//add new message to db
-export const handleSubmitDirectMessage = () => async (dispatch) => {
-
-    if (curDirectMessage.trim() == "") {
-        return;
+        setFriendList: (state, action) => {
+            state.friendList = action.payload;
+        },
+        setDirectMessageChannelList: (state, action) => {
+            state.directMessageChannelList = action.payload;
+        },
+        setIsFriendListPageOpen: (state, action) => {
+            state.isFriendListPageOpen = action.payload;
+        },
+        toggleDirectMessageSidebar: (state, action) => {
+            state.isDirectMessageSidebarOpen = !state.isDirectMessageSidebarOpen;
+        },
+        setDirectMessageChannelRefs: (state, action) => {
+            state.directMessageChannelRefs = action.payload;
+        },
+        setCurrDirectMessageChannelRef: (state, action) => {
+            state.currDirectMessageChannelRef = action.payload;
+        },
+        setFriendIdList: (state, action) => {
+            state.friendIdList = action.payload;
+        },
+        setQueryFriendList: (state, action) => {
+            state.queryFriendList = action.payload;
+        }
     }
-    const { uid, displayName, photoURL } = auth.currentUser;
+})
 
-    await addDoc(collection(db, "messages"), {
-        type: "text",
-        content: draftDirectMessage,
-        fileName: "",
-        userName: displayName,
-        avatar: photoURL,
-        createdAt: Timestamp.fromDate(new Date()),
-        channelRef: currentPrivateChannel.uid,
-        serverRef: currentServer.uid,
-        userRef: uid,
-    }).then(() => {
-        dispatch(setDirectMessage(""))
-    })
-}
+export const { setQueryFriendList, setFriendIdList, setFriendList, setCurrDirectMessageChannelRef, setDirectMessageChannelRefs, setDirectMessageChannelList, setIsDirectMessagePageOpen, setCurrDirectMessageChannel, setFriendFilter, setIsFriendListPageOpen, toggleDirectMessageSidebar } = directMessageSlice.actions;
+export default directMessageSlice.reducer;
