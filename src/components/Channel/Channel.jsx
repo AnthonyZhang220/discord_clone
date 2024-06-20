@@ -76,6 +76,7 @@ const Channel = () => {
         if (selectedServer) {
             const serverRef = doc(db, "servers", selectedServer)
             getDoc(serverRef).then((doc) => {
+                console.log(doc.data().name)
                 dispatch(setCurrServer({ name: doc.data().name, id: doc.data().id }))
             })
         }

@@ -26,8 +26,8 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
     const { user } = useSelector((state) => state.auth)
 
     useEffect(() => {
-        console.log(user.bannerColor)
-    }, [user.bannerColor])
+        console.log(user?.bannerColor)
+    }, [user?.bannerColor])
     return (
         <Popover
             className='user-detail-paper'
@@ -60,7 +60,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             <rect></rect>
                             <circle></circle>
                         </mask>
-                        <foreignObject className="user-detail-object" sx={{ background: user.bannerColor?.toString() }}>
+                        <foreignObject className="user-detail-object" sx={{ background: user?.bannerColor?.toString() }}>
                             <Box sx={{ height: "100px", width: "100%", transition: "background-color 0.1s" }}>
                             </Box>
                         </foreignObject>
@@ -70,22 +70,22 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                         className="user-detail-avatar"
                         badgeContent={
-                            <StatusList status={user.status} />
+                            <StatusList status={user?.status} />
                         }
                     >
-                        <Avatar alt={user.displayName} sx={{ width: "80px", height: "80px" }} src={user.avatar} imgProps={{ crossOrigin: "Anonymous" }} />
+                        <Avatar alt={user?.displayName} sx={{ width: "80px", height: "80px" }} src={user?.avatar} imgProps={{ crossOrigin: "Anonymous" }} />
                     </Badge>
                 </Box>
                 <Box className="user-detail-list" sx={{ backgroundColor: "#111214" }}>
                     <ListItem dense>
                         <MenuListItemButton>
-                            <ListItemText primary={user.displayName} primaryTypographyProps={{ variant: "h3" }} />
+                            <ListItemText primary={user?.displayName} primaryTypographyProps={{ variant: "h3" }} />
                         </MenuListItemButton>
                     </ListItem>
                     <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
                     <ListItem dense>
                         <MenuListItemButton>
-                            <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(user.createdAt?.seconds * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
+                            <ListItemText primary="MEMBER SINCE" primaryTypographyProps={{ variant: "h5" }} secondary={new Date(user?.createdAt?.seconds * 1000).toLocaleDateString('en-US', { month: "short", day: "2-digit", year: "numeric" })} secondaryTypographyProps={{
                                 style: {
                                     color: "white"
                                 }
@@ -161,8 +161,8 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                 }
                             }}>
 
-                                <StatusList edge={"start"} status={user.status} size={15} />
-                                <ListItemText primary={statusFormat(user.status)} sx={{ ml: 1 }} />
+                                <StatusList edge={"start"} status={user?.status} size={15} />
+                                <ListItemText primary={statusFormat(user?.status)} sx={{ ml: 1 }} />
                                 <NavigateNextIcon edge="end" sx={{ color: "white" }} />
                             </MenuListItemButton>
                         </StatusMenu>

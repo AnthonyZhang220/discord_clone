@@ -26,7 +26,6 @@ export const handleSubmitDirectMessage = async (e) => {
         avatar: avatar,
         createdAt: Timestamp.fromDate(new Date()),
         channelRef: currChannel,
-        serverRef: currServer,
         userRef: id,
     }).then(() => {
         store.dispatch(setDraftDirectMessage(""))
@@ -54,7 +53,6 @@ export const handleSubmitMessage = async (e) => {
         avatar: avatar,
         createdAt: Timestamp.fromDate(new Date()),
         channelRef: currChannel,
-        serverRef: currServer,
         userRef: id,
     }).then(() => {
         store.dispatch(setDraftMessage(""))
