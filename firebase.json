@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "discordcloneaz",
+    "site": "discordclone-95fc0",
     "public": "dist",
     "ignore": [
       "firebase.json",
