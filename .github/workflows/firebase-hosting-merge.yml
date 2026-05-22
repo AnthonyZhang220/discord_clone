@@ -35,7 +35,7 @@ jobs:
           apiKey: "${{secrets.FIREBASE_API_KEY}}"
           authDomain: "${{secrets.AUTH_DOMAIN}}"
           databaseURL: "${{secrets.DATABASE_URL}}"
-          storeageBucket: "${{secrets.STORAGE_BUCKET}}"
+          storageBucket: "${{secrets.STORAGE_BUCKET}}"
           appId: "${{secrets.FIREBASE_APP_ID}}"
           agoraAppId: "${{secrets.AGORA_APP_ID}}"
           agoraAppCerti: "${{secrets.AGORA_APP_CERTIFI}}"
