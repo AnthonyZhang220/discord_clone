@@ -2,43 +2,36 @@
 # https://github.com/firebase/firebase-tools
 
 name: Deploy to Firebase Hosting on merge
-
 on:
   push:
     branches:
       - main
 
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Install Node.js and npm
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-
-      - name: Deploy to Firebase Hosting
-        uses: FirebaseExtended/action-hosting-deploy@v0
+      - run: npm ci && npm run build
+        env:
+          REACT_APP_API_KEY: ${{ secrets.REACT_APP_API_KEY }}
+          REACT_APP_AUTH_DOMAIN: ${{ secrets.REACT_APP_AUTH_DOMAIN }}
+          REACT_APP_DATABASE_URL: ${{ secrets.REACT_APP_DATABASE_URL }}
+          REACT_APP_STORAGE_BUCKET: ${{ secrets.REACT_APP_STORAGE_BUCKET }}
+          REACT_APP_APP_ID: ${{ secrets.REACT_APP_APP_ID }}
+          REACT_APP_AGORA_APP_ID: ${{ secrets.REACT_APP_AGORA_APP_ID }}
+          REACT_APP_AGORA_SERVER_URL: ${{ secrets.REACT_APP_AGORA_SERVER_URL }}
+      - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: "${{ secrets.GITHUB_TOKEN }}"
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT_DISCORDCLONE_95FC0 }}"
-          apiKey: "${{secrets.FIREBASE_API_KEY}}"
-          authDomain: "${{secrets.AUTH_DOMAIN}}"
-          databaseURL: "${{secrets.DATABASE_URL}}"
-          storageBucket: "${{secrets.STORAGE_BUCKET}}"
-          appId: "${{secrets.FIREBASE_APP_ID}}"
-          agoraAppId: "${{secrets.AGORA_APP_ID}}"
-          agoraAppCerti: "${{secrets.AGORA_APP_CERTIFI}}"
-          serverURL: "${{secrets.SERVER_URL}}"
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_DISCORDCLONE_95FC0 }}
           channelId: live
           projectId: discordclone-95fc0
