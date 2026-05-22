@@ -31,14 +31,14 @@ const UserFooter = () => {
                     overlap="circular"
                     anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                     badgeContent={
-                        <StatusList status={user.status} size={12} />
+                        <StatusList status={user?.status} size={12} />
                     }
                 >
-                    <Avatar alt={user.displayName} sx={{ width: "30px", height: "30px" }} src={user.avatar} className="avatar" />
+                    <Avatar alt={user?.displayName} sx={{ width: "30px", height: "30px" }} src={user?.avatar} className="avatar" />
                 </Badge>
                 <Box className="user-footer-details">
                     <Box className="username" sx={{ fontSize: 14 }}>
-                        {user.displayName}
+                        {user?.displayName}
                     </Box>
                     <Box component="span" className="tag"></Box>
                 </Box>
