@@ -67,7 +67,11 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.join(__dirname, 'public', 'index.html')
         }),
-        new DotenvWebpackPlugin(),
+        new DotenvWebpackPlugin({
+            safe: false,        // 允许未在 .env.example 中定义的变量
+            systemvars: true,   // 允许系统环境变量（GitHub Actions 会用到）
+            expand: true,       // 允许变量扩展
+        }),
         new NodePolyfillPlugin(),
     ]
 };
