@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback, Fragment } from 'react'
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
+import { doc, getDoc, setDoc, updateDoc, Timestamp } from 'firebase/firestore'
 import Chat from './components/Chat/Chat'
 import ServerList from './components/ServerList/ServerList'
 import Channel from './components/Channel/Channel'
@@ -17,7 +17,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import DirectMessageMenu from "./components/DirectMessage/DirectMessageMenu/DirectMessageMenu";
 import DirectMessageBody from './components/DirectMessage/DirectMessageBody/DirectMessageBody';
 import PageNotFound from './components/PageNotFound/PageNotFound'
-import { onAuthStateChanged } from 'firebase/auth'
+import { onAuthStateChanged, getRedirectResult, GoogleAuthProvider } from 'firebase/auth'
 import { getSelectStore } from './utils/userSelectStore'
 import { setUser, setIsLoggedIn } from './redux/features/authSlice'
 import { getBannerColor } from './utils/getBannerColor'
@@ -33,41 +33,86 @@ function App() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userRef = doc(db, "users", user.uid);
-                const userDoc = await getDoc(userRef);
-
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    console.log("userData", userData)
-                    dispatch(setUser({ ...userData }))
-                } else {
-                    const userDoc = await setDoc(userRef, {
-                        displayName: user.displayName,
-                        email: user.email ? user.email : "",
-                        avatar: user.photoURL,
-                        id: user.uid,
-                        createdAt: Timestamp.fromDate(new Date()),
-                        status: "online",
-                        friends: [],
-                        bannerColor: await getBannerColor(user.photoURL)
-                    })
-                    if (userDoc) {
-                        dispatch(setUser(userDoc))
+        // Handle OAuth redirect results (optional: access tokens, credentials)
+        (async () => {
+            try {
+                const result = await getRedirectResult(auth).catch(() => null)
+                if (result) {
+                    try {
+                        const credential = GoogleAuthProvider.credentialFromResult(result)
+                        if (credential) {
+                            console.log('OAuth credential from redirect:', credential)
+                        }
+                    } catch (e) {
+                        // provider-specific parsing failed, ignore
+                        console.warn('Could not parse OAuth credential from redirect result', e)
                     }
                 }
-                getSelectStore()
-                dispatch(setIsLoggedIn(true))
-                navigate("/channels")
-            } else {
-                dispatch(setUser(null))
-                dispatch(setIsLoggedIn(false))
-                navigate("/")
+            } catch (err) {
+                console.warn('getRedirectResult failed', err)
+            }
+        })()
+
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            try {
+                if (user) {
+                    const userRef = doc(db, "users", user.uid);
+                    const userDoc = await getDoc(userRef);
+
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        console.log("userData", userData)
+                        dispatch(setUser({
+                            displayName: userData.displayName,
+                            avatar: userData.avatar,
+                            id: userData.id,
+                            createdAt: userData.createdAt?.seconds ? userData.createdAt.seconds : null,
+                            status: userData.status,
+                            email: userData.email,
+                            bannerColor: userData.bannerColor,
+                            friends: userData.friends || []
+                        }))
+                    } else {
+                        const newUser = {
+                            displayName: user.displayName,
+                            email: user.email ? user.email : "",
+                            avatar: user.photoURL,
+                            id: user.uid,
+                            createdAt: Timestamp.fromDate(new Date()),
+                            status: "online",
+                            friends: [],
+                            bannerColor: await getBannerColor(user.photoURL)
+                        }
+
+                        await setDoc(userRef, newUser)
+
+                        dispatch(setUser({
+                            displayName: newUser.displayName,
+                            avatar: newUser.avatar,
+                            id: newUser.id,
+                            createdAt: newUser.createdAt.seconds,
+                            status: newUser.status,
+                            email: newUser.email,
+                            bannerColor: newUser.bannerColor,
+                            friends: newUser.friends
+                        }))
+                    }
+
+                    getSelectStore()
+                    dispatch(setIsLoggedIn(true))
+                    navigate("/channels")
+                } else {
+                    dispatch(setUser(null))
+                    dispatch(setIsLoggedIn(false))
+                    navigate("/")
+                }
+            } catch (error) {
+                console.error("Error fetching user data", error)
             }
         })
 
         return unsubscribe;
+
     }, [auth])
 
     return (
