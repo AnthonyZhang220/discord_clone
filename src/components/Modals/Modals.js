@@ -123,7 +123,7 @@ export function CreateServerDialog({ createServerFormModal }) {
                             variant="outlined"
                             autoComplete='off'
                             onChange={e => dispatch(setNewServerInfo({ ...newServerInfo, serverName: e.target.value }))}
-                            placeholder={`${user.displayName}'s Server`}
+                            placeholder={`${user?.displayName}'s Server`}
                         />
                     </FormControl>
                 </Box>
