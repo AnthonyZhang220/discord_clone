@@ -20,7 +20,23 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: npm ci && npm run build
+      - name: Verify FIREBASE env present
+        run: |
+          node -e "console.log(process.env.REACT_APP_PROJECT_ID ? 'REACT_APP_PROJECT_ID=OK' : 'REACT_APP_PROJECT_ID=MISSING')"
+        env:
+          REACT_APP_PROJECT_ID: ${{ secrets.REACT_APP_PROJECT_ID }}
+          REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
+          REACT_APP_AUTH_DOMAIN: ${{ secrets.REACT_APP_AUTH_DOMAIN }}
+          REACT_APP_DATABASE_URL: ${{ secrets.REACT_APP_DATABASE_URL }}
+          REACT_APP_STORAGE_BUCKET: ${{ secrets.REACT_APP_STORAGE_BUCKET }}
+          REACT_APP_MESSAGING_SENDER_ID: ${{ secrets.REACT_APP_MESSAGING_SENDER_ID }}
+          REACT_APP_FIREBASE_APP_ID: ${{ secrets.REACT_APP_FIREBASE_APP_ID }}
+          REACT_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
+          REACT_APP_AGORA_APP_ID: ${{ secrets.REACT_APP_AGORA_APP_ID }}
+          REACT_APP_AGORA_SERVER_URL: ${{ secrets.REACT_APP_AGORA_SERVER_URL }}
+
+      - name: Install and build
+        run: npm ci && npm run build
         env:
           REACT_APP_FIREBASE_API_KEY: ${{ secrets.REACT_APP_FIREBASE_API_KEY }}
           REACT_APP_AUTH_DOMAIN: ${{ secrets.REACT_APP_AUTH_DOMAIN }}
@@ -32,6 +48,17 @@ jobs:
           REACT_APP_MEASUREMENT_ID: ${{ secrets.REACT_APP_MEASUREMENT_ID }}
           REACT_APP_AGORA_APP_ID: ${{ secrets.REACT_APP_AGORA_APP_ID }}
           REACT_APP_AGORA_SERVER_URL: ${{ secrets.REACT_APP_AGORA_SERVER_URL }}
+
+      - name: Check build output contains project id
+        run: |
+          if grep -R "$REACT_APP_PROJECT_ID" dist >/dev/null 2>&1; then
+            echo "PROJECT_ID found in build output"
+          else
+            echo "PROJECT_ID NOT found in build output"
+            exit 1
+          fi
+        env:
+          REACT_APP_PROJECT_ID: ${{ secrets.REACT_APP_PROJECT_ID }}
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
