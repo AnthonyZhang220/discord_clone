@@ -31,7 +31,8 @@ module.exports = {
         },
         alias: {
             stream: 'stream-browserify',
-            '@': path.resolve(__dirname, 'src')
+            '@': path.resolve(__dirname, 'src'),
+            '@styles': path.resolve(__dirname, 'src/styles'), // 新增
         }
     },
     module: {
@@ -46,7 +47,16 @@ module.exports = {
                 use: [
                     'style-loader',
                     'css-loader',
-                    'sass-loader',
+                    {
+                        loader: 'sass-loader',
+                        options: {
+                            api: 'modern',
+                            additionalData: `@use "sass:color";\n@use "variables" as *;\n`,
+                            sassOptions: {
+                                loadPaths: [path.resolve(__dirname, 'src/styles')],
+                            },
+                        },
+                    },
                 ],
             },
             {
@@ -69,10 +79,10 @@ module.exports = {
             template: path.join(__dirname, 'public', 'index.html')
         }),
         new DotenvWebpackPlugin({
-            safe: false,        // 允许未在 .env.example 中定义的变量
-            systemvars: true,   // 允许系统环境变量（GitHub Actions 会用到）
-            expand: true,       // 允许变量扩展
+            safe: false,
+            systemvars: true,
+            expand: true,
         }),
         new NodePolyfillPlugin(),
-    ]
+    ],
 };
