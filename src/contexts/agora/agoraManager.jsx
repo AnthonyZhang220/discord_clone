@@ -6,14 +6,12 @@ import {
     useRTCClient,
     useRemoteUsers,
     useClientEvent,
-    useCurrentUID,
     useVolumeLevel,
     useNetworkQuality,
     useConnectionState,
-    useRTCScreenShareClient,
     useLocalScreenTrack,
 } from "agora-rtc-react";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import {
     setIsVoiceChatConnected,
     setLatency,
@@ -25,24 +23,20 @@ import VoiceChatTile from "../../components/VoiceChat/VoiceChatTile/VoiceChatTil
 import fetchRTCToken from "../../utils/fetchToken";
 import { handleLeaveVoiceChannel } from "../../handlers/voiceChannelHandlers";
 
-export const AgoraManager = ({ config, children }) => {
+export const AgoraManager = ({ config }) => {
     const dispatch = useDispatch();
-    // user from auth slice not used here
-    const { isMicOn, isDeafen, isCameraOn, agoraConfig, isVoiceChatConnected, isScreenSharingOn } =
+    const { isMicOn, isCameraOn, agoraConfig, isVoiceChatConnected, isScreenSharingOn } =
         useSelector((state) => state.voiceChat);
     const { currVoiceChannel } = useSelector((state) => state.channel);
+    const user = useSelector((state) => state.auth?.user) || {};
 
-    const localUser = useMemo(() => user, [user.avatar, user.displayName]);
     const agoraClient = useRTCClient();
-    const agoraShareClient = useRTCScreenShareClient();
-    const currAgoraUID = useCurrentUID();
     const connectionState = useConnectionState();
     const networkQuality = useNetworkQuality();
-    const volume = useVolumeLevel(localMicrophoneTrack);
 
-    const { screenTrack, screenShareError } = useLocalScreenTrack(isScreenSharingOn, {}, "disable");
+    const { screenTrack } = useLocalScreenTrack(isScreenSharingOn, {}, "disable");
 
-    const { isConnected, isLoading, error, data } = useJoin(
+    const { isConnected, isLoading, data } = useJoin(
         {
             appid: agoraConfig.appid,
             channel: agoraConfig.channel,
@@ -55,6 +49,8 @@ export const AgoraManager = ({ config, children }) => {
     //local
     const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack(isMicOn);
     const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack(isCameraOn);
+    const volume = useVolumeLevel(localMicrophoneTrack);
+    const localUser = user;
     usePublish([localMicrophoneTrack, localCameraTrack, screenTrack]);
 
     //remote
