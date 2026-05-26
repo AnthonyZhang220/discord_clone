@@ -1,13 +1,13 @@
 import React, { useState } from "react";
 import { Box, Typography, FormControl, InputAdornment, InputBase, Divider } from "@mui/material";
-import FriendActive from "../FriendActive/FriendActive";
+import FriendActive from "@/components/DirectMessage/DirectMessageBody/FriendBody/FriendActive/FriendActive";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
 import { LoadingButton } from "@mui/lab";
-import { handleSearchFriend } from "../../../../../handlers/searchHandlers";
-import { debounce } from "../../../../../handlers/searchHandlers";
-import FriendTab from "../FriendTab/FriendTab";
+import { handleSearchFriend } from "@/handlers/searchHandlers";
+import { debounce } from "@/handlers/searchHandlers";
+import FriendTab from "@/components/DirectMessage/DirectMessageBody/FriendBody/FriendTab/FriendTab";
 import "./AddFriend.scss";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({

@@ -1,5 +1,5 @@
 import React, { useEffect, Fragment, useRef } from "react";
-import { db } from "../../firebase";
+import { db } from "@/firebase";
 import { onSnapshot, query, where, collection, doc, getDoc } from "firebase/firestore";
 
 import { ListItemText, ListItem, ListItemButton, ListItemAvatar } from "@mui/material";
@@ -18,15 +18,19 @@ import ServerSettings from "./ServerSettings/ServerSettings";
 import UserFooter from "./UserFooter/UserFooter";
 import VoiceControl from "./VoiceControl/VoiceControl";
 
-import { FunctionTooltip } from "../CustomUIComponents";
-import { CreateChannelDialog, CreateVoiceChannelDialog, InviteDialog } from "../Modals/Modals";
+import { FunctionTooltip } from "@/components/CustomUIComponents";
+import {
+    CreateChannelDialog,
+    CreateVoiceChannelDialog,
+    InviteDialog,
+} from "@/components/Modals/Modals";
 import { useDispatch, useSelector } from "react-redux";
-import { setCreateChannelModal, setCreateVoiceChannelModal } from "../../redux/features/modalSlice";
-import { setCurrChannelList, setCurrVoiceChannelList } from "../../redux/features/channelSlice";
-import { toggleServerSettings } from "../../redux/features/popoverSlice";
-import { handleSelectChannel } from "../../handlers/channelHandlers";
-import { handleJoinVoiceChannel } from "../../handlers/voiceChannelHandlers";
-import { setCurrServer } from "../../redux/features/serverSlice";
+import { setCreateChannelModal, setCreateVoiceChannelModal } from "@/redux/features/modalSlice";
+import { setCurrChannelList, setCurrVoiceChannelList } from "@/redux/features/channelSlice";
+import { toggleServerSettings } from "@/redux/features/popoverSlice";
+import { handleSelectChannel } from "@/handlers/channelHandlers";
+import { handleJoinVoiceChannel } from "@/handlers/voiceChannelHandlers";
+import { setCurrServer } from "@/redux/features/serverSlice";
 
 const Channel = () => {
     const channelHeaderRef = useRef(null);

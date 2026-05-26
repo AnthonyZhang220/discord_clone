@@ -1,15 +1,15 @@
-import store from "../redux/store";
-import { db } from "../firebase";
+import store from "@/redux/store";
+import { db } from "@/firebase";
 import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import { setCurrVoiceChannel } from "../redux/features/channelSlice";
+import { setCurrVoiceChannel } from "@/redux/features/channelSlice";
 import {
     setAgoraConfig,
     setIsVoiceChatConnected,
     setIsVoiceChatLoading,
     setIsVoiceChatPageOpen,
-} from "../redux/features/voiceChatSlice";
-import fetchRTCToken from "../utils/fetchToken";
-import AgoraConfig from "../contexts/agora/config";
+} from "@/redux/features/voiceChatSlice";
+import fetchRTCToken from "@/utils/fetchToken";
+import AgoraConfig from "@/contexts/agora/config";
 
 export const handleJoinVoiceChannel = async (name, channelId) => {
     store.dispatch(setIsVoiceChatLoading(true));

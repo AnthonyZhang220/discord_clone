@@ -4,8 +4,8 @@ import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Avatar from "@mui/material/Avatar";
 import { Badge, Divider } from "@mui/material";
-import { MenuListItemButton } from "../../../CustomUIComponents";
-import StatusList from "../../../StatusList";
+import { MenuListItemButton } from "@/components/CustomUIComponents";
+import StatusList from "@/components/StatusList";
 
 import "./UserSidebar.scss";
 

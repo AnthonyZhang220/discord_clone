@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Box, Typography, FormHelperText, Button, SvgIcon, FormLabel } from "@mui/material";
 
-import { auth, db } from "../../firebase";
+import { auth, db } from "@/firebase";
 import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
 
 import { Link, createSearchParams, useNavigate, useSearchParams } from "react-router-dom";
@@ -18,9 +18,9 @@ import GithubButton from "./github.svg";
 
 import "./LoginPage.scss";
 import { useDispatch } from "react-redux";
-import { signInWithOAuth } from "../../utils/authentication";
-import { setUser } from "../../redux/features/authSlice";
-import { setError } from "../../redux/features/errorSlice";
+import { signInWithOAuth } from "@/utils/authentication";
+import { setUser } from "@/redux/features/authSlice";
+import { setError } from "@/redux/features/errorSlice";
 
 export function RegisterPage() {
     const navigate = useNavigate();

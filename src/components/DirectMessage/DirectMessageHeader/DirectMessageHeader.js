@@ -1,19 +1,19 @@
 import React from "react";
 import { Box, SvgIcon, Button, Divider, Typography } from "@mui/material";
 
-import FriendIcon from "../DirectMessageBody/FriendBody/friend.svg";
-import GroupDMIcon from "../DirectMessageBody/FriendBody/groupdm.svg";
+import FriendIcon from "@/components/DirectMessage/DirectMessageBody/FriendBody/friend.svg";
+import GroupDMIcon from "@/components/DirectMessage/DirectMessageBody/FriendBody/groupdm.svg";
 import InboxIcon from "@mui/icons-material/Inbox";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 
 import { Stack } from "@mui/material";
 
-import StatusList from "../../StatusList";
-import { FunctionTooltip } from "../../CustomUIComponents";
+import StatusList from "@/components/StatusList";
+import { FunctionTooltip } from "@/components/CustomUIComponents";
 import { AlternateEmailSharp } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { setFriendFilter } from "../../../redux/features/directMessageSlice";
-import { toggleDirectMessageSidebar } from "../../../redux/features/directMessageSlice";
+import { setFriendFilter } from "@/redux/features/directMessageSlice";
+import { toggleDirectMessageSidebar } from "@/redux/features/directMessageSlice";
 import "./DirectMessageHeader.scss";
 
 export default function DirectMessageHeader() {

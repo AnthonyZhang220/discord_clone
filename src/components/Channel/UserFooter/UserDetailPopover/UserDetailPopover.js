@@ -6,14 +6,14 @@ import StopCircleIcon from "@mui/icons-material/StopCircle";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
-import { StatusMenu, MenuListItemButton } from "../../../CustomUIComponents";
+import { StatusMenu, MenuListItemButton } from "@/components/CustomUIComponents";
 import { useDispatch, useSelector } from "react-redux";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { signOut } from "../../../../utils/authentication";
-import StatusList from "../../../StatusList";
-import { statusFormat } from "../../../../utils/formatter";
-import { changeStatus } from "../../../../utils/authentication";
-import { setUserDetailPopover } from "../../../../redux/features/popoverSlice";
+import { signOut } from "@/utils/authentication";
+import StatusList from "@/components/StatusList";
+import { statusFormat } from "@/utils/formatter";
+import { changeStatus } from "@/utils/authentication";
+import { setUserDetailPopover } from "@/redux/features/popoverSlice";
 
 import "./UserDetailPopover.scss";
 

@@ -1,16 +1,16 @@
 import React from "react";
 import { Box, Tooltip, Fab } from "@mui/material";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import { AgoraManager } from "../../contexts/agora/agoraManager";
-import AgoraConfig from "../../contexts/agora/config";
-import AgoraClient from "../../contexts/agora/AgoraClient";
+import { AgoraManager } from "@/contexts/agora/agoraManager";
+import AgoraConfig from "@/contexts/agora/config";
+import AgoraClient from "@/contexts/agora/AgoraClient";
 import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
 import VideocamOffRoundedIcon from "@mui/icons-material/VideocamOffRounded";
 import CallEndRoundedIcon from "@mui/icons-material/CallEndRounded";
 import MicRoundedIcon from "@mui/icons-material/MicRounded";
 import MicOffRoundedIcon from "@mui/icons-material/MicOffRounded";
-import { toggleCamera, toggleMic } from "../../handlers/voiceControlHandlers";
-import { handleLeaveVoiceChannel } from "../../handlers/voiceChannelHandlers";
+import { toggleCamera, toggleMic } from "@/handlers/voiceControlHandlers";
+import { handleLeaveVoiceChannel } from "@/handlers/voiceChannelHandlers";
 import { useSelector } from "react-redux";
 
 import "./VoiceChat.scss";

@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Alert, Snackbar, AlertTitle } from "@mui/material";
-import { setError } from "../../redux/features/errorSlice";
+import { setError } from "@/redux/features/errorSlice";
 
 function Error() {
     const dispatch = useDispatch();

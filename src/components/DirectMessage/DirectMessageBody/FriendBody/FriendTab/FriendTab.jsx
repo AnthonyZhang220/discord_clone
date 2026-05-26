@@ -1,7 +1,7 @@
 import React from "react";
 import ChatIcon from "@mui/icons-material/Chat";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { FunctionTooltip, FriendMessageIconButton } from "../../../../CustomUIComponents";
+import { FunctionTooltip, FriendMessageIconButton } from "@/components/CustomUIComponents";
 import {
     Box,
     Divider,
@@ -13,8 +13,8 @@ import {
     ListItemText,
     Typography,
 } from "@mui/material";
-import { handleCurrDirectMessageChannel } from "../../../../../handlers/channelHandlers";
-import StatusList from "../../../../StatusList";
+import { handleCurrDirectMessageChannel } from "@/handlers/channelHandlers";
+import StatusList from "@/components/StatusList";
 
 export default function FriendTab({ displayName, avatar, status, id, createdAt }) {
     return (

@@ -9,8 +9,8 @@ import {
     Badge,
     Avatar,
 } from "@mui/material";
-import { handleCurrDirectMessageChannel } from "../../../../handlers/channelHandlers";
-import StatusList from "../../../StatusList";
+import { handleCurrDirectMessageChannel } from "@/handlers/channelHandlers";
+import StatusList from "@/components/StatusList";
 import "./DirectMessageList.scss";
 
 export const DirectMessageList = ({ id, status, displayName, avatar, createdAt }) => {

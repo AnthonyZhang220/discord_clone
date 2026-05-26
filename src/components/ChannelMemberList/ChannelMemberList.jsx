@@ -12,14 +12,14 @@ import {
 } from "@mui/material";
 
 import { doc, getDoc, onSnapshot, query, collection, where } from "firebase/firestore";
-import { db } from "../../firebase";
-import StatusList from "../StatusList";
+import { db } from "@/firebase";
+import StatusList from "@/components/StatusList";
 import { useDispatch, useSelector } from "react-redux";
 import { MemberDetailPopover } from "./MemberDetailPopover/MemberDetailPopover";
-import { setMemberList, setMemberDetail } from "../../redux/features/memberListSlice";
+import { setMemberList, setMemberDetail } from "@/redux/features/memberListSlice";
 
 import "./ChannelMemberList.scss";
-import { setMemberDetailPopover } from "../../redux/features/popoverSlice";
+import { setMemberDetailPopover } from "@/redux/features/popoverSlice";
 
 function ChannelMemberList() {
     const dispatch = useDispatch();

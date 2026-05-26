@@ -1,4 +1,4 @@
-import store from "../redux/store";
+import store from "@/redux/store";
 import {
     addDoc,
     updateDoc,
@@ -12,22 +12,22 @@ import {
     deleteDoc,
 } from "firebase/firestore";
 import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
-import { storage, db } from "../firebase";
+import { storage, db } from "@/firebase";
 import {
     setNewServerInfo,
     setCurrServer,
     setUploadServerProfileImage,
-} from "../redux/features/serverSlice";
-import { setIsLoading } from "../redux/features/loadSlice";
-import { setSelectedChannel, setSelectedServer } from "../redux/features/userSelectStoreSlice";
-import { setIsDirectMessagePageOpen } from "../redux/features/directMessageSlice";
+} from "@/redux/features/serverSlice";
+import { setIsLoading } from "@/redux/features/loadSlice";
+import { setSelectedChannel, setSelectedServer } from "@/redux/features/userSelectStoreSlice";
+import { setIsDirectMessagePageOpen } from "@/redux/features/directMessageSlice";
 import {
     setCreateServerFormModal,
     setCreateServerModal,
     setInviteModal,
-} from "../redux/features/modalSlice";
-import { toggleServerSettings } from "../redux/features/popoverSlice";
-import { setCurrChannelList } from "../redux/features/channelSlice";
+} from "@/redux/features/modalSlice";
+import { toggleServerSettings } from "@/redux/features/popoverSlice";
+import { setCurrChannelList } from "@/redux/features/channelSlice";
 // userSelectStore
 // {
 // selectedServerId: "",
