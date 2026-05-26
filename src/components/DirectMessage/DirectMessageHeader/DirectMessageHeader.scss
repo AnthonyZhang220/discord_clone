@@ -1,13 +1,11 @@
-@import "../../../App.scss";
-
 .friend-main-header {
     flex: 0 0 57px;
     padding: 0 20px 0 20px;
     background: $menu-bg;
-    border-bottom: 1px solid darken($menu-bg, 2.5%);
+    border-bottom: 1px solid color.adjust($menu-bg, $lightness: -2.5%);
     align-items: center;
     box-shadow:
-        0 1px 0 darken($channels-bg, 4.1%),
+        0 1px 0 color.adjust($channels-bg, $lightness: -4.1%),
         inset 0 -1px 0 rgba(#000, 0.1);
     transition: background 0.15s ease;
 
@@ -50,12 +48,12 @@
 
         .friend-main-header-button {
             &:hover {
-                background-color: darken(#3e4046, 10%);
+                background-color: color.adjust(#3e4046, $lightness: -10%);
                 border-radius: 4px;
             }
 
             &.active {
-                background-color: darken($body-color, 60%);
+                background-color: color.adjust($body-color, $lightness: -60%);
             }
         }
 
@@ -64,11 +62,11 @@
             color: $body-color;
 
             &:hover {
-                background-color: darken($body-color, 40%);
+                background-color: color.adjust($body-color, $lightness: -40%);
                 border-radius: 4px;
             }
             &.active {
-                background-color: darken($success-color, 10%);
+                background-color: color.adjust($success-color, $lightness: -10%);
             }
         }
     }
