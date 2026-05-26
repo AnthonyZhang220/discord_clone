@@ -1,5 +1,5 @@
 import React from "react";
-import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material";
+import { createTheme, ThemeProvider, responsiveFontSizes, GlobalStyles } from "@mui/material";
 
 function ThemeContextProvider({ children }) {
     let theme = createTheme({
@@ -68,7 +68,21 @@ function ThemeContextProvider({ children }) {
 
     theme = responsiveFontSizes(theme);
 
-    return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+    const rootVars = {
+        ":root": {
+            "--primary-color": theme.palette.primary?.main,
+            "--primary-color-hover": theme.palette.primary?.main,
+            "--body-color": (theme.typography?.body1 && theme.typography.body1.color) || "#ffffff",
+            "--server-marker-unread": theme.palette?.success?.main || "#43b581",
+        },
+    };
+
+    return (
+        <ThemeProvider theme={theme}>
+            <GlobalStyles styles={rootVars} />
+            {children}
+        </ThemeProvider>
+    );
 }
 
 export default ThemeContextProvider;

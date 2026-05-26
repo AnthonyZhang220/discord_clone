@@ -1,3 +1,5 @@
+@import "../../../styles/variables";
+
 .user-footer-container {
     display: flex;
     align-items: center;
@@ -7,7 +9,6 @@
     font-size: 14px;
     height: 52px;
     -webkit-box-align: center;
-    @import "../../../styles/variables";
     margin-bottom: 1px;
 
     .user-footer-profile {
