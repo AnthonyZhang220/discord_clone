@@ -1,11 +1,11 @@
 // serverSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const userSelectStoreSlice = createSlice({
-    name: 'userSelectStore',
+    name: "userSelectStore",
     initialState: {
-        selectedServer: '',
-        selectedChannel: '',
+        selectedServer: "",
+        selectedChannel: "",
     },
     reducers: {
         setSelectedChannel: (state, action) => {

@@ -12,22 +12,22 @@ import {
     useConnectionState,
     useRTCScreenShareClient,
     useLocalScreenTrack,
-} from 'agora-rtc-react';
-import React, { useEffect, useMemo } from 'react';
+} from "agora-rtc-react";
+import React, { useEffect, useMemo } from "react";
 import {
     setIsVoiceChatConnected,
     setLatency,
     setConnectionState,
     setIsVoiceChatLoading,
-} from '../../redux/features/voiceChatSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import VoiceChatTile from '../../components/VoiceChat/VoiceChatTile/VoiceChatTile';
-import fetchRTCToken from '../../utils/fetchToken';
-import { handleLeaveVoiceChannel } from '../../handlers/voiceChannelHandlers';
+} from "../../redux/features/voiceChatSlice";
+import { useDispatch, useSelector } from "react-redux";
+import VoiceChatTile from "../../components/VoiceChat/VoiceChatTile/VoiceChatTile";
+import fetchRTCToken from "../../utils/fetchToken";
+import { handleLeaveVoiceChannel } from "../../handlers/voiceChannelHandlers";
 
 export const AgoraManager = ({ config, children }) => {
     const dispatch = useDispatch();
-    const { user } = useSelector((state) => state.auth);
+    // user from auth slice not used here
     const { isMicOn, isDeafen, isCameraOn, agoraConfig, isVoiceChatConnected, isScreenSharingOn } =
         useSelector((state) => state.voiceChat);
     const { currVoiceChannel } = useSelector((state) => state.channel);
@@ -40,7 +40,7 @@ export const AgoraManager = ({ config, children }) => {
     const networkQuality = useNetworkQuality();
     const volume = useVolumeLevel(localMicrophoneTrack);
 
-    const { screenTrack, screenShareError } = useLocalScreenTrack(isScreenSharingOn, {}, 'disable');
+    const { screenTrack, screenShareError } = useLocalScreenTrack(isScreenSharingOn, {}, "disable");
 
     const { isConnected, isLoading, error, data } = useJoin(
         {
@@ -73,8 +73,8 @@ export const AgoraManager = ({ config, children }) => {
     // }, [agoraClient])
 
     useEffect(() => {
-        console.log('isConnected', isConnected);
-        console.log('data', data);
+        console.log("isConnected", isConnected);
+        console.log("data", data);
         if (isConnected) {
             dispatch(setIsVoiceChatConnected(true));
         } else {
@@ -86,11 +86,11 @@ export const AgoraManager = ({ config, children }) => {
         dispatch(setConnectionState(connectionState));
     }, [connectionState]);
 
-    useClientEvent(agoraClient, 'token-privilege-will-expire', () => {
-        if (config.serverUrl !== '') {
+    useClientEvent(agoraClient, "token-privilege-will-expire", () => {
+        if (config.serverUrl !== "") {
             fetchRTCToken(config, currVoiceChannel.name)
                 .then((token) => {
-                    console.log('RTC token fetched from server: ', token);
+                    console.log("RTC token fetched from server: ", token);
                     if (token) return agoraClient.renewToken(token);
                 })
                 .catch((error) => {
@@ -98,7 +98,7 @@ export const AgoraManager = ({ config, children }) => {
                 });
         } else {
             console.log(
-                'Please make sure you specified the token server URL in the configuration file'
+                "Please make sure you specified the token server URL in the configuration file"
             );
         }
     });

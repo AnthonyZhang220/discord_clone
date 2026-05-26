@@ -1,12 +1,12 @@
-import React, { Fragment, useEffect } from 'react';
-import { Box, List, Typography } from '@mui/material';
-import { query, collection, where, onSnapshot } from 'firebase/firestore';
-import { db } from '../../../../../firebase';
-import FriendTab from '../FriendTab/FriendTab';
-import { setFriendIdList, setFriendList } from '../../../../../redux/features/directMessageSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { Fragment, useEffect } from "react";
+import { Box, List, Typography } from "@mui/material";
+import { query, collection, where, onSnapshot } from "firebase/firestore";
+import { db } from "../../../../../firebase";
+import FriendTab from "../FriendTab/FriendTab";
+import { setFriendIdList, setFriendList } from "../../../../../redux/features/directMessageSlice";
+import { useDispatch, useSelector } from "react-redux";
 
-import './FriendList.scss';
+import "./FriendList.scss";
 
 export default function FriendList() {
     const dispatch = useDispatch();
@@ -16,9 +16,9 @@ export default function FriendList() {
     useEffect(() => {
         if (user.id) {
             // const docRef = doc(collectionRef, user.uid)
-            const docRef = query(collection(db, 'users'), where('id', '==', user.id));
+            const docRef = query(collection(db, "users"), where("id", "==", user.id));
 
-            const unsub = onSnapshot(docRef, (QuerySnapshot) => {
+            onSnapshot(docRef, (QuerySnapshot) => {
                 let data = [];
                 QuerySnapshot.forEach((doc) => {
                     data = doc.data().friends;
@@ -32,8 +32,8 @@ export default function FriendList() {
     //get user's friend list
     useEffect(() => {
         if (friendIdList.length > 0) {
-            const q = query(collection(db, 'users'), where('id', 'in', friendIdList));
-            const unsubscribe = onSnapshot(q, (snapshot) => {
+            const q = query(collection(db, "users"), where("id", "in", friendIdList));
+            onSnapshot(q, (snapshot) => {
                 const friendList = [];
                 snapshot.forEach((doc) => {
                     friendList.push({
@@ -50,12 +50,12 @@ export default function FriendList() {
     }, [friendIdList.length]);
 
     return (
-        <Box className='friend-list-container'>
+        <Box className="friend-list-container">
             <List dense>
-                {friendFilter == 'all' ? (
+                {friendFilter == "all" ? (
                     <Fragment>
                         <Box sx={{ p: 1 }}>
-                            <Typography variant='h6'>All - {friendList.length}</Typography>
+                            <Typography variant="h6">All - {friendList.length}</Typography>
                         </Box>
                         {friendList.map(({ displayName, status, avatar, id }) => (
                             <FriendTab
@@ -70,13 +70,13 @@ export default function FriendList() {
                 ) : (
                     <Fragment>
                         <Box sx={{ p: 1 }}>
-                            <Typography variant='h6'>
-                                Online -{' '}
-                                {friendList.filter((obj) => obj.status !== 'offline').length}
+                            <Typography variant="h6">
+                                Online -{" "}
+                                {friendList.filter((obj) => obj.status !== "offline").length}
                             </Typography>
                         </Box>
                         {friendList
-                            .filter((obj) => obj.status !== 'offline')
+                            .filter((obj) => obj.status !== "offline")
                             .map(({ displayName, status, avatar, id }) => (
                                 <FriendTab
                                     displayName={displayName}

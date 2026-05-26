@@ -1,7 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const memberListSlice = createSlice({
-    name: 'memberList',
+    name: "memberList",
     initialState: {
         isMemberListOpen: true,
         memberList: [],

@@ -1,14 +1,14 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const serverSlice = createSlice({
-    name: 'server',
+    name: "server",
     initialState: {
         currServer: {},
         currServerList: [],
         newServerInfo: { serverName: null, serverPic: null },
-        joinServerId: '',
+        joinServerId: "",
         uploadServerProfileImage: null,
-        uploadFileLocationURL: '',
+        uploadFileLocationURL: "",
     },
     reducers: {
         setCurrServer: (state, action) => {

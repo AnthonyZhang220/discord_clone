@@ -1,14 +1,14 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const popoverSlice = createSlice({
-    name: 'popover',
+    name: "popover",
     initialState: {
         serverSettingsPopover: false,
         userDetailPopover: false,
         memberDetailPopover: false,
     },
     reducers: {
-        toggleServerSettings: (state, action) => {
+        toggleServerSettings: (state) => {
             state.serverSettingsPopover = !state.serverSettingsPopover;
         },
         setUserDetailPopover: (state, action) => {

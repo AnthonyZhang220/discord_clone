@@ -1,27 +1,27 @@
-import store from '../redux/store';
-import { setNewChannelInfo, setCurrChannel } from '../redux/features/channelSlice';
-import { setSelectedChannel } from '../redux/features/userSelectStoreSlice';
+import store from "../redux/store";
+import { setNewChannelInfo, setCurrChannel } from "../redux/features/channelSlice";
+import { setSelectedChannel } from "../redux/features/userSelectStoreSlice";
 import {
     setIsFriendListPageOpen,
     setCurrDirectMessageChannelRef,
     setCurrDirectMessageChannel,
-} from '../redux/features/directMessageSlice';
-import { db } from '../firebase';
-import { doc, getDoc, addDoc, Timestamp, collection } from 'firebase/firestore';
-import { setIsVoiceChatPageOpen } from '../redux/features/voiceChatSlice';
-import { setIsLoading } from '../redux/features/loadSlice';
-import { setCreateChannelModal, setCreateVoiceChannelModal } from '../redux/features/modalSlice';
+} from "../redux/features/directMessageSlice";
+import { db } from "../firebase";
+import { doc, getDoc, addDoc, Timestamp, collection } from "firebase/firestore";
+import { setIsVoiceChatPageOpen } from "../redux/features/voiceChatSlice";
+import { setIsLoading } from "../redux/features/loadSlice";
+import { setCreateChannelModal, setCreateVoiceChannelModal } from "../redux/features/modalSlice";
 
 export const handleCreateChannel = async (newChannelInfo) => {
     store.dispatch(setIsLoading(true));
-    const doc = await addDoc(collection(db, 'channels'), {
+    const doc = await addDoc(collection(db, "channels"), {
         name: newChannelInfo.channelName,
         serverRef: store.getState().userSelectStore.selectedServer,
         createdAt: Timestamp.fromDate(new Date()),
         messages: [],
     });
     if (doc) {
-        store.dispatch(setNewChannelInfo({ channelName: '' }));
+        store.dispatch(setNewChannelInfo({ channelName: "" }));
         store.dispatch(setIsLoading(false));
         store.dispatch(setCreateChannelModal(false));
         // handleChannelModalClose();
@@ -30,14 +30,14 @@ export const handleCreateChannel = async (newChannelInfo) => {
 
 export const handleCreateVoiceChannel = async (newChannelInfo) => {
     store.dispatch(setIsLoading(true));
-    const doc = await addDoc(collection(db, 'voicechannels'), {
+    const doc = await addDoc(collection(db, "voicechannels"), {
         name: newChannelInfo.channelName,
         serverRef: store.getState().userSelectStore.selectedServer,
         createdAt: Timestamp.fromDate(new Date()),
         participants: [],
     });
     if (doc) {
-        store.dispatch(setNewChannelInfo({ channelName: '' }));
+        store.dispatch(setNewChannelInfo({ channelName: "" }));
         store.dispatch(setIsLoading(false));
         store.dispatch(setCreateVoiceChannelModal(false));
         // handleChannelModalClose();
@@ -63,7 +63,7 @@ export const handleCurrDirectMessageChannel = async (
     );
     const privateChannels = store.getState().directMessage.directMessageChannelRefs;
     console.log(privateChannels);
-    const channelRef = doc(db, 'privatechannels', privateChannels[userId]);
+    const channelRef = doc(db, "privatechannels", privateChannels[userId]);
     const channelDoc = await getDoc(channelRef);
     const ref = channelDoc.data().channelRef;
     console.log(ref);
@@ -72,7 +72,7 @@ export const handleCurrDirectMessageChannel = async (
 };
 
 export const handleSelectChannel = (channelName, channelId) => {
-    const storedData = localStorage.getItem('userSelectStore');
+    const storedData = localStorage.getItem("userSelectStore");
     const userSelectStore = JSON.parse(storedData);
     const defaultChannels = userSelectStore.selectedChannelIds;
     const selectedServer = store.getState().userSelectStore.selectedServer;
@@ -81,7 +81,7 @@ export const handleSelectChannel = (channelName, channelId) => {
 
     const updatedUserSelectStore = JSON.stringify(userSelectStore);
 
-    localStorage.setItem('userSelectStore', updatedUserSelectStore);
+    localStorage.setItem("userSelectStore", updatedUserSelectStore);
     store.dispatch(setIsVoiceChatPageOpen(false));
     store.dispatch(setSelectedChannel(channelId));
     store.dispatch(setCurrChannel({ name: channelName, id: channelId }));

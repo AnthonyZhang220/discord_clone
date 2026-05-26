@@ -1,4 +1,4 @@
-@import '../../App.scss';
+@import "../../App.scss";
 
 .chat-container {
     display: flex;
@@ -51,7 +51,7 @@
     }
 
     .content::before {
-        content: '';
+        content: "";
         position: absolute;
         display: block;
         top: -1px;

@@ -1,20 +1,20 @@
-import store from '../redux/store';
-import { setSelectedChannel, setSelectedServer } from '../redux/features/userSelectStoreSlice';
+import store from "../redux/store";
+import { setSelectedChannel, setSelectedServer } from "../redux/features/userSelectStoreSlice";
 
 export const getSelectStore = () => {
-    const storedData = localStorage.getItem('userSelectStore');
+    const storedData = localStorage.getItem("userSelectStore");
     const userSelectStore = JSON.parse(storedData);
 
     if (!userSelectStore) {
         //if user not in the storage, add to the local storage
         const store = {
-            selectedServerId: '',
+            selectedServerId: "",
             selectedChannelIds: {},
         };
         const updatedUserSelectStore = JSON.stringify(store);
-        localStorage.setItem('userSelectStore', updatedUserSelectStore);
-        store.dispatch(setSelectedServer(''));
-        store.dispatch(setSelectedChannel(''));
+        localStorage.setItem("userSelectStore", updatedUserSelectStore);
+        store.dispatch(setSelectedServer(""));
+        store.dispatch(setSelectedChannel(""));
     } else {
         const defaultServerId = userSelectStore.selectedServerId;
         const defaultChannelId = userSelectStore[defaultServerId];

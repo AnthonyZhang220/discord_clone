@@ -1,8 +1,11 @@
 // voiceChatSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
+import store from "../store";
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { db } from "../../firebase";
 
 const voiceChatSlice = createSlice({
-    name: 'voiceChat',
+    name: "voiceChat",
     initialState: {
         isMicOn: true,
         isDeafen: false,
@@ -18,7 +21,7 @@ const voiceChatSlice = createSlice({
         localTracks: null,
         currAgoraUID: null,
         screenTrack: null,
-        connectionState: '',
+        connectionState: "",
         latency: null,
         // Add other voice chat-related state here
     },
@@ -79,14 +82,13 @@ export const {
     setIsCameraOn,
     setIsMicOn,
     setIsDeafen,
-    setIsSharingOn,
     setIsVoiceChatConnected,
     setIsScreenSharingOn,
     setAgoraEngine,
     setScreenShareRef,
     setRemoteUsers,
     setLocalTracks,
-    setCurrentAgoraUID,
+    setCurrAgoraUID,
     setScreenTrack,
     setAgoraConfig,
     setIsVoiceChatPageOpen,
@@ -96,72 +98,45 @@ export const {
 } = voiceChatSlice.actions;
 export default voiceChatSlice.reducer;
 
+// Helpers to access current runtime state and dispatch actions
+const getState = () => store.getState();
+const getCurrentVoiceChannel = () =>
+    getState().server?.currentVoiceChannel ||
+    getState().voiceChat?.currentVoiceChannel || { uid: null };
+const getCurrentUser = () => getState().auth?.user || {};
+const getLocalTracks = () => getState().voiceChat?.localTracks || [];
+const getAgoraEngine = () => getState().voiceChat?.agoraEngine;
+const dispatch = (action) => store.dispatch(action);
+const setCurrentVoiceChannel = (val) =>
+    dispatch({ type: "server/setCurrentVoiceChannel", payload: val });
+
 export const handleVolume = (volumes) => {
-    setRemoteUsers((previousUsers) => {
-        if (previousUsers) {
-            return previousUsers.map((user) => {
-                if (user) {
-                    const volume = volumes.find((v) => v.uid == user.uid);
-                    if (volume) {
-                        return { ...user, volume: volume.level };
-                    }
-                    return user;
-                }
-            });
+    const previousUsers = getState().voiceChat.remoteUsers || [];
+    const next = previousUsers.map((user) => {
+        if (user) {
+            const volume = volumes.find((v) => v.uid == user.uid);
+            if (volume) return { ...user, volume: volume.level };
+            return user;
         }
+        return user;
     });
+    dispatch(voiceChatSlice.actions.setRemoteUsers(next));
 };
 
-const handleUserUnpublishedFromAgora = (user, mediaType) => {
-    updateFirebaseMediaStatus(user.uid, mediaType, false);
-
-    if (mediaType === 'audio') {
-        setRemoteUsers((previousUsers) => {
-            if (previousUsers !== undefined) {
-                return previousUsers.map((User) => {
-                    if (User) {
-                        if (User.uid == user.uid) {
-                            return { ...User, hasAudio: false, audioTrack: null, uid: user.uid };
-                        }
-                        return User;
-                    }
-                });
-            }
-        });
-    }
-
-    if (mediaType === 'video') {
-        setRemoteUsers((previousUsers) => {
-            if (previousUsers !== undefined) {
-                return previousUsers.map((User) => {
-                    if (User) {
-                        if (User.uid == user.uid) {
-                            return { ...User, hasVideo: false, videoTrack: null, uid: user.uid };
-                        }
-                        return User;
-                    }
-                });
-            }
-        });
-    }
-};
+// Note: handleUserUnpublishedFromAgora removed because it was unused; keep remote user handlers minimal
 
 export const updateFirebaseMediaStatus = (agoraID, mediaType, status) => {
-    if (currentVoiceChannel.uid) {
-        const voiceChannelRef = doc(db, 'voicechannels', currentVoiceChannel.uid);
+    const cv = getCurrentVoiceChannel();
+    if (cv && cv.uid) {
+        const voiceChannelRef = doc(db, "voicechannels", cv.uid);
 
-        getDoc(voiceChannelRef).then((doc) => {
-            if (doc.exists()) {
-                const arr = doc.data().liveUser;
+        getDoc(voiceChannelRef).then((d) => {
+            if (d.exists()) {
+                const arr = d.data().liveUser || [];
                 const updateUser = arr.find((x) => x.uid == agoraID);
-                console.log(updateUser);
                 if (updateUser) {
-                    if (mediaType === 'audio') {
-                        updateUser.hasAudio = status;
-                    }
-                    if (mediaType === 'video') {
-                        updateUser.hasVideo = status;
-                    }
+                    if (mediaType === "audio") updateUser.hasAudio = status;
+                    if (mediaType === "video") updateUser.hasVideo = status;
                 }
 
                 updateDoc(voiceChannelRef, {
@@ -175,87 +150,71 @@ export const updateFirebaseMediaStatus = (agoraID, mediaType, status) => {
 export const handleUserPublishedToAgora = (user, mediaType) => {
     updateFirebaseMediaStatus(user.uid, mediaType, true);
 
-    setRemoteUsers((previousUsers) => {
-        if (previousUsers !== undefined) {
-            return previousUsers.map((User) => {
-                if (User) {
-                    if (User.uid == user.uid) {
-                        if (mediaType === 'video') {
-                            return {
-                                ...User,
-                                hasVideo: true,
-                                videoTrack: user.videoTrack,
-                                uid: user.uid,
-                            };
-                        }
-
-                        if (mediaType === 'audio') {
-                            return {
-                                ...User,
-                                hasAudio: true,
-                                audioTrack: user.audioTrack,
-                                uid: user.uid,
-                            };
-                        }
-                    }
-                    return User;
-                }
-            });
+    const previousUsers = getState().voiceChat.remoteUsers || [];
+    const next = previousUsers.map((User) => {
+        if (User && User.uid == user.uid) {
+            if (mediaType === "video")
+                return { ...User, hasVideo: true, videoTrack: user.videoTrack, uid: user.uid };
+            if (mediaType === "audio")
+                return { ...User, hasAudio: true, audioTrack: user.audioTrack, uid: user.uid };
         }
+        return User;
     });
+    dispatch(voiceChatSlice.actions.setRemoteUsers(next));
 };
 
 export const handleRemoteUserJoinedAgora = (user) => {
-    setRemoteUsers((previousUsers) => {
-        if (previousUsers !== undefined) {
-            if (previousUsers.find((User) => User.uid != user.uid)) {
-                return [
-                    ...previousUsers,
-                    {
-                        uid: user.uid,
-                        hasAudio: user.hasAudio,
-                        audioTrack: user.audioTrack,
-                        hasVideo: user.hasVideo,
-                        videoTrack: user.videoTrack,
-                    },
-                ];
-            }
-        }
-    });
+    const previousUsers = getState().voiceChat.remoteUsers || [];
+    if (!previousUsers.find((User) => User.uid == user.uid)) {
+        const next = [
+            ...previousUsers,
+            {
+                uid: user.uid,
+                hasAudio: user.hasAudio,
+                audioTrack: user.audioTrack,
+                hasVideo: user.hasVideo,
+                videoTrack: user.videoTrack,
+            },
+        ];
+        dispatch(voiceChatSlice.actions.setRemoteUsers(next));
+    }
 };
 
 export const handleLocalUserLeftAgora = async () => {
-    removeLiveUserFromFirebase(currentAgoraUID);
-    setRemoteUsers([]);
+    removeLiveUserFromFirebase(getState().voiceChat.currAgoraUID);
+    dispatch(voiceChatSlice.actions.setRemoteUsers([]));
 
-    for (const localTrack of localTracks) {
-        localTrack.stop();
-        localTrack.close();
+    for (const localTrack of getLocalTracks()) {
+        if (localTrack) {
+            localTrack.stop();
+            localTrack.close();
+        }
     }
 
-    await agoraEngine.unpublish(localTracks);
-    await agoraEngine.leave();
+    const engine = getAgoraEngine();
+    if (engine) {
+        await engine.unpublish(getLocalTracks());
+        await engine.leave();
+    }
 
-    setLocalTracks(null);
-    console.log('You left the channel');
+    dispatch(voiceChatSlice.actions.setLocalTracks(null));
+    console.log("You left the channel");
     setCurrentVoiceChannel({ name: null, uid: null });
 };
 
 export const handleRemoteUserLeftAgora = (user) => {
-    setRemoteUsers((previousUsers) => {
-        if (previousUsers !== undefined) {
-            const newArr = previousUsers.filter((User) => User.uid != user.uid);
-            return newArr;
-        }
-    });
+    const previousUsers = getState().voiceChat.remoteUsers || [];
+    const newArr = previousUsers.filter((User) => User.uid != user.uid);
+    dispatch(voiceChatSlice.actions.setRemoteUsers(newArr));
 };
 
 export const addLiveUserToFirebase = (userData) => {
-    const userRef = doc(db, 'voicechannels', currentVoiceChannel.uid);
-    getDoc(userRef).then((doc) => {
-        if (doc.exists()) {
-            const arr = doc.data().liveUser;
-            if (!arr.find((x) => x.firebaseUID == currentUser.uid)) {
+    const cv = getCurrentVoiceChannel();
+    const userRef = doc(db, "voicechannels", cv.uid);
+    getDoc(userRef).then((d) => {
+        if (d.exists()) {
+            const arr = d.data().liveUser || [];
+            if (!arr.find((x) => x.firebaseUID == getCurrentUser().uid)) {
                 updateDoc(userRef, {
                     liveUser: arrayUnion(userData),
                 });
@@ -265,11 +224,12 @@ export const addLiveUserToFirebase = (userData) => {
 };
 
 export const removeLiveUserFromFirebase = (agoraID) => {
-    if (agoraID && currentVoiceChannel.uid) {
-        const userRef = doc(db, 'voicechannels', currentVoiceChannel.uid);
-        getDoc(userRef).then((doc) => {
-            if (doc.exists()) {
-                const arr = doc.data().liveUser;
+    const cv = getCurrentVoiceChannel();
+    if (agoraID && cv && cv.uid) {
+        const userRef = doc(db, "voicechannels", cv.uid);
+        getDoc(userRef).then((d) => {
+            if (d.exists()) {
+                const arr = d.data().liveUser || [];
                 if (arr.find((x) => x.uid == agoraID)) {
                     const deleteUser = arr.find((x) => x.uid == agoraID);
                     console.log(deleteUser);

@@ -1,17 +1,17 @@
-import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import authSlice from './features/authSlice';
-import draftSlice from './features/draftSlice';
-import channelSlice from './features/channelSlice';
-import serverSlice from './features/serverSlice';
-import voiceChatSlice from './features/voiceChatSlice';
-import modalSlice from './features/modalSlice';
-import popoverSlice from './features/popoverSlice';
-import errorSlice from './features/errorSlice';
-import userSelectStoreSlice from './features/userSelectStoreSlice';
-import chatListSlice from './features/chatListSlice';
-import memberListSlice from './features/memberListSlice';
-import directMessageSlice from './features/directMessageSlice';
-import loadSlice from './features/loadSlice';
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import authSlice from "./features/authSlice";
+import draftSlice from "./features/draftSlice";
+import channelSlice from "./features/channelSlice";
+import serverSlice from "./features/serverSlice";
+import voiceChatSlice from "./features/voiceChatSlice";
+import modalSlice from "./features/modalSlice";
+import popoverSlice from "./features/popoverSlice";
+import errorSlice from "./features/errorSlice";
+import userSelectStoreSlice from "./features/userSelectStoreSlice";
+import chatListSlice from "./features/chatListSlice";
+import memberListSlice from "./features/memberListSlice";
+import directMessageSlice from "./features/directMessageSlice";
+import loadSlice from "./features/loadSlice";
 
 const rootReducer = combineReducers({
     auth: authSlice,
