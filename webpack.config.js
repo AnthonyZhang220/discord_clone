@@ -30,7 +30,8 @@ module.exports = {
             "stream": require.resolve("stream-browserify")
         },
         alias: {
-            stream: 'stream-browserify'
+            stream: 'stream-browserify',
+            '@': path.resolve(__dirname, 'src')
         }
     },
     module: {
