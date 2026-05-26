@@ -159,7 +159,7 @@ function App() {
                             }
                         />
                         <Route
-                            path="/channels/@me"
+                            path="@me"
                             element={
                                 <Fragment>
                                     <DirectMessageMenu />
