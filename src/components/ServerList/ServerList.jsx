@@ -48,10 +48,19 @@ const ServerList = () => {
     }, [user?.id, dispatch]);
 
     useEffect(() => {
-        if (isDirectMessagePageOpen) {
-            navigate("/channels/@me");
-        } else {
-            navigate("/channels");
+        try {
+            const currentPath = window.location.pathname;
+            if (isDirectMessagePageOpen) {
+                if (!currentPath.includes("/channels/@me")) {
+                    navigate("/channels/@me");
+                }
+            } else {
+                if (currentPath !== "/channels") {
+                    navigate("/channels");
+                }
+            }
+        } catch (e) {
+            // window may be undefined in some test environments; ignore
         }
     }, [isDirectMessagePageOpen, navigate]);
 
