@@ -5,7 +5,7 @@ const memberListSlice = createSlice({
     initialState: {
         isMemberListOpen: true,
         memberList: [],
-        memberDetail: {}
+        memberDetail: {},
     },
     reducers: {
         setIsMemberListOpen: (state, action) => {
@@ -16,9 +16,9 @@ const memberListSlice = createSlice({
         },
         setMemberDetail: (state, action) => {
             state.memberDetail = action.payload;
-        }
-    }
-})
+        },
+    },
+});
 
 export const { setIsMemberListOpen, setMemberList, setMemberDetail } = memberListSlice.actions;
 export default memberListSlice.reducer;

@@ -1,9 +1,7 @@
-import React from 'react'
+import React from "react";
 
 function VoiceChatVideo() {
-  return (
-    <div>VoiceChatVideo</div>
-  )
+    return <div>VoiceChatVideo</div>;
 }
 
-export default VoiceChatVideo
+export default VoiceChatVideo;

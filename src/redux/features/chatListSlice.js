@@ -1,8 +1,8 @@
 // privateChannelSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const chatListSlice = createSlice({
-    name: 'chatList',
+    name: "chatList",
     initialState: {
         directMessageList: [],
         messageList: [],
@@ -19,8 +19,5 @@ const chatListSlice = createSlice({
     },
 });
 
-export const {
-    setDirectMessageList, setMessageList
-} = chatListSlice.actions;
+export const { setDirectMessageList, setMessageList } = chatListSlice.actions;
 export default chatListSlice.reducer;
-

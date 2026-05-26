@@ -8,9 +8,9 @@ const loadSlice = createSlice({
     reducers: {
         setIsLoading: (state, action) => {
             state.isLoading = action.payload;
-        }
+        },
     },
-})
+});
 
 export const { setIsLoading } = loadSlice.actions;
 export default loadSlice.reducer;

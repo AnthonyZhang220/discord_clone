@@ -1,18 +1,17 @@
-import store from "../redux/store";
+import store from "@/redux/store";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
-import { db, storage } from "../firebase";
+import { db, storage } from "@/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { setDraftDirectMessage, setDraftMessage } from "../redux/features/draftSlice";
-import { setError } from "../redux/features/errorSlice";
-import { bytesToMB } from "../utils/bytesToMB";
+import { setDraftDirectMessage, setDraftMessage } from "@/redux/features/draftSlice";
+import { setError } from "@/redux/features/errorSlice";
+import { bytesToMB } from "@/utils/bytesToMB";
 
 //add new message to db
 export const handleSubmitDirectMessage = async (e) => {
     e.preventDefault();
-    const user = store.getState().auth.user
+    const user = store.getState().auth.user;
     const currDirectMessage = store.getState().draft.draftDirectMessage;
     const currChannel = store.getState().channel.currChannel.id;
-    const currServer = store.getState().server.currServer.id
     if (currDirectMessage.trim() == "") {
         return;
     }
@@ -28,17 +27,16 @@ export const handleSubmitDirectMessage = async (e) => {
         channelRef: currChannel,
         userRef: id,
     }).then(() => {
-        store.dispatch(setDraftDirectMessage(""))
-    })
-}
+        store.dispatch(setDraftDirectMessage(""));
+    });
+};
 
 //add new message to db
 export const handleSubmitMessage = async (e) => {
     e.preventDefault();
-    const user = store.getState().auth.user
+    const user = store.getState().auth.user;
     const currMessage = store.getState().draft.draftMessage;
     const currChannel = store.getState().channel.currChannel.id;
-    const currServer = store.getState().server.currServer.id
     if (currMessage.trim() == "") {
         return;
     }
@@ -55,16 +53,14 @@ export const handleSubmitMessage = async (e) => {
         channelRef: currChannel,
         userRef: id,
     }).then(() => {
-        store.dispatch(setDraftMessage(""))
-    })
-}
-
-
+        store.dispatch(setDraftMessage(""));
+    });
+};
 
 export const handleUploadFile = async (e) => {
     const user = store.getState().auth.user;
 
-    const fileUploaded = e.target.files[0]
+    const fileUploaded = e.target.files[0];
 
     const fileSize = fileUploaded.size;
     const fileType = fileUploaded.type;
@@ -77,7 +73,7 @@ export const handleUploadFile = async (e) => {
     }
 
     if (mb > 50) {
-        store.dispatch(setError("File", "File exceeds 50MB."))
+        store.dispatch(setError("File", "File exceeds 50MB."));
         return;
     }
 
@@ -91,10 +87,9 @@ export const handleUploadFile = async (e) => {
     const date = new Date();
     const timeString = date.toISOString();
 
-
-    const messageMediaRef = ref(storage, `messages/${user.id}/${fileName}-${timeString}`)
-    const uploadProgress = await uploadBytes(messageMediaRef, fileUploaded)
-    const url = await getDownloadURL(messageMediaRef)
+    const messageMediaRef = ref(storage, `messages/${user.id}/${fileName}-${timeString}`);
+    await uploadBytes(messageMediaRef, fileUploaded);
+    const url = await getDownloadURL(messageMediaRef);
 
     const currChannel = store.getState().channel.currChannel.id;
     const currServer = store.getState().server.currServer.id;
@@ -108,8 +103,5 @@ export const handleUploadFile = async (e) => {
         channelRef: currChannel,
         serverRef: currServer,
         userRef: user.id,
-    }).then(() => {
-
-    })
-
-}
+    }).then(() => {});
+};

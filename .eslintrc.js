@@ -20,6 +20,8 @@ module.exports = {
   plugins: ['react', 'react-hooks', 'prettier', 'unused-imports'],
   rules: {
     'prettier/prettier': ['error'],
+    'jsx-quotes': ['error', 'prefer-double'],
+    'quotes': ['error', 'double', { avoidEscape: true, allowTemplateLiterals: true }],
     'react/prop-types': 'off',
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'unused-imports/no-unused-imports': 'error',

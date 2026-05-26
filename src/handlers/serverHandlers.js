@@ -1,14 +1,33 @@
-import store from "../redux/store";
-import { addDoc, updateDoc, collection, Timestamp, arrayUnion, doc, query, where, getDocs, deleteDoc } from "firebase/firestore";
-import { uploadBytesResumable, uploadBytes, ref, getDownloadURL } from 'firebase/storage';
-import { storage, db } from "../firebase";
-import { setNewServerInfo, setCurrServer, setUploadServerProfileImage } from "../redux/features/serverSlice";
-import { setIsLoading } from "../redux/features/loadSlice";
-import { setSelectedChannel, setSelectedServer } from "../redux/features/userSelectStoreSlice";
-import { setIsDirectMessagePageOpen } from "../redux/features/directMessageSlice";
-import { setCreateServerFormModal, setCreateServerModal, setInviteModal } from "../redux/features/modalSlice";
-import { toggleServerSettings } from "../redux/features/popoverSlice";
-import { setCurrChannelList } from "../redux/features/channelSlice";
+import store from "@/redux/store";
+import {
+    addDoc,
+    updateDoc,
+    collection,
+    Timestamp,
+    arrayUnion,
+    doc,
+    query,
+    where,
+    getDocs,
+    deleteDoc,
+} from "firebase/firestore";
+import { uploadBytes, ref, getDownloadURL } from "firebase/storage";
+import { storage, db } from "@/firebase";
+import {
+    setNewServerInfo,
+    setCurrServer,
+    setUploadServerProfileImage,
+} from "@/redux/features/serverSlice";
+import { setIsLoading } from "@/redux/features/loadSlice";
+import { setSelectedChannel, setSelectedServer } from "@/redux/features/userSelectStoreSlice";
+import { setIsDirectMessagePageOpen } from "@/redux/features/directMessageSlice";
+import {
+    setCreateServerFormModal,
+    setCreateServerModal,
+    setInviteModal,
+} from "@/redux/features/modalSlice";
+import { toggleServerSettings } from "@/redux/features/popoverSlice";
+import { setCurrChannelList } from "@/redux/features/channelSlice";
 // userSelectStore
 // {
 // selectedServerId: "",
@@ -18,7 +37,6 @@ import { setCurrChannelList } from "../redux/features/channelSlice";
 // }
 
 export const handleSelectServer = (serverName, serverId) => {
-
     const storedData = localStorage.getItem("userSelectStore");
     const userSelectStore = JSON.parse(storedData);
     const storeChannelIds = userSelectStore?.selectedChannelIds;
@@ -27,18 +45,17 @@ export const handleSelectServer = (serverName, serverId) => {
     if (getDefaultChannelId === undefined) {
         storeChannelIds[serverId] = "";
     } else {
-        store.dispatch(setSelectedChannel(getDefaultChannelId))
+        store.dispatch(setSelectedChannel(getDefaultChannelId));
     }
 
     userSelectStore.selectedServerId = serverId;
     const updatedUserSelectStore = JSON.stringify(userSelectStore);
-    localStorage.setItem("userSelectStore", updatedUserSelectStore)
-    store.dispatch(setIsDirectMessagePageOpen(false))
-    store.dispatch(setSelectedServer(serverId))
-    store.dispatch(setSelectedChannel(getDefaultChannelId))
+    localStorage.setItem("userSelectStore", updatedUserSelectStore);
+    store.dispatch(setIsDirectMessagePageOpen(false));
+    store.dispatch(setSelectedServer(serverId));
+    store.dispatch(setSelectedChannel(getDefaultChannelId));
     store.dispatch(setCurrServer({ name: serverName, id: serverId }));
-}
-
+};
 
 //add new Server with handleUploadServerImage();
 export const handleCreateServer = async (newServerInfo) => {
@@ -46,8 +63,8 @@ export const handleCreateServer = async (newServerInfo) => {
     // Create the file metadata
     /** @type {any} */
     const metadata = {
-        contentType: "image/*"
-    }
+        contentType: "image/*",
+    };
 
     const date = new Date();
     const timeString = date.toISOString();
@@ -55,14 +72,16 @@ export const handleCreateServer = async (newServerInfo) => {
     const file = store.getState().server.uploadServerProfileImage;
 
     // Upload file and metadata to the object 'images/mountains.jpg'
-    const serverProfileRef = ref(storage, `serverProfile/${user.id}/${file.name}-${timeString}`, metadata);
+    const serverProfileRef = ref(
+        storage,
+        `serverProfile/${user.id}/${file.name}-${timeString}`,
+        metadata
+    );
 
-    console.log("serverProfileRef", serverProfileRef)
+    const uploadTask = await uploadBytes(serverProfileRef, file);
+    const url = await getDownloadURL(uploadTask.ref);
 
-    const uploadTask = await uploadBytes(serverProfileRef, file)
-    const url = await getDownloadURL(uploadTask.ref)
-
-    console.log("url", url)
+    // serverProfileRef created
     const serverDoc = collection(db, "servers");
     const channelDoc = collection(db, "channels");
 
@@ -73,47 +92,48 @@ export const handleCreateServer = async (newServerInfo) => {
         ownerId: user.id,
         createdAt: Timestamp.fromDate(new Date()),
         members: arrayUnion(user.id),
-    })
+    });
 
     const addedChannel = await addDoc(channelDoc, {
         name: "general",
         serverRef: addedServer.id,
         createdAt: Timestamp.fromDate(new Date()),
         messages: [],
-    })
+    });
 
     if (addedServer && addedChannel) {
-        store.dispatch(setIsLoading(false))
-        store.dispatch(setNewServerInfo({ serverName: "", serverPic: "" }))
-        store.dispatch(setUploadServerProfileImage(null))
-        store.dispatch(setCreateServerFormModal(false))
-        store.dispatch(setCreateServerModal(false))
+        store.dispatch(setIsLoading(false));
+        store.dispatch(setNewServerInfo({ serverName: "", serverPic: "" }));
+        store.dispatch(setUploadServerProfileImage(null));
+        store.dispatch(setCreateServerFormModal(false));
+        store.dispatch(setCreateServerModal(false));
     }
-}
+};
 
 export const handleJoinServer = async (serverId) => {
-    store.dispatch(setIsLoading(true))
+    store.dispatch(setIsLoading(true));
     try {
         const updateRef = doc(db, "servers", serverId);
+        const user = store.getState().auth.user;
         const joinSuccess = await updateDoc(updateRef, {
-            members: arrayUnion(user.uid)
-        })
+            members: arrayUnion(user.uid),
+        });
 
         if (joinSuccess) {
-            store.dispatch(setIsLoading(false))
+            store.dispatch(setIsLoading(false));
         }
     } catch (error) {
-        console.error("Join server error:", error)
+        // Join server error
     }
-}
+};
 
 export const handleDeleteServer = async () => {
-    store.dispatch(setIsLoading(true))
+    store.dispatch(setIsLoading(true));
 
     const selectedServer = store.getState().userSelectStore.selectedServer;
-    const serverRef = doc(db, "servers", selectedServer)
-    const channelRef = query(collection(db, 'channels'), where('serverRef', '==', selectedServer));
-    const messageRef = query(collection(db, 'messages'), where('serverRef', '==', selectedServer));
+    const serverRef = doc(db, "servers", selectedServer);
+    const channelRef = query(collection(db, "channels"), where("serverRef", "==", selectedServer));
+    const messageRef = query(collection(db, "messages"), where("serverRef", "==", selectedServer));
 
     await getDocs(messageRef)
         .then((querySnapshot) => {
@@ -122,8 +142,8 @@ export const handleDeleteServer = async () => {
                 deleteDoc(doc.ref);
             });
         })
-        .catch((error) => {
-            console.error('Error deleting documents: ', error);
+        .catch(() => {
+            // Error deleting documents
         });
 
     await getDocs(channelRef)
@@ -132,20 +152,19 @@ export const handleDeleteServer = async () => {
             querySnapshot.forEach((doc) => {
                 deleteDoc(doc.ref);
             });
-            store.dispatch(setCurrChannelList([]))
+            store.dispatch(setCurrChannelList([]));
         })
-        .catch((error) => {
-            console.error('Error deleting documents: ', error);
+        .catch(() => {
+            // Error deleting documents
         });
 
     await deleteDoc(serverRef).then(() => {
         store.dispatch(setCurrServer({ name: "", id: "" }));
         store.dispatch(setIsLoading(false));
-        store.dispatch(toggleServerSettings())
+        store.dispatch(toggleServerSettings());
     });
-
-}
+};
 
 export const handleInviteToServer = () => {
-    store.dispatch(setInviteModal(true))
-}
+    store.dispatch(setInviteModal(true));
+};

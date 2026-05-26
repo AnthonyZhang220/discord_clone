@@ -8,8 +8,8 @@ const popoverSlice = createSlice({
         memberDetailPopover: false,
     },
     reducers: {
-        toggleServerSettings: (state, action) => {
-            state.serverSettingsPopover = !state.serverSettingsPopover
+        toggleServerSettings: (state) => {
+            state.serverSettingsPopover = !state.serverSettingsPopover;
         },
         setUserDetailPopover: (state, action) => {
             state.userDetailPopover = action.payload;
@@ -17,10 +17,10 @@ const popoverSlice = createSlice({
         setMemberDetailPopover: (state, action) => {
             state.memberDetailPopover = action.payload;
         },
-    }
-})
+    },
+});
 
-export const { toggleServerSettings, setUserDetailPopover, setMemberDetailPopover } = popoverSlice.actions;
+export const { toggleServerSettings, setUserDetailPopover, setMemberDetailPopover } =
+    popoverSlice.actions;
 
 export default popoverSlice.reducer;
-

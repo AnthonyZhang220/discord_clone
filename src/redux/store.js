@@ -4,7 +4,7 @@ import draftSlice from "./features/draftSlice";
 import channelSlice from "./features/channelSlice";
 import serverSlice from "./features/serverSlice";
 import voiceChatSlice from "./features/voiceChatSlice";
-import modalSlice from "./features/modalSlice"
+import modalSlice from "./features/modalSlice";
 import popoverSlice from "./features/popoverSlice";
 import errorSlice from "./features/errorSlice";
 import userSelectStoreSlice from "./features/userSelectStoreSlice";
@@ -27,14 +27,14 @@ const rootReducer = combineReducers({
     memberList: memberListSlice,
     directMessage: directMessageSlice,
     load: loadSlice,
-})
+});
 
 const store = configureStore({
     reducer: rootReducer,
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({
             serializableCheck: false,
-        })
-})
+        }),
+});
 
 export default store;
