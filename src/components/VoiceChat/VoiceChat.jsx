@@ -30,7 +30,11 @@ const VoiceChat = () => {
                 <Box className="voicechat-control">
                     <Box className="gradient-top">
                         <VolumeUpIcon
-                            sx={{ color: "#8a8e94", marginRight: "6px", alignItems: "baseline" }}
+                            sx={{
+                                color: "var(--server-marker-unread)",
+                                marginRight: "6px",
+                                alignItems: "baseline",
+                            }}
                         />
                         <Box component="span" variant="h3" className="voicechat-header-title">
                             {currVoiceChannel.name}

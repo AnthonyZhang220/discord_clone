@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     margin-top: auto;
-    background: #232428;
+    background: lighten($servers-bg, 5%);
     padding: 0 8px;
     font-size: 14px;
     height: 52px;
@@ -24,7 +24,7 @@
         cursor: pointer;
 
         &:hover {
-            background: lighten(#232428, 2.5%);
+            background: lighten($servers-bg, 8%);
         }
 
         .user-footer-details {

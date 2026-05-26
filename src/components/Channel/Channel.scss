@@ -138,7 +138,7 @@
             &.active,
             &:hover,
             &:focus {
-                background: linear-gradient(to right, #282b30 85%, #2e3136);
+                background: linear-gradient(to right, darken($channels-bg, 1%), $button-bg);
 
                 &::before {
                     content: " ";
@@ -146,7 +146,7 @@
                     height: 100%;
                     position: absolute;
                     left: 0;
-                    background: #7289da;
+                    background: $server-bg-active;
                 }
             }
 
@@ -182,7 +182,7 @@
         margin: 1px 0 1px 0;
 
         &:hover {
-            background-color: #3d3f44;
+            background-color: lighten($chat-bg, 5%);
             border-radius: 4px;
         }
     }
@@ -192,5 +192,5 @@
 // 	content: "#";
 // 	margin-right: 10px;
 // 	font-weight: 300;
-// 	color: #8a8e94;
+// 	color: $server-marker-unread;
 // }

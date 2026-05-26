@@ -33,7 +33,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
             anchorEl={userAvatarRef.current}
             PaperProps={{
                 style: {
-                    background: "#232428",
+                    background: "var(--servers-bg)",
                     borderRadius: "8px 8px 8px 8px",
                     width: "340px",
                     fontSize: 14,
@@ -86,7 +86,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                         />
                     </Badge>
                 </Box>
-                <Box className="user-detail-list" sx={{ backgroundColor: "#111214" }}>
+                <Box className="user-detail-list" sx={{ backgroundColor: "var(--body-bg)" }}>
                     <ListItem dense>
                         <MenuListItemButton>
                             <ListItemText
@@ -95,7 +95,11 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             />
                         </MenuListItemButton>
                     </ListItem>
-                    <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
+                    <Divider
+                        style={{ backgroundColor: "var(--server-marker-unread)" }}
+                        variant="middle"
+                        light={true}
+                    />
                     <ListItem dense>
                         <MenuListItemButton>
                             <ListItemText
@@ -129,20 +133,24 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                             onClick={() => changeStatus("online")}
                                             sx={{
                                                 "&:hover": {
-                                                    backgroundColor: "#5865f2",
+                                                    backgroundColor: "var(--primary-color)",
                                                     borderRadius: "4px",
                                                 },
                                             }}
                                         >
                                             <CircleIcon
                                                 edge="start"
-                                                sx={{ mr: 2, color: "#23a55a" }}
+                                                sx={{ mr: 2, color: "var(--accent-green)" }}
                                             />
                                             <ListItemText primary="Online" />
                                         </MenuListItemButton>
                                     </ListItem>
                                     <Divider
-                                        sx={{ backgroundColor: "white", mt: 0.5, mb: 0.5 }}
+                                        sx={{
+                                            backgroundColor: "var(--body-color)",
+                                            mt: 0.5,
+                                            mb: 0.5,
+                                        }}
                                         variant="middle"
                                     />
                                     <ListItem sx={{ pl: 1, pr: 1 }}>
@@ -157,7 +165,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                         >
                                             <DarkModeIcon
                                                 edge="start"
-                                                sx={{ mr: 2, color: "#f0b132" }}
+                                                sx={{ mr: 2, color: "var(--warning-color)" }}
                                             />
                                             <ListItemText primary="Idle" />
                                         </MenuListItemButton>
@@ -174,7 +182,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                         >
                                             <RemoveCircleIcon
                                                 edge="start"
-                                                sx={{ mr: 2, color: "#f23f43" }}
+                                                sx={{ mr: 2, color: "var(--danger-color)" }}
                                             />
                                             <ListItemText
                                                 primary="Do Not Disturb"
@@ -199,7 +207,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                         >
                                             <StopCircleIcon
                                                 edge="start"
-                                                sx={{ color: "#80848e", mr: 2 }}
+                                                sx={{ color: "var(--muted-color)", mr: 2 }}
                                             />
                                             <ListItemText
                                                 primary="Invisible"
@@ -225,7 +233,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             >
                                 <StatusList edge={"start"} status={user?.status} size={15} />
                                 <ListItemText primary={statusFormat(user?.status)} sx={{ ml: 1 }} />
-                                <NavigateNextIcon edge="end" sx={{ color: "white" }} />
+                                <NavigateNextIcon edge="end" sx={{ color: "var(--body-color)" }} />
                             </MenuListItemButton>
                         </StatusMenu>
                     </ListItem>

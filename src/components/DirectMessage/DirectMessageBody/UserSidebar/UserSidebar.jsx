@@ -53,7 +53,7 @@ export const UserSidebar = ({ currDirectMessageChannel }) => {
                                 </MenuListItemButton>
                             </ListItem>
                             <Divider
-                                style={{ backgroundColor: "#8a8e94" }}
+                                style={{ backgroundColor: "var(--server-marker-unread)" }}
                                 variant="middle"
                                 light={true}
                             />
@@ -78,7 +78,7 @@ export const UserSidebar = ({ currDirectMessageChannel }) => {
                                 </MenuListItemButton>
                             </ListItem>
                             <Divider
-                                style={{ backgroundColor: "#8a8e94" }}
+                                style={{ backgroundColor: "var(--server-marker-unread)" }}
                                 variant="middle"
                                 light={true}
                             />

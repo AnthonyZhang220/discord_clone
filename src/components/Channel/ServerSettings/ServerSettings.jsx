@@ -20,7 +20,7 @@ export default function ServerSettings({ channelHeaderRef }) {
             anchorReference="anchorEl"
             PaperProps={{
                 style: {
-                    backgroundColor: "#111214",
+                    backgroundColor: "var(--body-bg)",
                     borderRadius: "4px",
                     width: "220px",
                 },
@@ -42,11 +42,11 @@ export default function ServerSettings({ channelHeaderRef }) {
                 <ListItemButton
                     onClick={() => handleInviteToServer()}
                     sx={{
-                        color: "#949cf7",
+                        color: "var(--primary-color)",
                         borderRadius: "4px",
                         "&:hover": {
-                            backgroundColor: "#5865f2",
-                            color: "#ffffff",
+                            backgroundColor: "var(--primary-color)",
+                            color: "var(--body-color)",
                         },
                     }}
                 >
@@ -60,11 +60,11 @@ export default function ServerSettings({ channelHeaderRef }) {
                 <ListItemButton
                     onClick={() => dispatch(toggleServerSettings())}
                     sx={{
-                        color: "#ffffff",
+                        color: "var(--body-color)",
                         borderRadius: "4px",
                         "&:hover": {
-                            backgroundColor: "#5865f2",
-                            color: "#ffffff",
+                            backgroundColor: "var(--primary-color)",
+                            color: "var(--body-color)",
                         },
                     }}
                 >
@@ -74,7 +74,11 @@ export default function ServerSettings({ channelHeaderRef }) {
                     <SettingsIcon sx={{ marginLeft: "auto", fontSize: 20 }} />
                 </ListItemButton>
             </ListItem>
-            <Divider sx={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
+            <Divider
+                sx={{ backgroundColor: "var(--server-marker-unread)" }}
+                variant="middle"
+                light={true}
+            />
             <ListItem sx={{ p: 0.75 }}>
                 <ListItemButton
                     onClick={() => handleDeleteServer()}
