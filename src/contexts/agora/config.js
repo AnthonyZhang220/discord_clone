@@ -2,7 +2,7 @@ const AgoraConfig = {
     uid: 0,
     serverUrl: process.env.REACT_APP_AGORA_SERVER_URL,
     appId: process.env.REACT_APP_AGORA_APP_ID,
-    channelName: 'test', // your agora channel
+    channelName: "test", // your agora channel
     rtcToken: "",
     tokenExpiryTime: 3600,
     token: "",
@@ -16,7 +16,7 @@ const AgoraConfig = {
     secondChannel: "",
     secondChannelToken: "",
     secondChannelUID: 2,
-    selectedProduct: "rtc"
+    selectedProduct: "rtc",
 };
 
 export default AgoraConfig;

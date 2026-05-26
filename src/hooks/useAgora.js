@@ -66,8 +66,6 @@
 
 //     const [connectionState, setConnectionState] = useState({ state: null, reason: null })
 
-
-
 //     const handleUserSubscribe = async (user, mediaType) => {
 //         const id = user.uid
 //         await agoraEngine.subscribe(user, mediaType)
@@ -88,7 +86,6 @@
 //             }
 //         });
 //     }
-
 
 //     const handleUserUnpublishedFromAgora = (user, mediaType) => {
 //         updateFirebaseMediaStatus(user.uid, mediaType, false)

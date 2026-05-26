@@ -1,11 +1,11 @@
-// import store from "../redux/store";
-// import { setIsMuted, setIsCameraOn, setIsDeafen, setIsScreenSharingOn, setIsSharingOn, setIsVoiceChatConnected } from "../redux/features/voiceChatSlice";
+// import store from "@/redux/store";
+// import { setIsMuted, setIsCameraOn, setIsDeafen, setIsScreenSharingOn, setIsSharingOn, setIsVoiceChatConnected } from "@/redux/features/voiceChatSlice";
 
 // export const toggleVoice = async () => {
 //     const [audio, video] = localTracks
 
 //     if (store.getState().voiceChat.isMuted === false) {
-//         // Mute the local video. 
+//         // Mute the local video.
 //         updateFirebaseMediaStatus(currentAgoraUID, "audio", false)
 //         const muteSuccess = agoraEngine && await audio.setEnabled(false)
 //         if (muteSuccess) {
@@ -21,7 +21,6 @@
 //     }
 
 // }
-
 
 // export const toggleHeadphone = async () => {
 //     if (store.getState().voiceChat.isDeafen) {

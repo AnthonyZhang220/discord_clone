@@ -82,10 +82,24 @@
     "webpack-dev-server": "^4.11.1"
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,scss,json,md}": [
+    "src/**/*.{js,jsx}": [
       "prettier --write",
       "eslint --fix",
       "git add"
+    ],
+    "src/**/*.{scss,json,md}": [
+      "prettier --write",
+      "git add"
     ]
+  }
+  ,
+  "eslintConfig": {
+    "settings": {
+      "import/resolver": {
+        "webpack": {
+          "config": "webpack.config.js"
+        }
+      }
+    }
   }
 }

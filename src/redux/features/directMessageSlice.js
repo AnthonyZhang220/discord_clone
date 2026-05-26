@@ -34,7 +34,7 @@ const directMessageSlice = createSlice({
         setIsFriendListPageOpen: (state, action) => {
             state.isFriendListPageOpen = action.payload;
         },
-        toggleDirectMessageSidebar: (state, action) => {
+        toggleDirectMessageSidebar: (state) => {
             state.isDirectMessageSidebarOpen = !state.isDirectMessageSidebarOpen;
         },
         setDirectMessageChannelRefs: (state, action) => {
@@ -48,9 +48,21 @@ const directMessageSlice = createSlice({
         },
         setQueryFriendList: (state, action) => {
             state.queryFriendList = action.payload;
-        }
-    }
-})
+        },
+    },
+});
 
-export const { setQueryFriendList, setFriendIdList, setFriendList, setCurrDirectMessageChannelRef, setDirectMessageChannelRefs, setDirectMessageChannelList, setIsDirectMessagePageOpen, setCurrDirectMessageChannel, setFriendFilter, setIsFriendListPageOpen, toggleDirectMessageSidebar } = directMessageSlice.actions;
+export const {
+    setQueryFriendList,
+    setFriendIdList,
+    setFriendList,
+    setCurrDirectMessageChannelRef,
+    setDirectMessageChannelRefs,
+    setDirectMessageChannelList,
+    setIsDirectMessagePageOpen,
+    setCurrDirectMessageChannel,
+    setFriendFilter,
+    setIsFriendListPageOpen,
+    toggleDirectMessageSidebar,
+} = directMessageSlice.actions;
 export default directMessageSlice.reducer;
