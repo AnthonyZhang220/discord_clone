@@ -107,11 +107,25 @@ function App() {
 
                     getSelectStore();
                     dispatch(setIsLoggedIn(true));
-                    navigate("/channels");
+                    try {
+                        const cur = window.location.pathname || "";
+                        if (!cur.startsWith("/channels")) {
+                            navigate("/channels");
+                        }
+                    } catch (e) {
+                        navigate("/channels");
+                    }
                 } else {
                     dispatch(setUser(null));
                     dispatch(setIsLoggedIn(false));
-                    navigate("/");
+                    try {
+                        const cur = window.location.pathname || "";
+                        if (cur !== "/") {
+                            navigate("/");
+                        }
+                    } catch (e) {
+                        navigate("/");
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching user data", error);
