@@ -4,7 +4,7 @@ import Chat from "./components/Chat/Chat";
 import ServerList from "./components/ServerList/ServerList";
 import Channel from "./components/Channel/Channel";
 import { Box } from "@mui/system";
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import LoginPage, { ResetPasswordPage } from "./components/LoginPage/LoginPage";
 import { RegisterPage } from "./components/LoginPage/LoginPage";
 import { db, auth } from "./firebase";
@@ -20,6 +20,7 @@ import PageNotFound from "./components/PageNotFound/PageNotFound";
 import { onAuthStateChanged, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
 import { getSelectStore } from "./utils/userSelectStore";
 import { setUser, setIsLoggedIn } from "./redux/features/authSlice";
+import { setIsDirectMessagePageOpen } from "./redux/features/directMessageSlice";
 import { getBannerColor } from "./utils/getBannerColor";
 import Error from "./components/Error/Error";
 import "./App.scss";
@@ -31,6 +32,7 @@ function App() {
     const { currVoiceChannel } = useSelector((state) => state.channel);
 
     const navigate = useNavigate();
+    const location = useLocation();
 
     useEffect(() => {
         // Handle OAuth redirect results (optional: access tokens, credentials)
@@ -118,6 +120,19 @@ function App() {
 
         return unsubscribe;
     }, [dispatch, navigate]);
+
+    useEffect(() => {
+        try {
+            const path = location.pathname || "";
+            if (path.includes("/channels/@me")) {
+                dispatch(setIsDirectMessagePageOpen(true));
+            } else if (path.startsWith("/channels")) {
+                dispatch(setIsDirectMessagePageOpen(false));
+            }
+        } catch (e) {
+            // ignore in non-browser environments
+        }
+    }, [location.pathname, dispatch]);
 
     return (
         <ThemeContextProvider>

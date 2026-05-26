@@ -16,7 +16,6 @@ import { handleSelectServer } from "../../handlers/serverHandlers";
 import { setCreateServerModal } from "../../redux/features/modalSlice";
 import { setCurrServerList } from "../../redux/features/serverSlice";
 import "./ServerList.scss";
-import { setIsDirectMessagePageOpen } from "../../redux/features/directMessageSlice";
 
 const ServerList = () => {
     const navigate = useNavigate();
@@ -47,22 +46,7 @@ const ServerList = () => {
         }
     }, [user?.id, dispatch]);
 
-    useEffect(() => {
-        try {
-            const currentPath = window.location.pathname;
-            if (isDirectMessagePageOpen) {
-                if (!currentPath.includes("/channels/@me")) {
-                    navigate("/channels/@me");
-                }
-            } else {
-                if (currentPath !== "/channels") {
-                    navigate("/channels");
-                }
-            }
-        } catch (e) {
-            // window may be undefined in some test environments; ignore
-        }
-    }, [isDirectMessagePageOpen, navigate]);
+    // Routing is now the source of truth; navigation is triggered by clicks below.
 
     const [mouseDown, setMouseDown] = React.useState(false);
 
@@ -73,7 +57,7 @@ const ServerList = () => {
                     className={`server focusable server-friends ${isDirectMessagePageOpen ? "active" : ""}`}
                     role="button"
                     aria-label="Discord Friend"
-                    onClick={() => dispatch(setIsDirectMessagePageOpen(true))}
+                    onClick={() => navigate("/channels/@me")}
                 >
                     <ServerNameTooltip
                         title={
@@ -109,6 +93,7 @@ const ServerList = () => {
                         onMouseDown={() => setMouseDown(true)}
                         onClick={() => {
                             handleSelectServer(name, id);
+                            navigate("/channels");
                         }}
                     >
                         <ServerNameTooltip
