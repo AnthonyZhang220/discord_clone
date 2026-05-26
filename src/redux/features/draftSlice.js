@@ -1,11 +1,11 @@
 // messageSlice.js
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const draftSlice = createSlice({
-    name: 'draft',
+    name: "draft",
     initialState: {
-        draftMessage: '',
-        draftDirectMessage: '',
+        draftMessage: "",
+        draftDirectMessage: "",
         // Add other message-related state here
     },
     reducers: {

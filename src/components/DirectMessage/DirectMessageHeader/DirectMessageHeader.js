@@ -1,20 +1,20 @@
-import React from 'react';
-import { Box, SvgIcon, Button, Divider, Typography } from '@mui/material';
+import React from "react";
+import { Box, SvgIcon, Button, Divider, Typography } from "@mui/material";
 
-import FriendIcon from '../DirectMessageBody/FriendBody/friend.svg';
-import GroupDMIcon from '../DirectMessageBody/FriendBody/groupdm.svg';
-import InboxIcon from '@mui/icons-material/Inbox';
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import FriendIcon from "../DirectMessageBody/FriendBody/friend.svg";
+import GroupDMIcon from "../DirectMessageBody/FriendBody/groupdm.svg";
+import InboxIcon from "@mui/icons-material/Inbox";
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
 
-import { Stack } from '@mui/material';
+import { Stack } from "@mui/material";
 
-import StatusList from '../../StatusList';
-import { FunctionTooltip } from '../../CustomUIComponents';
-import { AlternateEmailSharp } from '@mui/icons-material';
-import { useDispatch, useSelector } from 'react-redux';
-import { setFriendFilter } from '../../../redux/features/directMessageSlice';
-import { toggleDirectMessageSidebar } from '../../../redux/features/directMessageSlice';
-import './DirectMessageHeader.scss';
+import StatusList from "../../StatusList";
+import { FunctionTooltip } from "../../CustomUIComponents";
+import { AlternateEmailSharp } from "@mui/icons-material";
+import { useDispatch, useSelector } from "react-redux";
+import { setFriendFilter } from "../../../redux/features/directMessageSlice";
+import { toggleDirectMessageSidebar } from "../../../redux/features/directMessageSlice";
+import "./DirectMessageHeader.scss";
 
 export default function DirectMessageHeader() {
     const { isFriendListPageOpen } = useSelector((state) => state.directMessage);
@@ -26,61 +26,61 @@ export const FriendHeader = () => {
     const { friendFilter } = useSelector((state) => state.directMessage);
 
     return (
-        <Box className='friend-main-header' component='section'>
-            <Box className='friend-main-header-name'>
+        <Box className="friend-main-header" component="section">
+            <Box className="friend-main-header-name">
                 <SvgIcon
                     component={FriendIcon}
                     inheritViewBox
-                    sx={{ color: '#8a8e94', marginRight: '6px', alignItems: 'baseline' }}
+                    sx={{ color: "#8a8e94", marginRight: "6px", alignItems: "baseline" }}
                 />
-                <Typography variant='h3' className='friend-main-header-text'>
+                <Typography variant="h3" className="friend-main-header-text">
                     Friends
                 </Typography>
                 <Divider
-                    orientation='vertical'
-                    variant='fullWidth'
+                    orientation="vertical"
+                    variant="fullWidth"
                     sx={{
-                        backgroundColor: '#3e4046',
-                        m: '0 8px',
-                        width: '1px',
-                        flex: '0 0 auto',
-                        height: '24px',
+                        backgroundColor: "#3e4046",
+                        m: "0 8px",
+                        width: "1px",
+                        flex: "0 0 auto",
+                        height: "24px",
                     }}
                 />
                 <Box>
-                    <Stack direction='row' spacing={1}>
+                    <Stack direction="row" spacing={1}>
                         <Button
-                            className={`friend-main-header-button ${friendFilter === 'online' ? 'active' : ''}`}
-                            onClick={() => dispatch(setFriendFilter('online'))}
+                            className={`friend-main-header-button ${friendFilter === "online" ? "active" : ""}`}
+                            onClick={() => dispatch(setFriendFilter("online"))}
                             disableRipple
                         >
                             Online
                         </Button>
                         <Button
-                            className={`friend-main-header-button ${friendFilter === 'all' ? 'active' : ''}`}
-                            onClick={() => dispatch(setFriendFilter('all'))}
+                            className={`friend-main-header-button ${friendFilter === "all" ? "active" : ""}`}
+                            onClick={() => dispatch(setFriendFilter("all"))}
                             disableRipple
                         >
                             All
                         </Button>
                         <Button
-                            className={`friend-main-header-button ${friendFilter === 'pending' ? 'active' : ''}`}
-                            onClick={() => dispatch(setFriendFilter('pending'))}
+                            className={`friend-main-header-button ${friendFilter === "pending" ? "active" : ""}`}
+                            onClick={() => dispatch(setFriendFilter("pending"))}
                             disableRipple
                         >
                             Pending
                         </Button>
                         <Button
-                            className={`friend-main-header-button ${friendFilter === 'blocked' ? 'active' : ''}`}
-                            onClick={() => dispatch(setFriendFilter('blocked'))}
+                            className={`friend-main-header-button ${friendFilter === "blocked" ? "active" : ""}`}
+                            onClick={() => dispatch(setFriendFilter("blocked"))}
                             disableRipple
                         >
                             Blocked
                         </Button>
                         <Button
-                            className={`addfriend-button ${friendFilter === 'addfriend' ? 'active' : ''}`}
-                            variant='contained'
-                            onClick={() => dispatch(setFriendFilter('addfriend'))}
+                            className={`addfriend-button ${friendFilter === "addfriend" ? "active" : ""}`}
+                            variant="contained"
+                            onClick={() => dispatch(setFriendFilter("addfriend"))}
                             disableRipple
                         >
                             Add Friend
@@ -88,33 +88,33 @@ export const FriendHeader = () => {
                     </Stack>
                 </Box>
             </Box>
-            <Box className='friend-main-header-feature'>
-                <Box className='friend-main-header-feature-icon'>
+            <Box className="friend-main-header-feature">
+                <Box className="friend-main-header-feature-icon">
                     <FunctionTooltip
                         title={
                             <React.Fragment>
-                                <Typography variant='body1' sx={{ m: 0.5 }}>
+                                <Typography variant="body1" sx={{ m: 0.5 }}>
                                     New Group DM
                                 </Typography>
                             </React.Fragment>
                         }
-                        placement='bottom'
+                        placement="bottom"
                     >
                         <Box>
                             <SvgIcon inheritViewBox component={GroupDMIcon} />
                         </Box>
                     </FunctionTooltip>
                 </Box>
-                <Box className='friend-main-header-feature-icon'>
+                <Box className="friend-main-header-feature-icon">
                     <FunctionTooltip
                         title={
                             <React.Fragment>
-                                <Typography variant='body1' sx={{ m: 0.5 }}>
+                                <Typography variant="body1" sx={{ m: 0.5 }}>
                                     Inbox
                                 </Typography>
                             </React.Fragment>
                         }
-                        placement='bottom'
+                        placement="bottom"
                     >
                         <Box>
                             <InboxIcon />
@@ -131,31 +131,31 @@ export const PrivateChannelHeader = () => {
     const { currDirectMessageChannel } = useSelector((state) => state.directMessage);
 
     return (
-        <Box className='friend-main-header' component='section'>
-            <Box className='friend-main-header-name'>
+        <Box className="friend-main-header" component="section">
+            <Box className="friend-main-header-name">
                 <AlternateEmailSharp
-                    sx={{ color: '#8a8e94', marginRight: '6px', alignItems: 'baseline' }}
+                    sx={{ color: "#8a8e94", marginRight: "6px", alignItems: "baseline" }}
                 />
-                <Box component='span' variant='h3' className='friend-main-header-hashtag'>
+                <Box component="span" variant="h3" className="friend-main-header-hashtag">
                     {currDirectMessageChannel.displayName}
                 </Box>
                 <Box>
                     <StatusList status={currDirectMessageChannel.status} size={15} />
                 </Box>
             </Box>
-            <Box className='friend-main-header-feature'>
+            <Box className="friend-main-header-feature">
                 <FunctionTooltip
                     title={
                         <React.Fragment>
-                            <Typography variant='body1' sx={{ m: 0.5 }}>
+                            <Typography variant="body1" sx={{ m: 0.5 }}>
                                 More
                             </Typography>
                         </React.Fragment>
                     }
-                    placement='bottom'
+                    placement="bottom"
                 >
                     <PeopleAltIcon
-                        color='white'
+                        color="white"
                         onClick={() => dispatch(toggleDirectMessageSidebar())}
                     />
                 </FunctionTooltip>

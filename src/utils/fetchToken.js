@@ -1,5 +1,5 @@
-import axios from 'axios';
-import store from '../redux/store';
+import axios from "axios";
+import store from "../redux/store";
 
 export default async function fetchRTCToken(config, channelName) {
     const userId = store.getState().auth.user.id;
@@ -7,25 +7,25 @@ export default async function fetchRTCToken(config, channelName) {
     return new Promise(function (resolve, reject) {
         if (channelName) {
             // 调用你的 Cloudflare Worker
-            const workerUrl = config.serverUrl + '/token';
+            const workerUrl = config.serverUrl + "/token";
 
             axios
                 .post(workerUrl, {
                     channelName: channelName,
                     uid: userId || 0,
                     expiry: config.tokenExpiryTime || 3600,
-                    role: 'publisher',
+                    role: "publisher",
                 })
                 .then((response) => {
-                    console.log('Agora Token retrieved successfully');
+                    console.log("Agora Token retrieved successfully");
                     resolve(response.data.token);
                 })
                 .catch((error) => {
-                    console.error('Failed to get Agora token:', error);
+                    console.error("Failed to get Agora token:", error);
                     reject(error);
                 });
         } else {
-            reject(new Error('channelName is required'));
+            reject(new Error("channelName is required"));
         }
     });
 }

@@ -1,32 +1,32 @@
-import React, { useEffect, Fragment } from 'react';
-import { doc, getDoc, setDoc, Timestamp } from 'firebase/firestore';
-import Chat from './components/Chat/Chat';
-import ServerList from './components/ServerList/ServerList';
-import Channel from './components/Channel/Channel';
-import { Box } from '@mui/system';
-import { Routes, Route, useNavigate } from 'react-router-dom';
-import LoginPage, { ResetPasswordPage } from './components/LoginPage/LoginPage';
-import { RegisterPage } from './components/LoginPage/LoginPage';
-import { db, auth } from './firebase';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect, Fragment } from "react";
+import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
+import Chat from "./components/Chat/Chat";
+import ServerList from "./components/ServerList/ServerList";
+import Channel from "./components/Channel/Channel";
+import { Box } from "@mui/system";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import LoginPage, { ResetPasswordPage } from "./components/LoginPage/LoginPage";
+import { RegisterPage } from "./components/LoginPage/LoginPage";
+import { db, auth } from "./firebase";
+import { Outlet } from "react-router-dom";
 // import { RtcRole } from "agora-token"
-import VoiceChat from './components/VoiceChat/VoiceChat';
-import { useDispatch, useSelector } from 'react-redux';
-import ThemeContextProvider from './contexts/ThemeContextProvider';
-import CssBaseline from '@mui/material/CssBaseline';
-import DirectMessageMenu from './components/DirectMessage/DirectMessageMenu/DirectMessageMenu';
-import DirectMessageBody from './components/DirectMessage/DirectMessageBody/DirectMessageBody';
-import PageNotFound from './components/PageNotFound/PageNotFound';
-import { onAuthStateChanged, getRedirectResult, GoogleAuthProvider } from 'firebase/auth';
-import { getSelectStore } from './utils/userSelectStore';
-import { setUser, setIsLoggedIn } from './redux/features/authSlice';
-import { getBannerColor } from './utils/getBannerColor';
-import Error from './components/Error/Error';
-import './App.scss';
+import VoiceChat from "./components/VoiceChat/VoiceChat";
+import { useDispatch, useSelector } from "react-redux";
+import ThemeContextProvider from "./contexts/ThemeContextProvider";
+import CssBaseline from "@mui/material/CssBaseline";
+import DirectMessageMenu from "./components/DirectMessage/DirectMessageMenu/DirectMessageMenu";
+import DirectMessageBody from "./components/DirectMessage/DirectMessageBody/DirectMessageBody";
+import PageNotFound from "./components/PageNotFound/PageNotFound";
+import { onAuthStateChanged, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
+import { getSelectStore } from "./utils/userSelectStore";
+import { setUser, setIsLoggedIn } from "./redux/features/authSlice";
+import { getBannerColor } from "./utils/getBannerColor";
+import Error from "./components/Error/Error";
+import "./App.scss";
 
 function App() {
     const dispatch = useDispatch();
-    const { user } = useSelector((state) => state.auth);
+    // user state is not used in this component
     const { isVoiceChatPageOpen } = useSelector((state) => state.voiceChat);
     const { currVoiceChannel } = useSelector((state) => state.channel);
 
@@ -41,27 +41,27 @@ function App() {
                     try {
                         const credential = GoogleAuthProvider.credentialFromResult(result);
                         if (credential) {
-                            console.log('OAuth credential from redirect:', credential);
+                            console.log("OAuth credential from redirect:", credential);
                         }
                     } catch (e) {
                         // provider-specific parsing failed, ignore
-                        console.warn('Could not parse OAuth credential from redirect result', e);
+                        console.warn("Could not parse OAuth credential from redirect result", e);
                     }
                 }
             } catch (err) {
-                console.warn('getRedirectResult failed', err);
+                console.warn("getRedirectResult failed", err);
             }
         })();
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             try {
                 if (user) {
-                    const userRef = doc(db, 'users', user.uid);
+                    const userRef = doc(db, "users", user.uid);
                     const userDoc = await getDoc(userRef);
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
-                        console.log('userData', userData);
+                        console.log("userData", userData);
                         dispatch(
                             setUser({
                                 displayName: userData.displayName,
@@ -79,11 +79,11 @@ function App() {
                     } else {
                         const newUser = {
                             displayName: user.displayName,
-                            email: user.email ? user.email : '',
+                            email: user.email ? user.email : "",
                             avatar: user.photoURL,
                             id: user.uid,
                             createdAt: Timestamp.fromDate(new Date()),
-                            status: 'online',
+                            status: "online",
                             friends: [],
                             bannerColor: await getBannerColor(user.photoURL),
                         };
@@ -106,14 +106,14 @@ function App() {
 
                     getSelectStore();
                     dispatch(setIsLoggedIn(true));
-                    navigate('/channels');
+                    navigate("/channels");
                 } else {
                     dispatch(setUser(null));
                     dispatch(setIsLoggedIn(false));
-                    navigate('/');
+                    navigate("/");
                 }
             } catch (error) {
-                console.error('Error fetching user data', error);
+                console.error("Error fetching user data", error);
             }
         });
 
@@ -125,20 +125,20 @@ function App() {
             <CssBaseline />
             <Error />
             <Routes>
-                <Route path='/' element={<LoginPage />} />
-                <Route path='/reset' element={<ResetPasswordPage />} />
-                <Route path='/register' element={<RegisterPage />} />
+                <Route path="/" element={<LoginPage />} />
+                <Route path="/reset" element={<ResetPasswordPage />} />
+                <Route path="/register" element={<RegisterPage />} />
                 <Route
                     element={
-                        <Box className='app-mount'>
-                            <Box className='app-container'>
+                        <Box className="app-mount">
+                            <Box className="app-container">
                                 <Outlet />
                             </Box>
                         </Box>
                     }
                 >
                     <Route
-                        path='/channels'
+                        path="/channels"
                         element={
                             <Fragment>
                                 <ServerList />
@@ -160,7 +160,7 @@ function App() {
                             }
                         />
                         <Route
-                            path='/channels/@me'
+                            path="/channels/@me"
                             element={
                                 <Fragment>
                                     <DirectMessageMenu />
@@ -170,7 +170,7 @@ function App() {
                         />
                     </Route>
                 </Route>
-                <Route path='*' element={<PageNotFound />} />
+                <Route path="*" element={<PageNotFound />} />
             </Routes>
         </ThemeContextProvider>
     );

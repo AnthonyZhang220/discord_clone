@@ -1,4 +1,4 @@
-@import '../../App.scss';
+@import "../../App.scss";
 
 .channel-container {
     background: $channels-bg;
@@ -141,7 +141,7 @@
                 background: linear-gradient(to right, #282b30 85%, #2e3136);
 
                 &::before {
-                    content: ' ';
+                    content: " ";
                     width: 2px;
                     height: 100%;
                     position: absolute;

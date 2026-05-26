@@ -1,7 +1,7 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const modalSlice = createSlice({
-    name: 'modal',
+    name: "modal",
     initialState: {
         createChannelModal: false,
         createVoiceChannelModal: false,

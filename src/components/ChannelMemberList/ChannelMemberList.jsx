@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 import {
     Box,
     List,
@@ -9,17 +9,17 @@ import {
     Avatar,
     Badge,
     ListSubheader,
-} from '@mui/material';
+} from "@mui/material";
 
-import { doc, getDoc, onSnapshot, query, collection, where } from 'firebase/firestore';
-import { db } from '../../firebase';
-import StatusList from '../StatusList';
-import { useDispatch, useSelector } from 'react-redux';
-import { MemberDetailPopover } from './MemberDetailPopover/MemberDetailPopover';
-import { setMemberList, setMemberDetail } from '../../redux/features/memberListSlice';
+import { doc, getDoc, onSnapshot, query, collection, where } from "firebase/firestore";
+import { db } from "../../firebase";
+import StatusList from "../StatusList";
+import { useDispatch, useSelector } from "react-redux";
+import { MemberDetailPopover } from "./MemberDetailPopover/MemberDetailPopover";
+import { setMemberList, setMemberDetail } from "../../redux/features/memberListSlice";
 
-import './ChannelMemberList.scss';
-import { setMemberDetailPopover } from '../../redux/features/popoverSlice';
+import "./ChannelMemberList.scss";
+import { setMemberDetailPopover } from "../../redux/features/popoverSlice";
 
 function ChannelMemberList() {
     const dispatch = useDispatch();
@@ -30,12 +30,12 @@ function ChannelMemberList() {
 
     const getMemberList = async () => {
         if (selectedServer) {
-            const serverRef = doc(db, 'servers', selectedServer);
+            const serverRef = doc(db, "servers", selectedServer);
             const serverDoc = await getDoc(serverRef);
             const memberIds = serverDoc.data().members;
 
-            const q = query(collection(db, 'users'), where('id', 'in', memberIds));
-            const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+            const q = query(collection(db, "users"), where("id", "in", memberIds));
+            onSnapshot(q, (QuerySnapshot) => {
                 let fetchedMemberList = [];
                 QuerySnapshot.forEach((doc) => {
                     fetchedMemberList.push(doc.data());
@@ -64,7 +64,7 @@ function ChannelMemberList() {
     };
 
     const online = (status) => {
-        if (status === 'online' || status === 'idle' || status === 'donotdisturb') {
+        if (status === "online" || status === "idle" || status === "donotdisturb") {
             return true;
         } else {
             return false;
@@ -72,18 +72,18 @@ function ChannelMemberList() {
     };
 
     return (
-        <Box className='userstatus-container'>
-            <Box component='aside' className='userstatus-memberlist-wrapper'>
-                <Box className='userstatus-memberlist'>
-                    <Box component='header' className='userstatus-online focusable'>
+        <Box className="userstatus-container">
+            <Box component="aside" className="userstatus-memberlist-wrapper">
+                <Box className="userstatus-memberlist">
+                    <Box component="header" className="userstatus-online focusable">
                         {memberList.find((member) => online(member.status) === true) ? (
                             <List
                                 subheader={
                                     <ListSubheader
-                                        component='div'
-                                        sx={{ backgroundColor: '#2b2d31', color: 'white' }}
+                                        component="div"
+                                        sx={{ backgroundColor: "#2b2d31", color: "white" }}
                                     >
-                                        Online -{' '}
+                                        Online -{" "}
                                         {
                                             memberList?.filter(
                                                 (member) => online(member.status) === true
@@ -106,10 +106,10 @@ function ChannelMemberList() {
                                             >
                                                 <ListItemAvatar>
                                                     <Badge
-                                                        overlap='circular'
+                                                        overlap="circular"
                                                         anchorOrigin={{
-                                                            vertical: 'bottom',
-                                                            horizontal: 'right',
+                                                            vertical: "bottom",
+                                                            horizontal: "right",
                                                         }}
                                                         badgeContent={
                                                             <StatusList status={status} size={15} />
@@ -128,10 +128,10 @@ function ChannelMemberList() {
                             <List
                                 subheader={
                                     <ListSubheader
-                                        component='div'
-                                        sx={{ backgroundColor: '#2b2d31', color: 'white' }}
+                                        component="div"
+                                        sx={{ backgroundColor: "#2b2d31", color: "white" }}
                                     >
-                                        Offline -{' '}
+                                        Offline -{" "}
                                         {
                                             memberList?.filter(
                                                 (member) => online(member.status) === false
@@ -154,10 +154,10 @@ function ChannelMemberList() {
                                             >
                                                 <ListItemAvatar>
                                                     <Badge
-                                                        overlap='circular'
+                                                        overlap="circular"
                                                         anchorOrigin={{
-                                                            vertical: 'bottom',
-                                                            horizontal: 'right',
+                                                            vertical: "bottom",
+                                                            horizontal: "right",
                                                         }}
                                                         badgeContent={<StatusList size={15} />}
                                                     >
