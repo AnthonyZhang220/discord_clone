@@ -45,7 +45,7 @@ const ServerList = () => {
                 dispatch(setCurrServerList(userServers));
             });
         }
-    }, [user]);
+    }, [user?.id, dispatch]);
 
     useEffect(() => {
         if (isDirectMessagePageOpen) {
@@ -53,7 +53,7 @@ const ServerList = () => {
         } else {
             navigate("/channels");
         }
-    }, [isDirectMessagePageOpen]);
+    }, [isDirectMessagePageOpen, navigate]);
 
     const [mouseDown, setMouseDown] = React.useState(false);
 

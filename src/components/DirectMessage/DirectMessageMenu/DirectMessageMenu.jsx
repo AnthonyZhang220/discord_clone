@@ -47,10 +47,12 @@ function DirectMessageMenu() {
                 dispatch(setDirectMessageChannelRefs(data));
             });
         }
-    }, [user.id]);
+    }, [user.id, dispatch]);
+
+    const refsCount = Object.keys(directMessageChannelRefs).length;
 
     useEffect(() => {
-        if (Object.keys(directMessageChannelRefs).length) {
+        if (refsCount) {
             let userArr = [];
             for (const key in directMessageChannelRefs) {
                 userArr.push(key);
@@ -64,7 +66,7 @@ function DirectMessageMenu() {
                 dispatch(setDirectMessageChannelList(dmList));
             });
         }
-    }, [Object.keys(directMessageChannelRefs).length]);
+    }, [refsCount, directMessageChannelRefs, dispatch]);
 
     return (
         <Box component="aside" className="friend-container">

@@ -41,7 +41,7 @@ function App() {
                     try {
                         const credential = GoogleAuthProvider.credentialFromResult(result);
                         if (credential) {
-                            console.log("OAuth credential from redirect:", credential);
+                            // OAuth credential available; intentionally not logged in production
                         }
                     } catch (e) {
                         // provider-specific parsing failed, ignore
@@ -61,7 +61,6 @@ function App() {
 
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
-                        console.log("userData", userData);
                         dispatch(
                             setUser({
                                 displayName: userData.displayName,
@@ -118,7 +117,7 @@ function App() {
         });
 
         return unsubscribe;
-    }, [auth]);
+    }, [dispatch, navigate]);
 
     return (
         <ThemeContextProvider>

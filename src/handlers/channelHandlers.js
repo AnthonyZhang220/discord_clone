@@ -51,7 +51,6 @@ export const handleCurrDirectMessageChannel = async (
     avatar,
     createdAt
 ) => {
-    console.log(userId);
     store.dispatch(
         setCurrDirectMessageChannel({
             id: userId,
@@ -62,11 +61,9 @@ export const handleCurrDirectMessageChannel = async (
         })
     );
     const privateChannels = store.getState().directMessage.directMessageChannelRefs;
-    console.log(privateChannels);
     const channelRef = doc(db, "privatechannels", privateChannels[userId]);
     const channelDoc = await getDoc(channelRef);
     const ref = channelDoc.data().channelRef;
-    console.log(ref);
     store.dispatch(setCurrDirectMessageChannelRef(ref));
     store.dispatch(setIsFriendListPageOpen(false));
 };
