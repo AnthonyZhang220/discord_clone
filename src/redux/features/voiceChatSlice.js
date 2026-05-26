@@ -1,8 +1,8 @@
 // voiceChatSlice.js
 import { createSlice } from "@reduxjs/toolkit";
-import store from "../store";
+import store from "@/redux/store";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "@/firebase";
 
 const voiceChatSlice = createSlice({
     name: "voiceChat",

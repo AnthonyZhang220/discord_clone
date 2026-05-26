@@ -1,5 +1,5 @@
-import store from "../redux/store";
-import { setSelectedChannel, setSelectedServer } from "../redux/features/userSelectStoreSlice";
+import store from "@/redux/store";
+import { setSelectedChannel, setSelectedServer } from "@/redux/features/userSelectStoreSlice";
 
 export const getSelectStore = () => {
     const storedData = localStorage.getItem("userSelectStore");

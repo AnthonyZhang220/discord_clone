@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, Fragment, useRef } from "react";
 import { collection } from "firebase/firestore";
 //query get chat message from db
 import { doc, getDoc, query, orderBy, onSnapshot, where, limitToLast } from "firebase/firestore";
-import { db } from "../../firebase";
+import { db } from "@/firebase";
 
 //material ui comp
 import Box from "@mui/material/Box";
@@ -23,18 +23,18 @@ import InputBase from "@mui/material/InputBase";
 import { ClickAwayListener } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import NumbersIcon from "@mui/icons-material/Numbers";
-import ChannelMemberList from "../ChannelMemberList/ChannelMemberList";
+import ChannelMemberList from "@/components/ChannelMemberList/ChannelMemberList";
 import "./Chat.scss";
 
-import { FunctionTooltip } from "../CustomUIComponents";
-import { convertDate, convertDateDivider, convertTime } from "../../utils/formatter";
+import { FunctionTooltip } from "@/components/CustomUIComponents";
+import { convertDate, convertDateDivider, convertTime } from "@/utils/formatter";
 import { useDispatch, useSelector } from "react-redux";
-import { setDraftMessage } from "../../redux/features/draftSlice";
-import { setIsMemberListOpen } from "../../redux/features/memberListSlice";
-import { setCurrChannel } from "../../redux/features/channelSlice";
-import { handleSubmitMessage } from "../../handlers/messageHandlers";
-import { setMessageList } from "../../redux/features/chatListSlice";
-import { handleUploadFile } from "../../handlers/messageHandlers";
+import { setDraftMessage } from "@/redux/features/draftSlice";
+import { setIsMemberListOpen } from "@/redux/features/memberListSlice";
+import { setCurrChannel } from "@/redux/features/channelSlice";
+import { handleSubmitMessage } from "@/handlers/messageHandlers";
+import { setMessageList } from "@/redux/features/chatListSlice";
+import { handleUploadFile } from "@/handlers/messageHandlers";
 // const URL = 'http://localhost:3000';
 // export const socket = io(URL);
 

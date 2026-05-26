@@ -3,19 +3,19 @@ import React, { useEffect, Fragment } from "react";
 import { Box, Typography, SvgIcon, ListItem, ListItemButton, ListItemText } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
-import UserFooter from "../../Channel/UserFooter/UserFooter";
+import UserFooter from "@/components/Channel/UserFooter/UserFooter";
 import { lighten } from "@mui/material/styles";
-import FriendIcon from "../DirectMessageBody/FriendBody/friend.svg";
-import { FunctionTooltip } from "../../CustomUIComponents";
+import FriendIcon from "@/components/DirectMessage/DirectMessageBody/FriendBody/friend.svg";
+import { FunctionTooltip } from "@/components/CustomUIComponents";
 
 import { onSnapshot, query, collection, where } from "firebase/firestore";
-import { db } from "../../../firebase";
+import { db } from "@/firebase";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setIsFriendListPageOpen,
     setDirectMessageChannelList,
     setDirectMessageChannelRefs,
-} from "../../../redux/features/directMessageSlice";
+} from "@/redux/features/directMessageSlice";
 import { DirectMessageList } from "./DirectMessageList/DirectMessageList";
 import "./DirectMessageMenu.scss";
 

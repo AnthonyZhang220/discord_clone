@@ -1,0 +1,722 @@
+[
+  {
+    "file": "src\\components\\Channel\\Channel.jsx",
+    "orig": "../../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\components\\Channel\\Channel.jsx",
+    "orig": "../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\Channel\\Channel.jsx",
+    "orig": "../Modals/Modals",
+    "repl": "@/components/Modals/Modals"
+  },
+  {
+    "file": "src\\components\\Channel\\Channel.jsx",
+    "orig": "../../redux/features/modalSlice",
+    "repl": "@/redux/features/modalSlice"
+  },
+  {
+    "file": "src\\components\\Channel\\Channel.jsx",
+    "orig": "../../redux/features/channelSlice",
+    "repl": "@/redux/features/channelSlice"
+  },
+  {
+    "file": "src\\components\\Channel\\Channel.jsx",
+    "orig": "../../redux/features/popoverSlice",
+    "repl": "@/redux/features/popoverSlice"
+  },
+  {
+    "file": "src\\components\\Channel\\Channel.jsx",
+    "orig": "../../handlers/channelHandlers",
+    "repl": "@/handlers/channelHandlers"
+  },
+  {
+    "file": "src\\components\\Channel\\Channel.jsx",
+    "orig": "../../handlers/voiceChannelHandlers",
+    "repl": "@/handlers/voiceChannelHandlers"
+  },
+  {
+    "file": "src\\components\\Channel\\Channel.jsx",
+    "orig": "../../redux/features/serverSlice",
+    "repl": "@/redux/features/serverSlice"
+  },
+  {
+    "file": "src\\components\\Channel\\ServerSettings\\ServerSettings.jsx",
+    "orig": "../../../redux/features/popoverSlice",
+    "repl": "@/redux/features/popoverSlice"
+  },
+  {
+    "file": "src\\components\\Channel\\ServerSettings\\ServerSettings.jsx",
+    "orig": "../../../handlers/serverHandlers",
+    "repl": "@/handlers/serverHandlers"
+  },
+  {
+    "file": "src\\components\\Channel\\UserFooter\\UserDetailPopover\\UserDetailPopover.js",
+    "orig": "../../../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\Channel\\UserFooter\\UserDetailPopover\\UserDetailPopover.js",
+    "orig": "../../../../utils/authentication",
+    "repl": "@/utils/authentication"
+  },
+  {
+    "file": "src\\components\\Channel\\UserFooter\\UserDetailPopover\\UserDetailPopover.js",
+    "orig": "../../../StatusList",
+    "repl": "@/components/StatusList"
+  },
+  {
+    "file": "src\\components\\Channel\\UserFooter\\UserDetailPopover\\UserDetailPopover.js",
+    "orig": "../../../../utils/formatter",
+    "repl": "@/utils/formatter"
+  },
+  {
+    "file": "src\\components\\Channel\\UserFooter\\UserDetailPopover\\UserDetailPopover.js",
+    "orig": "../../../../utils/authentication",
+    "repl": "@/utils/authentication"
+  },
+  {
+    "file": "src\\components\\Channel\\UserFooter\\UserDetailPopover\\UserDetailPopover.js",
+    "orig": "../../../../redux/features/popoverSlice",
+    "repl": "@/redux/features/popoverSlice"
+  },
+  {
+    "file": "src\\components\\Channel\\UserFooter\\UserFooter.jsx",
+    "orig": "../../StatusList",
+    "repl": "@/components/StatusList"
+  },
+  {
+    "file": "src\\components\\Channel\\UserFooter\\UserFooter.jsx",
+    "orig": "../../../redux/features/popoverSlice",
+    "repl": "@/redux/features/popoverSlice"
+  },
+  {
+    "file": "src\\components\\Channel\\UserFooter\\UserFooter.jsx",
+    "orig": "../../../handlers/voiceControlHandlers",
+    "repl": "@/handlers/voiceControlHandlers"
+  },
+  {
+    "file": "src\\components\\Channel\\VoiceControl\\VoiceControl.jsx",
+    "orig": "../../../handlers/voiceControlHandlers",
+    "repl": "@/handlers/voiceControlHandlers"
+  },
+  {
+    "file": "src\\components\\Channel\\VoiceControl\\VoiceControl.jsx",
+    "orig": "../../../handlers/voiceChannelHandlers",
+    "repl": "@/handlers/voiceChannelHandlers"
+  },
+  {
+    "file": "src\\components\\ChannelMemberList\\ChannelMemberList.jsx",
+    "orig": "../../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\components\\ChannelMemberList\\ChannelMemberList.jsx",
+    "orig": "../StatusList",
+    "repl": "@/components/StatusList"
+  },
+  {
+    "file": "src\\components\\ChannelMemberList\\ChannelMemberList.jsx",
+    "orig": "../../redux/features/memberListSlice",
+    "repl": "@/redux/features/memberListSlice"
+  },
+  {
+    "file": "src\\components\\ChannelMemberList\\ChannelMemberList.jsx",
+    "orig": "../../redux/features/popoverSlice",
+    "repl": "@/redux/features/popoverSlice"
+  },
+  {
+    "file": "src\\components\\ChannelMemberList\\MemberDetailPopover\\MemberDetailPopover.jsx",
+    "orig": "../../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\ChannelMemberList\\MemberDetailPopover\\MemberDetailPopover.jsx",
+    "orig": "../../StatusList",
+    "repl": "@/components/StatusList"
+  },
+  {
+    "file": "src\\components\\ChannelMemberList\\MemberDetailPopover\\MemberDetailPopover.jsx",
+    "orig": "../../../redux/features/popoverSlice",
+    "repl": "@/redux/features/popoverSlice"
+  },
+  {
+    "file": "src\\components\\Chat\\Chat.jsx",
+    "orig": "../../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\components\\Chat\\Chat.jsx",
+    "orig": "../ChannelMemberList/ChannelMemberList",
+    "repl": "@/components/ChannelMemberList/ChannelMemberList"
+  },
+  {
+    "file": "src\\components\\Chat\\Chat.jsx",
+    "orig": "../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\Chat\\Chat.jsx",
+    "orig": "../../utils/formatter",
+    "repl": "@/utils/formatter"
+  },
+  {
+    "file": "src\\components\\Chat\\Chat.jsx",
+    "orig": "../../redux/features/draftSlice",
+    "repl": "@/redux/features/draftSlice"
+  },
+  {
+    "file": "src\\components\\Chat\\Chat.jsx",
+    "orig": "../../redux/features/memberListSlice",
+    "repl": "@/redux/features/memberListSlice"
+  },
+  {
+    "file": "src\\components\\Chat\\Chat.jsx",
+    "orig": "../../redux/features/channelSlice",
+    "repl": "@/redux/features/channelSlice"
+  },
+  {
+    "file": "src\\components\\Chat\\Chat.jsx",
+    "orig": "../../handlers/messageHandlers",
+    "repl": "@/handlers/messageHandlers"
+  },
+  {
+    "file": "src\\components\\Chat\\Chat.jsx",
+    "orig": "../../redux/features/chatListSlice",
+    "repl": "@/redux/features/chatListSlice"
+  },
+  {
+    "file": "src\\components\\Chat\\Chat.jsx",
+    "orig": "../../handlers/messageHandlers",
+    "repl": "@/handlers/messageHandlers"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\DirectMessageBody.jsx",
+    "orig": "../DirectMessageHeader/DirectMessageHeader",
+    "repl": "@/components/DirectMessage/DirectMessageHeader/DirectMessageHeader"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\AddFriend\\AddFriend.jsx",
+    "orig": "../FriendActive/FriendActive",
+    "repl": "@/components/DirectMessage/DirectMessageBody/FriendBody/FriendActive/FriendActive"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\AddFriend\\AddFriend.jsx",
+    "orig": "../../../../../handlers/searchHandlers",
+    "repl": "@/handlers/searchHandlers"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\AddFriend\\AddFriend.jsx",
+    "orig": "../../../../../handlers/searchHandlers",
+    "repl": "@/handlers/searchHandlers"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\AddFriend\\AddFriend.jsx",
+    "orig": "../FriendTab/FriendTab",
+    "repl": "@/components/DirectMessage/DirectMessageBody/FriendBody/FriendTab/FriendTab"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\FriendBody.jsx",
+    "orig": "../../../../handlers/searchHandlers",
+    "repl": "@/handlers/searchHandlers"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\FriendList\\FriendList.jsx",
+    "orig": "../../../../../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\FriendList\\FriendList.jsx",
+    "orig": "../FriendTab/FriendTab",
+    "repl": "@/components/DirectMessage/DirectMessageBody/FriendBody/FriendTab/FriendTab"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\FriendList\\FriendList.jsx",
+    "orig": "../../../../../redux/features/directMessageSlice",
+    "repl": "@/redux/features/directMessageSlice"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\FriendTab\\FriendTab.jsx",
+    "orig": "../../../../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\FriendTab\\FriendTab.jsx",
+    "orig": "../../../../../handlers/channelHandlers",
+    "repl": "@/handlers/channelHandlers"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\FriendBody\\FriendTab\\FriendTab.jsx",
+    "orig": "../../../../StatusList",
+    "repl": "@/components/StatusList"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\PrivateChat\\PrivateChat.jsx",
+    "orig": "../../../../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\PrivateChat\\PrivateChat.jsx",
+    "orig": "../../../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\PrivateChat\\PrivateChat.jsx",
+    "orig": "../../../../redux/features/draftSlice",
+    "repl": "@/redux/features/draftSlice"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\PrivateChat\\PrivateChat.jsx",
+    "orig": "../../../../utils/formatter",
+    "repl": "@/utils/formatter"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\PrivateChat\\PrivateChat.jsx",
+    "orig": "../../../../redux/features/chatListSlice",
+    "repl": "@/redux/features/chatListSlice"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\PrivateChat\\PrivateChat.jsx",
+    "orig": "../../../../handlers/messageHandlers",
+    "repl": "@/handlers/messageHandlers"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\PrivateChat\\PrivateChat.jsx",
+    "orig": "../../../../handlers/messageHandlers",
+    "repl": "@/handlers/messageHandlers"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\PrivateChat\\PrivateChat.jsx",
+    "orig": "../UserSidebar/UserSidebar",
+    "repl": "@/components/DirectMessage/DirectMessageBody/UserSidebar/UserSidebar"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\UserSidebar\\UserSidebar.jsx",
+    "orig": "../../../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageBody\\UserSidebar\\UserSidebar.jsx",
+    "orig": "../../../StatusList",
+    "repl": "@/components/StatusList"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageHeader\\DirectMessageHeader.js",
+    "orig": "../DirectMessageBody/FriendBody/friend.svg",
+    "repl": "@/components/DirectMessage/DirectMessageBody/FriendBody/friend.svg"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageHeader\\DirectMessageHeader.js",
+    "orig": "../DirectMessageBody/FriendBody/groupdm.svg",
+    "repl": "@/components/DirectMessage/DirectMessageBody/FriendBody/groupdm.svg"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageHeader\\DirectMessageHeader.js",
+    "orig": "../../StatusList",
+    "repl": "@/components/StatusList"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageHeader\\DirectMessageHeader.js",
+    "orig": "../../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageHeader\\DirectMessageHeader.js",
+    "orig": "../../../redux/features/directMessageSlice",
+    "repl": "@/redux/features/directMessageSlice"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageHeader\\DirectMessageHeader.js",
+    "orig": "../../../redux/features/directMessageSlice",
+    "repl": "@/redux/features/directMessageSlice"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageMenu\\DirectMessageList\\DirectMessageList.jsx",
+    "orig": "../../../../handlers/channelHandlers",
+    "repl": "@/handlers/channelHandlers"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageMenu\\DirectMessageList\\DirectMessageList.jsx",
+    "orig": "../../../StatusList",
+    "repl": "@/components/StatusList"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageMenu\\DirectMessageMenu.jsx",
+    "orig": "../../Channel/UserFooter/UserFooter",
+    "repl": "@/components/Channel/UserFooter/UserFooter"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageMenu\\DirectMessageMenu.jsx",
+    "orig": "../DirectMessageBody/FriendBody/friend.svg",
+    "repl": "@/components/DirectMessage/DirectMessageBody/FriendBody/friend.svg"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageMenu\\DirectMessageMenu.jsx",
+    "orig": "../../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageMenu\\DirectMessageMenu.jsx",
+    "orig": "../../../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\components\\DirectMessage\\DirectMessageMenu\\DirectMessageMenu.jsx",
+    "orig": "../../../redux/features/directMessageSlice",
+    "repl": "@/redux/features/directMessageSlice"
+  },
+  {
+    "file": "src\\components\\Error\\Error.jsx",
+    "orig": "../../redux/features/errorSlice",
+    "repl": "@/redux/features/errorSlice"
+  },
+  {
+    "file": "src\\components\\LoginPage\\LoginPage.jsx",
+    "orig": "../../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\components\\LoginPage\\LoginPage.jsx",
+    "orig": "../../utils/authentication",
+    "repl": "@/utils/authentication"
+  },
+  {
+    "file": "src\\components\\LoginPage\\LoginPage.jsx",
+    "orig": "../../redux/features/authSlice",
+    "repl": "@/redux/features/authSlice"
+  },
+  {
+    "file": "src\\components\\LoginPage\\LoginPage.jsx",
+    "orig": "../../redux/features/errorSlice",
+    "repl": "@/redux/features/errorSlice"
+  },
+  {
+    "file": "src\\components\\Modals\\Modals.js",
+    "orig": "../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\Modals\\Modals.js",
+    "orig": "../../redux/features/modalSlice",
+    "repl": "@/redux/features/modalSlice"
+  },
+  {
+    "file": "src\\components\\Modals\\Modals.js",
+    "orig": "../../redux/features/serverSlice",
+    "repl": "@/redux/features/serverSlice"
+  },
+  {
+    "file": "src\\components\\Modals\\Modals.js",
+    "orig": "../../redux/features/channelSlice",
+    "repl": "@/redux/features/channelSlice"
+  },
+  {
+    "file": "src\\components\\Modals\\Modals.js",
+    "orig": "../../handlers/serverHandlers",
+    "repl": "@/handlers/serverHandlers"
+  },
+  {
+    "file": "src\\components\\Modals\\Modals.js",
+    "orig": "../../handlers/channelHandlers",
+    "repl": "@/handlers/channelHandlers"
+  },
+  {
+    "file": "src\\components\\ServerList\\ServerList.jsx",
+    "orig": "../../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\components\\ServerList\\ServerList.jsx",
+    "orig": "../CustomUIComponents",
+    "repl": "@/components/CustomUIComponents"
+  },
+  {
+    "file": "src\\components\\ServerList\\ServerList.jsx",
+    "orig": "../Modals/Modals",
+    "repl": "@/components/Modals/Modals"
+  },
+  {
+    "file": "src\\components\\ServerList\\ServerList.jsx",
+    "orig": "../../handlers/serverHandlers",
+    "repl": "@/handlers/serverHandlers"
+  },
+  {
+    "file": "src\\components\\ServerList\\ServerList.jsx",
+    "orig": "../../redux/features/modalSlice",
+    "repl": "@/redux/features/modalSlice"
+  },
+  {
+    "file": "src\\components\\ServerList\\ServerList.jsx",
+    "orig": "../../redux/features/serverSlice",
+    "repl": "@/redux/features/serverSlice"
+  },
+  {
+    "file": "src\\components\\VoiceChat\\VoiceChat.jsx",
+    "orig": "../../contexts/agora/agoraManager",
+    "repl": "@/contexts/agora/agoraManager"
+  },
+  {
+    "file": "src\\components\\VoiceChat\\VoiceChat.jsx",
+    "orig": "../../contexts/agora/config",
+    "repl": "@/contexts/agora/config"
+  },
+  {
+    "file": "src\\components\\VoiceChat\\VoiceChat.jsx",
+    "orig": "../../contexts/agora/AgoraClient",
+    "repl": "@/contexts/agora/AgoraClient"
+  },
+  {
+    "file": "src\\components\\VoiceChat\\VoiceChat.jsx",
+    "orig": "../../handlers/voiceControlHandlers",
+    "repl": "@/handlers/voiceControlHandlers"
+  },
+  {
+    "file": "src\\components\\VoiceChat\\VoiceChat.jsx",
+    "orig": "../../handlers/voiceChannelHandlers",
+    "repl": "@/handlers/voiceChannelHandlers"
+  },
+  {
+    "file": "src\\contexts\\agora\\agoraManager.jsx",
+    "orig": "../../redux/features/voiceChatSlice",
+    "repl": "@/redux/features/voiceChatSlice"
+  },
+  {
+    "file": "src\\contexts\\agora\\agoraManager.jsx",
+    "orig": "../../components/VoiceChat/VoiceChatTile/VoiceChatTile",
+    "repl": "@/components/VoiceChat/VoiceChatTile/VoiceChatTile"
+  },
+  {
+    "file": "src\\contexts\\agora\\agoraManager.jsx",
+    "orig": "../../utils/fetchToken",
+    "repl": "@/utils/fetchToken"
+  },
+  {
+    "file": "src\\contexts\\agora\\agoraManager.jsx",
+    "orig": "../../handlers/voiceChannelHandlers",
+    "repl": "@/handlers/voiceChannelHandlers"
+  },
+  {
+    "file": "src\\handlers\\channelHandlers.js",
+    "orig": "../redux/store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\handlers\\channelHandlers.js",
+    "orig": "../redux/features/channelSlice",
+    "repl": "@/redux/features/channelSlice"
+  },
+  {
+    "file": "src\\handlers\\channelHandlers.js",
+    "orig": "../redux/features/userSelectStoreSlice",
+    "repl": "@/redux/features/userSelectStoreSlice"
+  },
+  {
+    "file": "src\\handlers\\channelHandlers.js",
+    "orig": "../redux/features/directMessageSlice",
+    "repl": "@/redux/features/directMessageSlice"
+  },
+  {
+    "file": "src\\handlers\\channelHandlers.js",
+    "orig": "../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\handlers\\channelHandlers.js",
+    "orig": "../redux/features/voiceChatSlice",
+    "repl": "@/redux/features/voiceChatSlice"
+  },
+  {
+    "file": "src\\handlers\\channelHandlers.js",
+    "orig": "../redux/features/loadSlice",
+    "repl": "@/redux/features/loadSlice"
+  },
+  {
+    "file": "src\\handlers\\channelHandlers.js",
+    "orig": "../redux/features/modalSlice",
+    "repl": "@/redux/features/modalSlice"
+  },
+  {
+    "file": "src\\handlers\\messageHandlers.js",
+    "orig": "../redux/store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\handlers\\messageHandlers.js",
+    "orig": "../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\handlers\\messageHandlers.js",
+    "orig": "../redux/features/draftSlice",
+    "repl": "@/redux/features/draftSlice"
+  },
+  {
+    "file": "src\\handlers\\messageHandlers.js",
+    "orig": "../redux/features/errorSlice",
+    "repl": "@/redux/features/errorSlice"
+  },
+  {
+    "file": "src\\handlers\\messageHandlers.js",
+    "orig": "../utils/bytesToMB",
+    "repl": "@/utils/bytesToMB"
+  },
+  {
+    "file": "src\\handlers\\searchHandlers.js",
+    "orig": "../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\handlers\\searchHandlers.js",
+    "orig": "../redux/store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\handlers\\searchHandlers.js",
+    "orig": "../redux/features/directMessageSlice",
+    "repl": "@/redux/features/directMessageSlice"
+  },
+  {
+    "file": "src\\handlers\\serverHandlers.js",
+    "orig": "../redux/store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\handlers\\serverHandlers.js",
+    "orig": "../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\handlers\\serverHandlers.js",
+    "orig": "../redux/features/serverSlice",
+    "repl": "@/redux/features/serverSlice"
+  },
+  {
+    "file": "src\\handlers\\serverHandlers.js",
+    "orig": "../redux/features/loadSlice",
+    "repl": "@/redux/features/loadSlice"
+  },
+  {
+    "file": "src\\handlers\\serverHandlers.js",
+    "orig": "../redux/features/userSelectStoreSlice",
+    "repl": "@/redux/features/userSelectStoreSlice"
+  },
+  {
+    "file": "src\\handlers\\serverHandlers.js",
+    "orig": "../redux/features/directMessageSlice",
+    "repl": "@/redux/features/directMessageSlice"
+  },
+  {
+    "file": "src\\handlers\\serverHandlers.js",
+    "orig": "../redux/features/modalSlice",
+    "repl": "@/redux/features/modalSlice"
+  },
+  {
+    "file": "src\\handlers\\serverHandlers.js",
+    "orig": "../redux/features/popoverSlice",
+    "repl": "@/redux/features/popoverSlice"
+  },
+  {
+    "file": "src\\handlers\\serverHandlers.js",
+    "orig": "../redux/features/channelSlice",
+    "repl": "@/redux/features/channelSlice"
+  },
+  {
+    "file": "src\\handlers\\voiceChannelHandlers.js",
+    "orig": "../redux/store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\handlers\\voiceChannelHandlers.js",
+    "orig": "../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\handlers\\voiceChannelHandlers.js",
+    "orig": "../redux/features/channelSlice",
+    "repl": "@/redux/features/channelSlice"
+  },
+  {
+    "file": "src\\handlers\\voiceChannelHandlers.js",
+    "orig": "../redux/features/voiceChatSlice",
+    "repl": "@/redux/features/voiceChatSlice"
+  },
+  {
+    "file": "src\\handlers\\voiceChannelHandlers.js",
+    "orig": "../utils/fetchToken",
+    "repl": "@/utils/fetchToken"
+  },
+  {
+    "file": "src\\handlers\\voiceChannelHandlers.js",
+    "orig": "../contexts/agora/config",
+    "repl": "@/contexts/agora/config"
+  },
+  {
+    "file": "src\\handlers\\voiceControlHandlers.js",
+    "orig": "../redux/store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\handlers\\voiceControlHandlers.js",
+    "orig": "../redux/features/voiceChatSlice",
+    "repl": "@/redux/features/voiceChatSlice"
+  },
+  {
+    "file": "src\\redux\\features\\voiceChatSlice.js",
+    "orig": "../store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\redux\\features\\voiceChatSlice.js",
+    "orig": "../../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\utils\\authentication.js",
+    "orig": "../redux/store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\utils\\authentication.js",
+    "orig": "../firebase",
+    "repl": "@/firebase"
+  },
+  {
+    "file": "src\\utils\\authentication.js",
+    "orig": "../redux/features/authSlice",
+    "repl": "@/redux/features/authSlice"
+  },
+  {
+    "file": "src\\utils\\authentication.js",
+    "orig": "../redux/features/errorSlice",
+    "repl": "@/redux/features/errorSlice"
+  },
+  {
+    "file": "src\\utils\\fetchToken.js",
+    "orig": "../redux/store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\utils\\userSelectStore.js",
+    "orig": "../redux/store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\utils\\userSelectStore.js",
+    "orig": "../redux/features/userSelectStoreSlice",
+    "repl": "@/redux/features/userSelectStoreSlice"
+  },
+  {
+    "file": "src\\utils\\voiceControlToggles.js",
+    "orig": "../redux/store",
+    "repl": "@/redux/store"
+  },
+  {
+    "file": "src\\utils\\voiceControlToggles.js",
+    "orig": "../redux/features/voiceChatSlice",
+    "repl": "@/redux/features/voiceChatSlice"
+  }
+]

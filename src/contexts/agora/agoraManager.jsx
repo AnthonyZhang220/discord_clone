@@ -17,11 +17,11 @@ import {
     setLatency,
     setConnectionState,
     setIsVoiceChatLoading,
-} from "../../redux/features/voiceChatSlice";
+} from "@/redux/features/voiceChatSlice";
 import { useDispatch, useSelector } from "react-redux";
-import VoiceChatTile from "../../components/VoiceChat/VoiceChatTile/VoiceChatTile";
-import fetchRTCToken from "../../utils/fetchToken";
-import { handleLeaveVoiceChannel } from "../../handlers/voiceChannelHandlers";
+import VoiceChatTile from "@/components/VoiceChat/VoiceChatTile/VoiceChatTile";
+import fetchRTCToken from "@/utils/fetchToken";
+import { handleLeaveVoiceChannel } from "@/handlers/voiceChannelHandlers";
 
 export const AgoraManager = ({ config }) => {
     const dispatch = useDispatch();

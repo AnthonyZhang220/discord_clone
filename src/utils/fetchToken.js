@@ -1,5 +1,5 @@
 import axios from "axios";
-import store from "../redux/store";
+import store from "@/redux/store";
 
 export default async function fetchRTCToken(config, channelName) {
     const userId = store.getState().auth.user.id;

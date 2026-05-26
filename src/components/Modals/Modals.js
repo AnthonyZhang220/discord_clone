@@ -22,7 +22,7 @@ import {
     ListItemText,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { InfoInput } from "../CustomUIComponents";
+import { InfoInput } from "@/components/CustomUIComponents";
 import { useDispatch, useSelector } from "react-redux";
 import {
     setCreateChannelModal,
@@ -31,16 +31,16 @@ import {
     setCreateServerModal,
     setInviteModal,
     setJoinServerModal,
-} from "../../redux/features/modalSlice";
+} from "@/redux/features/modalSlice";
 import {
     setNewServerInfo,
     setUploadFileLocationURL,
     setJoinServerId,
     setUploadServerProfileImage,
-} from "../../redux/features/serverSlice";
-import { setNewChannelInfo } from "../../redux/features/channelSlice";
-import { handleCreateServer, handleJoinServer } from "../../handlers/serverHandlers";
-import { handleCreateVoiceChannel, handleCreateChannel } from "../../handlers/channelHandlers";
+} from "@/redux/features/serverSlice";
+import { setNewChannelInfo } from "@/redux/features/channelSlice";
+import { handleCreateServer, handleJoinServer } from "@/handlers/serverHandlers";
+import { handleCreateVoiceChannel, handleCreateChannel } from "@/handlers/channelHandlers";
 import styled from "@emotion/styled";
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({

@@ -1,6 +1,6 @@
-import store from "../redux/store";
+import store from "@/redux/store";
 import { signInWithRedirect } from "firebase/auth";
-import { auth, db } from "../firebase";
+import { auth, db } from "@/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import {
     FacebookAuthProvider,
@@ -9,8 +9,8 @@ import {
     GoogleAuthProvider,
 } from "firebase/auth";
 import { redirect } from "react-router-dom";
-import { setIsLoggedIn, setUser } from "../redux/features/authSlice";
-import { setError } from "../redux/features/errorSlice";
+import { setIsLoggedIn, setUser } from "@/redux/features/authSlice";
+import { setError } from "@/redux/features/errorSlice";
 
 const GoogleProvider = new GoogleAuthProvider();
 const FacebookProvider = new FacebookAuthProvider();

@@ -1,16 +1,16 @@
-import store from "../redux/store";
-import { setNewChannelInfo, setCurrChannel } from "../redux/features/channelSlice";
-import { setSelectedChannel } from "../redux/features/userSelectStoreSlice";
+import store from "@/redux/store";
+import { setNewChannelInfo, setCurrChannel } from "@/redux/features/channelSlice";
+import { setSelectedChannel } from "@/redux/features/userSelectStoreSlice";
 import {
     setIsFriendListPageOpen,
     setCurrDirectMessageChannelRef,
     setCurrDirectMessageChannel,
-} from "../redux/features/directMessageSlice";
-import { db } from "../firebase";
+} from "@/redux/features/directMessageSlice";
+import { db } from "@/firebase";
 import { doc, getDoc, addDoc, Timestamp, collection } from "firebase/firestore";
-import { setIsVoiceChatPageOpen } from "../redux/features/voiceChatSlice";
-import { setIsLoading } from "../redux/features/loadSlice";
-import { setCreateChannelModal, setCreateVoiceChannelModal } from "../redux/features/modalSlice";
+import { setIsVoiceChatPageOpen } from "@/redux/features/voiceChatSlice";
+import { setIsLoading } from "@/redux/features/loadSlice";
+import { setCreateChannelModal, setCreateVoiceChannelModal } from "@/redux/features/modalSlice";
 
 export const handleCreateChannel = async (newChannelInfo) => {
     store.dispatch(setIsLoading(true));

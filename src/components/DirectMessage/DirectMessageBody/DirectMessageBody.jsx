@@ -3,7 +3,7 @@ import { Box } from "@mui/material";
 import PrivateChat from "./PrivateChat/PrivateChat";
 import FriendBody from "./FriendBody/FriendBody";
 import { useSelector } from "react-redux";
-import DirectMessageHeader from "../DirectMessageHeader/DirectMessageHeader";
+import DirectMessageHeader from "@/components/DirectMessage/DirectMessageHeader/DirectMessageHeader";
 import "./DirectMessageBody.scss";
 
 function DirectMessageBody() {

@@ -1,5 +1,5 @@
-// import store from "../redux/store";
-// import { setIsMuted, setIsCameraOn, setIsDeafen, setIsScreenSharingOn, setIsSharingOn, setIsVoiceChatConnected } from "../redux/features/voiceChatSlice";
+// import store from "@/redux/store";
+// import { setIsMuted, setIsCameraOn, setIsDeafen, setIsScreenSharingOn, setIsSharingOn, setIsVoiceChatConnected } from "@/redux/features/voiceChatSlice";
 
 // export const toggleVoice = async () => {
 //     const [audio, video] = localTracks

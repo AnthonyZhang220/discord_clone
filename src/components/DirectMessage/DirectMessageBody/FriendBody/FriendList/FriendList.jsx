@@ -1,9 +1,9 @@
 import React, { Fragment, useEffect } from "react";
 import { Box, List, Typography } from "@mui/material";
 import { query, collection, where, onSnapshot } from "firebase/firestore";
-import { db } from "../../../../../firebase";
-import FriendTab from "../FriendTab/FriendTab";
-import { setFriendIdList, setFriendList } from "../../../../../redux/features/directMessageSlice";
+import { db } from "@/firebase";
+import FriendTab from "@/components/DirectMessage/DirectMessageBody/FriendBody/FriendTab/FriendTab";
+import { setFriendIdList, setFriendList } from "@/redux/features/directMessageSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import "./FriendList.scss";

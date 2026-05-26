@@ -1,20 +1,20 @@
 import React, { useEffect } from "react";
-import { db } from "../../firebase";
+import { db } from "@/firebase";
 import { onSnapshot, query, where, collection } from "firebase/firestore";
 
 import { Avatar, Box, Typography, IconButton, Divider } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ExploreIcon from "@mui/icons-material/Explore";
-import { ServerNameTooltip } from "../CustomUIComponents";
+import { ServerNameTooltip } from "@/components/CustomUIComponents";
 
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { CreateServerDialog, JoinServerDialog, ServerDialog } from "../Modals/Modals";
+import { CreateServerDialog, JoinServerDialog, ServerDialog } from "@/components/Modals/Modals";
 
-import { handleSelectServer } from "../../handlers/serverHandlers";
-import { setCreateServerModal } from "../../redux/features/modalSlice";
-import { setCurrServerList } from "../../redux/features/serverSlice";
+import { handleSelectServer } from "@/handlers/serverHandlers";
+import { setCreateServerModal } from "@/redux/features/modalSlice";
+import { setCurrServerList } from "@/redux/features/serverSlice";
 import "./ServerList.scss";
 
 const ServerList = () => {

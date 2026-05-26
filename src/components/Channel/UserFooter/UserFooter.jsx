@@ -8,12 +8,12 @@ import MicOffIcon from "@mui/icons-material/MicOff";
 
 import IconButton from "@mui/material/IconButton";
 import SettingsIcon from "@mui/icons-material/Settings";
-import StatusList from "../../StatusList";
+import StatusList from "@/components/StatusList";
 import { UserDetailPopover } from "./UserDetailPopover/UserDetailPopover";
 import "./UserFooter.scss";
 import { useDispatch, useSelector } from "react-redux";
-import { setUserDetailPopover } from "../../../redux/features/popoverSlice";
-import { toggleDeafen, toggleMic } from "../../../handlers/voiceControlHandlers";
+import { setUserDetailPopover } from "@/redux/features/popoverSlice";
+import { toggleDeafen, toggleMic } from "@/handlers/voiceControlHandlers";
 
 const UserFooter = () => {
     const userAvatarRef = useRef(null);

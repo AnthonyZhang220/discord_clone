@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, ListItem, ListItemText, Avatar, Badge, Popover, Divider } from "@mui/material";
-import { MemberListItemButton } from "../../CustomUIComponents";
-import StatusList from "../../StatusList";
-import { setMemberDetailPopover } from "../../../redux/features/popoverSlice";
+import { MemberListItemButton } from "@/components/CustomUIComponents";
+import StatusList from "@/components/StatusList";
+import { setMemberDetailPopover } from "@/redux/features/popoverSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 export const MemberDetailPopover = ({ memberRef }) => {
