@@ -1,0 +1,26 @@
+// Global SCSS variables and CSS custom properties
+$primary-color: #7289da;
+$bg: #1e1f22;
+$bg-2: #2b2d31;
+$bg-3: #313338;
+$muted: #8a8e94;
+$muted-2: #99a0a6;
+$server-marker-unread: #43b581;
+$success: #43b581;
+$danger: #f04747;
+$warning: #faa81a;
+$glass: rgba(255, 255, 255, 0.04);
+
+:root {
+    --primary-color: #{$primary-color};
+    --bg: #{$bg};
+    --bg-2: #{$bg-2};
+    --bg-3: #{$bg-3};
+    --muted: #{$muted};
+    --muted-2: #{$muted-2};
+    --server-marker-unread: #{$server-marker-unread};
+    --success: #{$success};
+    --danger: #{$danger};
+    --warning: #{$warning};
+    --glass: #{$glass};
+}
