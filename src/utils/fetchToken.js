@@ -17,11 +17,11 @@ export default async function fetchRTCToken(config, channelName) {
                     role: "publisher",
                 })
                 .then((response) => {
-                    console.log("Agora Token retrieved successfully");
+                    // Agora Token retrieved successfully
                     resolve(response.data.token);
                 })
                 .catch((error) => {
-                    console.error("Failed to get Agora token:", error);
+                    // Failed to get Agora token
                     reject(error);
                 });
         } else {

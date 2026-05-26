@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Box, Avatar, Button, Typography, IconButton } from "@mui/material";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import MicOffIcon from "@mui/icons-material/MicOff";
@@ -8,9 +8,7 @@ import { LocalAudioTrack, LocalVideoTrack, RemoteUser } from "agora-rtc-react";
 import "./VoiceChatTile.scss";
 
 function VoiceChatTile({ user, volume, hasVideo, hasAudio, videoTrack, audioTrack, localUser }) {
-    useEffect(() => {
-        console.log(hasVideo, hasAudio);
-    }, [hasVideo, hasAudio]);
+    // no side-effects required
     return (
         <Box className="voicechat-tile" sx={{ transition: "background-color 0.1s" }}>
             <Box className="video-wrapper">

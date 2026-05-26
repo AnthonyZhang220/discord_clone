@@ -28,30 +28,26 @@ function ChannelMemberList() {
     const memberRefs = useRef({});
     const [memberRef, setMemberRef] = useState(null);
 
-    const getMemberList = async () => {
-        if (selectedServer) {
-            const serverRef = doc(db, "servers", selectedServer);
-            const serverDoc = await getDoc(serverRef);
-            const memberIds = serverDoc.data().members;
-
-            const q = query(collection(db, "users"), where("id", "in", memberIds));
-            onSnapshot(q, (QuerySnapshot) => {
-                let fetchedMemberList = [];
-                QuerySnapshot.forEach((doc) => {
-                    fetchedMemberList.push(doc.data());
-                });
-                dispatch(setMemberList(fetchedMemberList));
-            });
-
-            setMemberRef(memberIds);
-        }
-    };
-
     useEffect(() => {
         if (selectedServer) {
-            getMemberList();
+            (async () => {
+                const serverRef = doc(db, "servers", selectedServer);
+                const serverDoc = await getDoc(serverRef);
+                const memberIds = serverDoc.data().members;
+
+                const q = query(collection(db, "users"), where("id", "in", memberIds));
+                onSnapshot(q, (QuerySnapshot) => {
+                    let fetchedMemberList = [];
+                    QuerySnapshot.forEach((doc) => {
+                        fetchedMemberList.push(doc.data());
+                    });
+                    dispatch(setMemberList(fetchedMemberList));
+                });
+
+                setMemberRef(memberIds);
+            })();
         }
-    }, [selectedServer]);
+    }, [selectedServer, dispatch]);
 
     const handleOpenMemberDetail = (memberId) => {
         const currentMemberDetail = memberList.find((member) => member.id === memberId);

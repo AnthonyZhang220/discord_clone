@@ -198,7 +198,7 @@ export const handleLocalUserLeftAgora = async () => {
     }
 
     dispatch(voiceChatSlice.actions.setLocalTracks(null));
-    console.log("You left the channel");
+    // user left the channel
     setCurrentVoiceChannel({ name: null, uid: null });
 };
 
@@ -232,7 +232,6 @@ export const removeLiveUserFromFirebase = (agoraID) => {
                 const arr = d.data().liveUser || [];
                 if (arr.find((x) => x.uid == agoraID)) {
                     const deleteUser = arr.find((x) => x.uid == agoraID);
-                    console.log(deleteUser);
                     updateDoc(userRef, {
                         liveUser: arrayRemove(deleteUser),
                     });

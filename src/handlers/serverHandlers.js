@@ -78,12 +78,10 @@ export const handleCreateServer = async (newServerInfo) => {
         metadata
     );
 
-    console.log("serverProfileRef", serverProfileRef);
-
     const uploadTask = await uploadBytes(serverProfileRef, file);
     const url = await getDownloadURL(uploadTask.ref);
 
-    console.log("url", url);
+    // serverProfileRef created
     const serverDoc = collection(db, "servers");
     const channelDoc = collection(db, "channels");
 
@@ -125,7 +123,7 @@ export const handleJoinServer = async (serverId) => {
             store.dispatch(setIsLoading(false));
         }
     } catch (error) {
-        console.error("Join server error:", error);
+        // Join server error
     }
 };
 
@@ -144,8 +142,8 @@ export const handleDeleteServer = async () => {
                 deleteDoc(doc.ref);
             });
         })
-        .catch((error) => {
-            console.error("Error deleting documents: ", error);
+        .catch(() => {
+            // Error deleting documents
         });
 
     await getDocs(channelRef)
@@ -156,8 +154,8 @@ export const handleDeleteServer = async () => {
             });
             store.dispatch(setCurrChannelList([]));
         })
-        .catch((error) => {
-            console.error("Error deleting documents: ", error);
+        .catch(() => {
+            // Error deleting documents
         });
 
     await deleteDoc(serverRef).then(() => {

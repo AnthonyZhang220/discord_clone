@@ -28,7 +28,7 @@ export default function FriendList() {
 
             // return unsub
         }
-    }, [user.id]);
+    }, [user.id, dispatch]);
     //get user's friend list
     useEffect(() => {
         if (friendIdList.length > 0) {
@@ -47,7 +47,7 @@ export default function FriendList() {
             });
             // return unsubscribe
         }
-    }, [friendIdList.length]);
+    }, [friendIdList, dispatch]);
 
     return (
         <Box className="friend-list-container">

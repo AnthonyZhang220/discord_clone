@@ -178,7 +178,6 @@ export default function PrivateChat() {
     useEffect(() => {
         let unsubscribe;
         if (currDirectMessageChannelRef) {
-            console.log("currDirectMessageChannelRef", currDirectMessageChannelRef);
             const q = query(
                 collection(db, "messages"),
                 where("channelRef", "==", currDirectMessageChannelRef || ""),
@@ -192,7 +191,6 @@ export default function PrivateChat() {
                 let previousDate = null;
 
                 QuerySnapshot.forEach((doc) => {
-                    console.log(doc);
                     const chatMessage = doc.data();
                     const currentDate = convertDateDivider(chatMessage.createdAt);
                     if (previousDate === null || currentDate != previousDate) {
@@ -227,7 +225,7 @@ export default function PrivateChat() {
             if (typeof unsubscribe === "function") unsubscribe();
         };
         // chatScroller.current.scrollIntoView({ behavior: "smooth" });
-    }, [currDirectMessageChannelRef]);
+    }, [currDirectMessageChannelRef, dispatch]);
 
     const handleUploadOpen = () => {
         setOpenUpload(true);
@@ -274,7 +272,7 @@ export default function PrivateChat() {
                 <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
             </List>
         );
-    }, [currDirectMessageChannel.id, directMessageList]);
+    }, [currDirectMessageChannel.displayName, currDirectMessageChannel.avatar, directMessageList]);
 
     return (
         <Box className="content">

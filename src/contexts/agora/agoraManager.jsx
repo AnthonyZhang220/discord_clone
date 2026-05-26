@@ -69,43 +69,38 @@ export const AgoraManager = ({ config }) => {
     // }, [agoraClient])
 
     useEffect(() => {
-        console.log("isConnected", isConnected);
-        console.log("data", data);
         if (isConnected) {
             dispatch(setIsVoiceChatConnected(true));
         } else {
             dispatch(setIsVoiceChatConnected(false));
         }
-    }, [isConnected]);
+    }, [isConnected, data, dispatch]);
 
     useEffect(() => {
         dispatch(setConnectionState(connectionState));
-    }, [connectionState]);
+    }, [connectionState, dispatch]);
 
     useClientEvent(agoraClient, "token-privilege-will-expire", () => {
         if (config.serverUrl !== "") {
             fetchRTCToken(config, currVoiceChannel.name)
                 .then((token) => {
-                    console.log("RTC token fetched from server: ", token);
                     if (token) return agoraClient.renewToken(token);
                 })
-                .catch((error) => {
-                    console.error(error);
+                .catch(() => {
+                    // failed to renew token
                 });
         } else {
-            console.log(
-                "Please make sure you specified the token server URL in the configuration file"
-            );
+            // token server URL not specified
         }
     });
 
     useEffect(() => {
         dispatch(setLatency(networkQuality.delay));
-    }, [networkQuality.delay]);
+    }, [networkQuality.delay, dispatch]);
 
     useEffect(() => {
         dispatch(setIsVoiceChatLoading(isLoading));
-    }, [isLoading]);
+    }, [isLoading, dispatch]);
 
     useEffect(() => {
         return () => {
@@ -114,10 +109,10 @@ export const AgoraManager = ({ config }) => {
             localMicrophoneTrack?.close();
             handleLeaveVoiceChannel();
         };
-    }, []);
+    }, [screenTrack, localCameraTrack, localMicrophoneTrack]);
 
     useEffect(() => {
-        console.log(remoteUsers);
+        // remoteUsers updated
     }, [remoteUsers]);
 
     const deviceLoading = isLoadingMic || isLoadingCam;

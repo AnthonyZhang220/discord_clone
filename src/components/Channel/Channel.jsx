@@ -59,7 +59,7 @@ const Channel = () => {
         return () => {
             if (typeof unsubscribe === "function") unsubscribe();
         };
-    }, [selectedServer]);
+    }, [selectedServer, dispatch]);
 
     //get all the voice channels by server UID
     useEffect(() => {
@@ -80,17 +80,16 @@ const Channel = () => {
         return () => {
             if (typeof unsubscribe === "function") unsubscribe();
         };
-    }, [selectedServer]);
+    }, [selectedServer, dispatch]);
 
     useEffect(() => {
         if (selectedServer) {
             const serverRef = doc(db, "servers", selectedServer);
             getDoc(serverRef).then((doc) => {
-                console.log(doc.data().name);
                 dispatch(setCurrServer({ name: doc.data().name, id: doc.data().id }));
             });
         }
-    }, [selectedServer]);
+    }, [selectedServer, dispatch]);
 
     return (
         <Box component="aside" className="channel-container">

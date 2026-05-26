@@ -33,10 +33,10 @@ export const signInWithOAuth = (provider) => async () => {
                 await signInWithRedirect(auth, GithubProvider);
                 break;
             default:
-                console.log("Provider not supported!");
+            // provider not supported
         }
     } catch (error) {
-        console.error(`Error signing in with ${provider}`, error);
+        store.dispatch(setError("signInWithOAuth", error));
     }
 };
 
@@ -56,7 +56,6 @@ export async function signOut() {
         redirect("/");
     } catch (error) {
         store.dispatch(setError("signOut", error));
-        console.error("Sign out Error", error);
     }
 }
 

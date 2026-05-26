@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Box, ListItemText, ListItem, Badge, Popover, Avatar, Divider } from "@mui/material";
 import CircleIcon from "@mui/icons-material/Circle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
@@ -23,9 +23,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
     const { userDetailPopover } = useSelector((state) => state.popover);
     const { user } = useSelector((state) => state.auth);
 
-    useEffect(() => {
-        console.log(user?.bannerColor);
-    }, [user?.bannerColor]);
+    // no side-effects required here
     return (
         <Popover
             className="user-detail-paper"

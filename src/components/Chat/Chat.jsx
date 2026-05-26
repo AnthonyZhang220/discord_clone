@@ -63,7 +63,7 @@ export default function Chat() {
             };
             getChannelRef();
         }
-    }, [selectedChannel]);
+    }, [selectedChannel, dispatch]);
 
     useEffect(() => {
         if (selectedChannel) {
@@ -113,161 +113,149 @@ export default function Chat() {
         }
 
         // chatScroller.current.scrollIntoView({ behavior: "smooth" });
-    }, [selectedChannel]);
+    }, [selectedChannel, dispatch]);
 
-    const ChatItem = useMemo(
-        () =>
-            function ChatItem({
-                content,
-                displayName,
-                avatar,
-                createdAt,
-                type,
-                fileName,
-                dividerDate,
-            }) {
-                const FormatChat = () => {
-                    if (type.indexOf("image/") != -1) {
-                        return (
-                            <img
-                                alt={content}
-                                src={content}
-                                style={{
-                                    maxHeight: "350px",
-                                    aspectRatio: "auto",
-                                    borderRadius: "8px",
-                                    maxWidth: "550px",
-                                }}
-                            />
-                        );
-                    } else if (type.indexOf("audio/") != -1) {
-                        return (
-                            <Fragment>
-                                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                                    <Box>
-                                        <Typography variant="p">{fileName}</Typography>
-                                    </Box>
-                                    <Box>
-                                        <audio controls src={content} preload="metadata" />
-                                    </Box>
-                                </Box>
-                            </Fragment>
-                        );
-                    } else if (type.indexOf("video/") != -1) {
-                        return (
-                            <video controls width="400" preload="metadata">
-                                <source src={content} type={type} />
-                            </video>
-                        );
-                    } else if (type.indexOf("text") != -1) {
-                        return content;
-                    }
-                };
-
+    function ChatItem({ content, displayName, avatar, createdAt, type, fileName, dividerDate }) {
+        const FormatChat = () => {
+            if (type.indexOf("image/") != -1) {
+                return (
+                    <img
+                        alt={content}
+                        src={content}
+                        style={{
+                            maxHeight: "350px",
+                            aspectRatio: "auto",
+                            borderRadius: "8px",
+                            maxWidth: "550px",
+                        }}
+                    />
+                );
+            } else if (type.indexOf("audio/") != -1) {
                 return (
                     <Fragment>
-                        {dividerDate ? (
-                            <Divider sx={{ m: 2, fontSize: 12, color: "#b5bac1" }} variant="middle">
-                                {dividerDate}
-                            </Divider>
-                        ) : avatar ? (
-                            <ListItem className="message" sx={{ p: 0, m: 0 }}>
-                                <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
-                                    <ListItemAvatar>
-                                        <Avatar alt={displayName} src={avatar} />
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={
-                                            <Fragment>
-                                                {displayName}
-                                                <Typography
-                                                    sx={{
-                                                        display: "inline",
-                                                        color: "#b5bac1",
-                                                        fontSize: "0.8em",
-                                                    }}
-                                                    component="span"
-                                                    variant="p"
-                                                    color="text.primary"
-                                                    marginLeft="10px"
-                                                >
-                                                    {convertDate(createdAt)}
-                                                </Typography>
-                                                &nbsp;
-                                                <Typography
-                                                    sx={{
-                                                        display: "inline",
-                                                        color: "#b5bac1",
-                                                        fontSize: "0.8em",
-                                                    }}
-                                                    component="span"
-                                                    variant="p"
-                                                    color="text.primary"
-                                                >
-                                                    {convertTime(createdAt)}
-                                                </Typography>
-                                            </Fragment>
-                                        }
-                                        secondary={
-                                            <Fragment>
-                                                <FormatChat />
-                                            </Fragment>
-                                        }
-                                        primaryTypographyProps={{ variant: "body1" }}
-                                        secondaryTypographyProps={{
-                                            variant: "body2",
-                                            color: "white",
-                                        }}
-                                    />
-                                </ListItemButton>
-                            </ListItem>
-                        ) : (
-                            <ListItem
-                                className="message"
-                                sx={{
-                                    p: 0,
-                                    m: 0,
-                                    "&:hover": {
-                                        ".timeblock": {
-                                            display: "block",
-                                        },
-                                    },
-                                }}
-                            >
-                                <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
-                                    <ListItemAvatar>
+                        <Box sx={{ display: "flex", flexDirection: "column" }}>
+                            <Box>
+                                <Typography variant="p">{fileName}</Typography>
+                            </Box>
+                            <Box>
+                                <audio controls src={content} preload="metadata" />
+                            </Box>
+                        </Box>
+                    </Fragment>
+                );
+            } else if (type.indexOf("video/") != -1) {
+                return (
+                    <video controls width="400" preload="metadata">
+                        <source src={content} type={type} />
+                    </video>
+                );
+            } else if (type.indexOf("text") != -1) {
+                return content;
+            }
+        };
+
+        return (
+            <Fragment>
+                {dividerDate ? (
+                    <Divider sx={{ m: 2, fontSize: 12, color: "#b5bac1" }} variant="middle">
+                        {dividerDate}
+                    </Divider>
+                ) : avatar ? (
+                    <ListItem className="message" sx={{ p: 0, m: 0 }}>
+                        <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
+                            <ListItemAvatar>
+                                <Avatar alt={displayName} src={avatar} />
+                            </ListItemAvatar>
+                            <ListItemText
+                                primary={
+                                    <Fragment>
+                                        {displayName}
                                         <Typography
-                                            variant="body2"
-                                            className="timeblock"
                                             sx={{
-                                                display: "none",
-                                                fontSize: 12,
+                                                display: "inline",
                                                 color: "#b5bac1",
+                                                fontSize: "0.8em",
                                             }}
+                                            component="span"
+                                            variant="p"
+                                            color="text.primary"
+                                            marginLeft="10px"
+                                        >
+                                            {convertDate(createdAt)}
+                                        </Typography>
+                                        &nbsp;
+                                        <Typography
+                                            sx={{
+                                                display: "inline",
+                                                color: "#b5bac1",
+                                                fontSize: "0.8em",
+                                            }}
+                                            component="span"
+                                            variant="p"
+                                            color="text.primary"
                                         >
                                             {convertTime(createdAt)}
                                         </Typography>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        secondary={
-                                            <Fragment>
-                                                <FormatChat />
-                                            </Fragment>
-                                        }
-                                        primaryTypographyProps={{ variant: "body1" }}
-                                        secondaryTypographyProps={{
-                                            variant: "body2",
-                                            color: "white",
-                                        }}
-                                    />
-                                </ListItemButton>
-                            </ListItem>
-                        )}
-                    </Fragment>
-                );
-            },
-        [messageList]
-    );
+                                    </Fragment>
+                                }
+                                secondary={
+                                    <Fragment>
+                                        <FormatChat />
+                                    </Fragment>
+                                }
+                                primaryTypographyProps={{ variant: "body1" }}
+                                secondaryTypographyProps={{
+                                    variant: "body2",
+                                    color: "white",
+                                }}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                ) : (
+                    <ListItem
+                        className="message"
+                        sx={{
+                            p: 0,
+                            m: 0,
+                            "&:hover": {
+                                ".timeblock": {
+                                    display: "block",
+                                },
+                            },
+                        }}
+                    >
+                        <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
+                            <ListItemAvatar>
+                                <Typography
+                                    variant="body2"
+                                    className="timeblock"
+                                    sx={{
+                                        display: "none",
+                                        fontSize: 12,
+                                        color: "#b5bac1",
+                                    }}
+                                >
+                                    {convertTime(createdAt)}
+                                </Typography>
+                            </ListItemAvatar>
+                            <ListItemText
+                                secondary={
+                                    <Fragment>
+                                        <FormatChat />
+                                    </Fragment>
+                                }
+                                primaryTypographyProps={{ variant: "body1" }}
+                                secondaryTypographyProps={{
+                                    variant: "body2",
+                                    color: "white",
+                                }}
+                            />
+                        </ListItemButton>
+                    </ListItem>
+                )}
+            </Fragment>
+        );
+    }
 
     const ChatList = useMemo(() => {
         // useEffect(() => {
@@ -314,7 +302,7 @@ export default function Chat() {
                 <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
             </List>
         );
-    }, [messageList, currChannel.id]);
+    }, [messageList, currChannel.name]);
 
     return (
         <Box className="chat-container">
