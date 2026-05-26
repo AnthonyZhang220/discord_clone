@@ -1,6 +1,6 @@
 const AgoraConfig = {
     uid: 0,
-    serverUrl: process.env.REACT_APP_SERVER_URL,
+    serverUrl: process.env.REACT_APP_AGORA_SERVER_URL,
     appId: process.env.REACT_APP_AGORA_APP_ID,
     channelName: 'test', // your agora channel
     rtcToken: "",
