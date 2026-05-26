@@ -19,7 +19,7 @@ export const MemberDetailPopover = ({ memberRef }) => {
             anchorEl={memberRef ? () => memberRef : null}
             PaperProps={{
                 style: {
-                    background: "#232428",
+                    background: "var(--servers-bg)",
                     borderRadius: "8px 8px 8px 8px",
                     width: "340px",
                     fontSize: 14,
@@ -68,7 +68,7 @@ export const MemberDetailPopover = ({ memberRef }) => {
                     />
                 </Badge>
             </Box>
-            <Box className="member-detail-list" sx={{ backgroundColor: "#111214" }}>
+            <Box className="member-detail-list" sx={{ backgroundColor: "var(--body-bg)" }}>
                 <ListItem dense>
                     <MemberListItemButton>
                         <ListItemText
@@ -77,7 +77,11 @@ export const MemberDetailPopover = ({ memberRef }) => {
                         />
                     </MemberListItemButton>
                 </ListItem>
-                <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
+                <Divider
+                    style={{ backgroundColor: "var(--server-marker-unread)" }}
+                    variant="middle"
+                    light={true}
+                />
                 <ListItem dense>
                     <MemberListItemButton>
                         <ListItemText

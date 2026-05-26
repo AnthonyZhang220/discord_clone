@@ -310,7 +310,11 @@ export default function Chat() {
             <Box className="chat-header" component="section">
                 <Box className="chat-header-name">
                     <NumbersIcon
-                        sx={{ color: "#8a8e94", marginRight: "6px", alignItems: "baseline" }}
+                        sx={{
+                            color: "var(--server-marker-unread)",
+                            marginRight: "6px",
+                            alignItems: "baseline",
+                        }}
                     />
                     <Box component="span" variant="h3" className="chat-header-hashtag">
                         {currChannel.name}

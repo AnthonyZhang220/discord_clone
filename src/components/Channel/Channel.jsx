@@ -149,7 +149,9 @@ const Channel = () => {
                                 handleSelectChannel(name, id);
                             }}
                         >
-                            <NumbersIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />
+                            <NumbersIcon
+                                sx={{ color: "var(--server-marker-unread)", marginRight: "6px" }}
+                            />
                             <Box component="span" className="channel-name">
                                 {name}
                             </Box>
@@ -192,7 +194,12 @@ const Channel = () => {
                                     handleJoinVoiceChannel(name, id);
                                 }}
                             >
-                                <VolumeUpIcon sx={{ color: "#8a8e94", marginRight: "6px" }} />
+                                <VolumeUpIcon
+                                    sx={{
+                                        color: "var(--server-marker-unread)",
+                                        marginRight: "6px",
+                                    }}
+                                />
                                 <Box component="span" className="channel-name">
                                     {name}
                                 </Box>

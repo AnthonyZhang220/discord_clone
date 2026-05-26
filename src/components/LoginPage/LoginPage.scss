@@ -89,7 +89,7 @@ body {
                 align-items: center;
 
                 .primary-title {
-                    color: #fff;
+                    color: $body-color;
                     font-size: 24px;
                     line-height: 30px;
                     font-weight: 600;
@@ -97,7 +97,7 @@ body {
                 }
 
                 .secondary-title {
-                    color: #a2a3a7;
+                    color: lighten($body-color, 20%);
                     font-size: 16px;
                     line-height: 20px;
                 }
@@ -110,7 +110,7 @@ body {
                         text-align: left;
 
                         .input-placeholder {
-                            color: #919296;
+                            color: $server-marker-unread;
                             margin-bottom: 8px;
                             font-size: 12px;
                             font-weight: 700;
@@ -133,9 +133,9 @@ body {
                             font-size: 16px;
                             line-height: 22px;
                             letter-spacing: 0.5px;
-                            color: #c4c3ca;
-                            background-color: #1e1f22;
-                            border: 1px solid #282a2e;
+                            color: lighten($body-color, 10%);
+                            background-color: $servers-bg;
+                            border: 1px solid darken($servers-bg, 8%);
                             border-radius: 3px;
                             outline: none;
                             -webkit-transition: all 200ms linear;
@@ -169,13 +169,13 @@ body {
                     text-align: center;
                     border: none;
                     outline: none;
-                    background-color: #5865f2;
-                    color: white;
+                    background-color: $primary-color;
+                    color: $body-color;
                     cursor: pointer;
                 }
 
                 .btn:hover {
-                    background-color: #677bc4;
+                    background-color: $primary-color-hover;
                     box-shadow: 0 8px 24px 0 rgba(16, 39, 112, 0.2);
                 }
 
@@ -228,7 +228,7 @@ body {
                 }
 
                 .link {
-                    color: #0e87c6;
+                    color: $server-bg-active;
                     text-decoration: none;
                     font-weight: 800;
                     font-size: 14px;

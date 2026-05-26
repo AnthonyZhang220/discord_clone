@@ -55,20 +55,20 @@
             }
 
             &.active {
-                background-color: darken(#ffffff, 60%);
+                background-color: darken($body-color, 60%);
             }
         }
 
         .addfriend-button {
-            background-color: #248046;
-            color: #ffffff;
+            background-color: $success-color;
+            color: $body-color;
 
             &:hover {
-                background-color: darken(#ffffff, 40%);
+                background-color: darken($body-color, 40%);
                 border-radius: 4px;
             }
             &.active {
-                background-color: darken(#248046, 10%);
+                background-color: darken($success-color, 10%);
             }
         }
     }

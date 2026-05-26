@@ -31,7 +31,11 @@ export const FriendHeader = () => {
                 <SvgIcon
                     component={FriendIcon}
                     inheritViewBox
-                    sx={{ color: "#8a8e94", marginRight: "6px", alignItems: "baseline" }}
+                    sx={{
+                        color: "var(--server-marker-unread)",
+                        marginRight: "6px",
+                        alignItems: "baseline",
+                    }}
                 />
                 <Typography variant="h3" className="friend-main-header-text">
                     Friends
@@ -40,7 +44,7 @@ export const FriendHeader = () => {
                     orientation="vertical"
                     variant="fullWidth"
                     sx={{
-                        backgroundColor: "#3e4046",
+                        backgroundColor: "var(--border-accent)",
                         m: "0 8px",
                         width: "1px",
                         flex: "0 0 auto",
@@ -134,7 +138,11 @@ export const PrivateChannelHeader = () => {
         <Box className="friend-main-header" component="section">
             <Box className="friend-main-header-name">
                 <AlternateEmailSharp
-                    sx={{ color: "#8a8e94", marginRight: "6px", alignItems: "baseline" }}
+                    sx={{
+                        color: "var(--server-marker-unread)",
+                        marginRight: "6px",
+                        alignItems: "baseline",
+                    }}
                 />
                 <Box component="span" variant="h3" className="friend-main-header-hashtag">
                     {currDirectMessageChannel.displayName}

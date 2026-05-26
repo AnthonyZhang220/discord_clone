@@ -81,7 +81,7 @@
             -webkit-box-align: center;
             -ms-flex-align: center;
             align-items: center;
-            border: 1px solid #1e1f22;
+            border: 1px solid $servers-bg;
             border-radius: 8px;
             display: -webkit-box;
             display: -ms-flexbox;
@@ -92,11 +92,11 @@
             -webkit-transition: border-color 0.2s ease-in-out;
             transition: border-color 0.2s ease-in-out;
 
-            background-color: #1e1f22;
+            background-color: $servers-bg;
             color: hsl(240, 2%, 88%);
 
             &:focus-within {
-                border: 1px solid #049dea;
+                border: 1px solid $primary-color;
             }
 
             .add-friend-search-input {

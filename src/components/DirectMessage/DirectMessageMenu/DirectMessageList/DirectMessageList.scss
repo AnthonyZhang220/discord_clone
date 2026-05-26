@@ -6,7 +6,7 @@
     margin: 1px 0 1px 0;
 
     &:hover {
-        background-color: darken(#ffffff, 60%);
+        background-color: darken($body-color, 60%);
         border-radius: 4px;
     }
 }

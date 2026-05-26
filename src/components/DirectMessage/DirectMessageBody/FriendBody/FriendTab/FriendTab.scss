@@ -9,7 +9,7 @@
         border-color: transparent;
 
         &:hover {
-            background-color: #3d3f44;
+            background-color: lighten($chat-bg, 5%);
             border-radius: 8px;
         }
     }
