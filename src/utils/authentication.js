@@ -1,15 +1,16 @@
-import store from '../redux/store';
-import { signInWithRedirect } from 'firebase/auth';
-import { auth, db } from '../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
+import store from "../redux/store";
+import { signInWithRedirect } from "firebase/auth";
+import { auth, db } from "../firebase";
+import { doc, updateDoc } from "firebase/firestore";
 import {
     FacebookAuthProvider,
     TwitterAuthProvider,
     GithubAuthProvider,
     GoogleAuthProvider,
-} from 'firebase/auth';
-import { redirect } from 'react-router-dom';
-import { setIsLoggedIn, setUser } from '../redux/features/authSlice';
+} from "firebase/auth";
+import { redirect } from "react-router-dom";
+import { setIsLoggedIn, setUser } from "../redux/features/authSlice";
+import { setError } from "../redux/features/errorSlice";
 
 const GoogleProvider = new GoogleAuthProvider();
 const FacebookProvider = new FacebookAuthProvider();
@@ -19,20 +20,20 @@ const GithubProvider = new GithubAuthProvider();
 export const signInWithOAuth = (provider) => async () => {
     try {
         switch (provider) {
-            case 'google':
+            case "google":
                 await signInWithRedirect(auth, GoogleProvider);
                 break;
-            case 'facebook':
+            case "facebook":
                 await signInWithRedirect(auth, FacebookProvider);
                 break;
-            case 'twitter':
+            case "twitter":
                 await signInWithRedirect(auth, TwitterProvider);
                 break;
-            case 'github':
+            case "github":
                 await signInWithRedirect(auth, GithubProvider);
                 break;
             default:
-                console.log('Provider not supported!');
+                console.log("Provider not supported!");
         }
     } catch (error) {
         console.error(`Error signing in with ${provider}`, error);
@@ -41,24 +42,21 @@ export const signInWithOAuth = (provider) => async () => {
 
 export async function signOut() {
     try {
-        const signOutSuccess = await auth.signOut();
-        if (signOutSuccess) {
-            const userRef = doc(db, 'users', user.id);
-            const updateSuccess = await updateDoc(userRef, {
-                status: 'offline',
+        await auth.signOut();
+        const user = store.getState().auth.user;
+        if (user && user.id) {
+            const userRef = doc(db, "users", user.id);
+            await updateDoc(userRef, {
+                status: "offline",
             });
-
-            if (updateSuccess) {
-                store.dispatch(
-                    setUser({ displayName: null, avatar: null, uid: null, createdAt: null })
-                );
-                store.dispatch(setIsLoggedIn(false));
-                redirect('/');
-            }
         }
+
+        store.dispatch(setUser({ displayName: null, avatar: null, uid: null, createdAt: null }));
+        store.dispatch(setIsLoggedIn(false));
+        redirect("/");
     } catch (error) {
-        store.dispatch(setError('signOut', error));
-        console.error('Sign out Error', error);
+        store.dispatch(setError("signOut", error));
+        console.error("Sign out Error", error);
     }
 }
 
@@ -66,7 +64,7 @@ export async function changeStatus(status) {
     const user = store.getState().auth.user;
     store.dispatch(setUser({ ...user, status: status }));
 
-    const updateSuccess = await updateDoc(doc(db, 'users', user.id), {
+    await updateDoc(doc(db, "users", user.id), {
         status: status,
     });
 }
