@@ -12,8 +12,9 @@ import { handleLeaveVoiceChannel } from "../../../handlers/voiceChannelHandlers"
 import "./VoiceControl.scss";
 
 export default function VoiceControl() {
-    const { isCameraOn, isScreenSharingOn, isVoiceChatConnected, connectionState, latency } =
-        useSelector((state) => state.voiceChat);
+    const { isCameraOn, isScreenSharingOn, connectionState, latency } = useSelector(
+        (state) => state.voiceChat
+    );
     const { currVoiceChannel } = useSelector((state) => state.channel);
 
     return (

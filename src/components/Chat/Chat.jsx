@@ -117,7 +117,15 @@ export default function Chat() {
 
     const ChatItem = useMemo(
         () =>
-            ({ content, displayName, avatar, createdAt, type, fileName, dividerDate }) => {
+            function ChatItem({
+                content,
+                displayName,
+                avatar,
+                createdAt,
+                type,
+                fileName,
+                dividerDate,
+            }) {
                 const FormatChat = () => {
                     if (type.indexOf("image/") != -1) {
                         return (

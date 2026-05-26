@@ -17,9 +17,7 @@ import "./VoiceChat.scss";
 
 const VoiceChat = () => {
     const { currVoiceChannel } = useSelector((state) => state.channel);
-    const { isMicOn, isDeafen, isCameraOn, isVoiceChatConnected } = useSelector(
-        (state) => state.voiceChat
-    );
+    const { isMicOn, isCameraOn } = useSelector((state) => state.voiceChat);
 
     return (
         <AgoraClient>
