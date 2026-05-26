@@ -4,8 +4,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const draftSlice = createSlice({
     name: 'draft',
     initialState: {
-        draftMessage: "",
-        draftDirectMessage: "",
+        draftMessage: '',
+        draftDirectMessage: '',
         // Add other message-related state here
     },
     reducers: {

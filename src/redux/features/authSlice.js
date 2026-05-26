@@ -12,8 +12,8 @@ const authSlice = createSlice({
             state.user = action.payload;
         },
         setIsLoggedIn: (state, action) => {
-            state.isLoggedIn = action.payload
-        }
+            state.isLoggedIn = action.payload;
+        },
         // Add other auth-related reducers here
     },
 });

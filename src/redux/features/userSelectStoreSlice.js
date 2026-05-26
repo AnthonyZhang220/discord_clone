@@ -4,8 +4,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const userSelectStoreSlice = createSlice({
     name: 'userSelectStore',
     initialState: {
-        selectedServer: "",
-        selectedChannel: "",
+        selectedServer: '',
+        selectedChannel: '',
     },
     reducers: {
         setSelectedChannel: (state, action) => {
@@ -19,18 +19,10 @@ const userSelectStoreSlice = createSlice({
         },
         setChannelList: (state, action) => {
             state.channelList = action.payload;
-        }
+        },
     },
 });
 
-export const {
-    setSelectedServer,
-    setSelectedChannel,
-    setServerList,
-    setChannelList,
-} = userSelectStoreSlice.actions;
+export const { setSelectedServer, setSelectedChannel, setServerList, setChannelList } =
+    userSelectStoreSlice.actions;
 export default userSelectStoreSlice.reducer;
-
-
-
-

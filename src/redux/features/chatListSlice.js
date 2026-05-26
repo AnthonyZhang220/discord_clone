@@ -19,8 +19,5 @@ const chatListSlice = createSlice({
     },
 });
 
-export const {
-    setDirectMessageList, setMessageList
-} = chatListSlice.actions;
+export const { setDirectMessageList, setMessageList } = chatListSlice.actions;
 export default chatListSlice.reducer;
-

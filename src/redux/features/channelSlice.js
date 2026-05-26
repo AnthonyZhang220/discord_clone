@@ -1,9 +1,9 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const channelSlice = createSlice({
-    name: "channel",
+    name: 'channel',
     initialState: {
-        currChannel: { name: "", id: "" },
+        currChannel: { name: '', id: '' },
         currChannelList: [],
         currVoiceChannel: {},
         currVoiceChannelList: [],
@@ -25,8 +25,14 @@ const channelSlice = createSlice({
         setNewChannelInfo: (state, action) => {
             state.newChannelInfo = action.payload;
         },
-    }
-})
+    },
+});
 
-export const { setNewChannelInfo, setCurrChannelList, setCurrVoiceChannelList, setCurrChannel, setCurrVoiceChannel } = channelSlice.actions;
+export const {
+    setNewChannelInfo,
+    setCurrChannelList,
+    setCurrVoiceChannelList,
+    setCurrChannel,
+    setCurrVoiceChannel,
+} = channelSlice.actions;
 export default channelSlice.reducer;
