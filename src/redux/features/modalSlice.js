@@ -1,7 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const modalSlice = createSlice({
-    name: "modal",
+    name: 'modal',
     initialState: {
         createChannelModal: false,
         createVoiceChannelModal: false,
@@ -29,7 +29,14 @@ const modalSlice = createSlice({
         setInviteModal: (state, action) => {
             state.inviteModal = action.payload;
         },
-    }
-})
-export const { setCreateChannelModal, setCreateVoiceChannelModal, setCreateServerModal, setCreateServerFormModal, setJoinServerModal, setInviteModal } = modalSlice.actions;
+    },
+});
+export const {
+    setCreateChannelModal,
+    setCreateVoiceChannelModal,
+    setCreateServerModal,
+    setCreateServerFormModal,
+    setJoinServerModal,
+    setInviteModal,
+} = modalSlice.actions;
 export default modalSlice.reducer;

@@ -18,7 +18,7 @@ const voiceChatSlice = createSlice({
         localTracks: null,
         currAgoraUID: null,
         screenTrack: null,
-        connectionState: "",
+        connectionState: '',
         latency: null,
         // Add other voice chat-related state here
     },
@@ -71,7 +71,7 @@ const voiceChatSlice = createSlice({
         },
         setIsVoiceChatLoading: (state, action) => {
             state.isVoiceChatLoading = action.payload;
-        }
+        },
     },
 });
 
@@ -96,13 +96,12 @@ export const {
 } = voiceChatSlice.actions;
 export default voiceChatSlice.reducer;
 
-
 export const handleVolume = (volumes) => {
     setRemoteUsers((previousUsers) => {
         if (previousUsers) {
-            return previousUsers.map(user => {
+            return previousUsers.map((user) => {
                 if (user) {
-                    const volume = volumes.find(v => v.uid == user.uid);
+                    const volume = volumes.find((v) => v.uid == user.uid);
                     if (volume) {
                         return { ...user, volume: volume.level };
                     }
@@ -111,162 +110,174 @@ export const handleVolume = (volumes) => {
             });
         }
     });
-}
-
+};
 
 const handleUserUnpublishedFromAgora = (user, mediaType) => {
-    updateFirebaseMediaStatus(user.uid, mediaType, false)
+    updateFirebaseMediaStatus(user.uid, mediaType, false);
 
-    if (mediaType === "audio") {
+    if (mediaType === 'audio') {
         setRemoteUsers((previousUsers) => {
             if (previousUsers !== undefined) {
-                return (previousUsers.map((User) => {
+                return previousUsers.map((User) => {
                     if (User) {
                         if (User.uid == user.uid) {
-                            return { ...User, hasAudio: false, audioTrack: null, uid: user.uid }
+                            return { ...User, hasAudio: false, audioTrack: null, uid: user.uid };
                         }
-                        return User
+                        return User;
                     }
-                }))
+                });
             }
         });
     }
 
-    if (mediaType === "video") {
+    if (mediaType === 'video') {
         setRemoteUsers((previousUsers) => {
             if (previousUsers !== undefined) {
-                return (previousUsers.map((User) => {
+                return previousUsers.map((User) => {
                     if (User) {
                         if (User.uid == user.uid) {
-                            return { ...User, hasVideo: false, videoTrack: null, uid: user.uid }
+                            return { ...User, hasVideo: false, videoTrack: null, uid: user.uid };
                         }
-                        return User
+                        return User;
                     }
-                }))
+                });
             }
         });
     }
-}
+};
 
 export const updateFirebaseMediaStatus = (agoraID, mediaType, status) => {
-
     if (currentVoiceChannel.uid) {
-        const voiceChannelRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+        const voiceChannelRef = doc(db, 'voicechannels', currentVoiceChannel.uid);
 
         getDoc(voiceChannelRef).then((doc) => {
             if (doc.exists()) {
-                const arr = doc.data().liveUser
-                const updateUser = arr.find(x => x.uid == agoraID)
-                console.log(updateUser)
+                const arr = doc.data().liveUser;
+                const updateUser = arr.find((x) => x.uid == agoraID);
+                console.log(updateUser);
                 if (updateUser) {
-                    if (mediaType === "audio") {
+                    if (mediaType === 'audio') {
                         updateUser.hasAudio = status;
                     }
-                    if (mediaType === "video") {
+                    if (mediaType === 'video') {
                         updateUser.hasVideo = status;
                     }
                 }
 
                 updateDoc(voiceChannelRef, {
-                    liveUser: arr
-                })
+                    liveUser: arr,
+                });
             }
-        })
+        });
     }
-}
+};
 
 export const handleUserPublishedToAgora = (user, mediaType) => {
-
-    updateFirebaseMediaStatus(user.uid, mediaType, true)
+    updateFirebaseMediaStatus(user.uid, mediaType, true);
 
     setRemoteUsers((previousUsers) => {
         if (previousUsers !== undefined) {
-            return (previousUsers.map((User) => {
+            return previousUsers.map((User) => {
                 if (User) {
                     if (User.uid == user.uid) {
-                        if (mediaType === "video") {
-                            return { ...User, hasVideo: true, videoTrack: user.videoTrack, uid: user.uid }
+                        if (mediaType === 'video') {
+                            return {
+                                ...User,
+                                hasVideo: true,
+                                videoTrack: user.videoTrack,
+                                uid: user.uid,
+                            };
                         }
 
-                        if (mediaType === "audio") {
-                            return { ...User, hasAudio: true, audioTrack: user.audioTrack, uid: user.uid }
+                        if (mediaType === 'audio') {
+                            return {
+                                ...User,
+                                hasAudio: true,
+                                audioTrack: user.audioTrack,
+                                uid: user.uid,
+                            };
                         }
                     }
-                    return User
+                    return User;
                 }
-            }))
+            });
         }
-    })
-}
+    });
+};
 
 export const handleRemoteUserJoinedAgora = (user) => {
-
     setRemoteUsers((previousUsers) => {
         if (previousUsers !== undefined) {
-            if (previousUsers.find(User => User.uid != user.uid)) {
-                return [...previousUsers, { uid: user.uid, hasAudio: user.hasAudio, audioTrack: user.audioTrack, hasVideo: user.hasVideo, videoTrack: user.videoTrack }]
+            if (previousUsers.find((User) => User.uid != user.uid)) {
+                return [
+                    ...previousUsers,
+                    {
+                        uid: user.uid,
+                        hasAudio: user.hasAudio,
+                        audioTrack: user.audioTrack,
+                        hasVideo: user.hasVideo,
+                        videoTrack: user.videoTrack,
+                    },
+                ];
             }
         }
-    })
-}
+    });
+};
 
 export const handleLocalUserLeftAgora = async () => {
-
-    removeLiveUserFromFirebase(currentAgoraUID)
-    setRemoteUsers([])
+    removeLiveUserFromFirebase(currentAgoraUID);
+    setRemoteUsers([]);
 
     for (const localTrack of localTracks) {
         localTrack.stop();
         localTrack.close();
     }
 
-    await agoraEngine.unpublish(localTracks)
-    await agoraEngine.leave()
+    await agoraEngine.unpublish(localTracks);
+    await agoraEngine.leave();
 
-    setLocalTracks(null)
-    console.log("You left the channel");
-    setCurrentVoiceChannel({ name: null, uid: null })
-}
+    setLocalTracks(null);
+    console.log('You left the channel');
+    setCurrentVoiceChannel({ name: null, uid: null });
+};
 
 export const handleRemoteUserLeftAgora = (user) => {
-
     setRemoteUsers((previousUsers) => {
         if (previousUsers !== undefined) {
-            const newArr = previousUsers.filter((User) => User.uid != user.uid)
+            const newArr = previousUsers.filter((User) => User.uid != user.uid);
             return newArr;
         }
-    })
-
-}
+    });
+};
 
 export const addLiveUserToFirebase = (userData) => {
-    const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+    const userRef = doc(db, 'voicechannels', currentVoiceChannel.uid);
     getDoc(userRef).then((doc) => {
         if (doc.exists()) {
             const arr = doc.data().liveUser;
-            if (!arr.find(x => x.firebaseUID == currentUser.uid)) {
+            if (!arr.find((x) => x.firebaseUID == currentUser.uid)) {
                 updateDoc(userRef, {
-                    liveUser: arrayUnion(userData)
-                })
+                    liveUser: arrayUnion(userData),
+                });
             }
         }
-    })
-}
+    });
+};
 
 export const removeLiveUserFromFirebase = (agoraID) => {
     if (agoraID && currentVoiceChannel.uid) {
-        const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+        const userRef = doc(db, 'voicechannels', currentVoiceChannel.uid);
         getDoc(userRef).then((doc) => {
             if (doc.exists()) {
                 const arr = doc.data().liveUser;
-                if (arr.find(x => x.uid == agoraID)) {
-                    const deleteUser = arr.find(x => x.uid == agoraID)
-                    console.log(deleteUser)
+                if (arr.find((x) => x.uid == agoraID)) {
+                    const deleteUser = arr.find((x) => x.uid == agoraID);
+                    console.log(deleteUser);
                     updateDoc(userRef, {
-                        liveUser: arrayRemove(deleteUser)
-                    })
+                        liveUser: arrayRemove(deleteUser),
+                    });
                 }
             }
-        })
+        });
     }
-}
+};

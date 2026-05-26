@@ -1,12 +1,12 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const directMessageSlice = createSlice({
-    name: "directMessage",
+    name: 'directMessage',
     initialState: {
         isDirectMessagePageOpen: false,
         currDirectMessageChannel: {},
-        currDirectMessageChannelRef: "",
-        friendFilter: "",
+        currDirectMessageChannelRef: '',
+        friendFilter: '',
         friendList: [],
         friendIdList: [],
         directMessageChannelRefs: {},
@@ -48,9 +48,21 @@ const directMessageSlice = createSlice({
         },
         setQueryFriendList: (state, action) => {
             state.queryFriendList = action.payload;
-        }
-    }
-})
+        },
+    },
+});
 
-export const { setQueryFriendList, setFriendIdList, setFriendList, setCurrDirectMessageChannelRef, setDirectMessageChannelRefs, setDirectMessageChannelList, setIsDirectMessagePageOpen, setCurrDirectMessageChannel, setFriendFilter, setIsFriendListPageOpen, toggleDirectMessageSidebar } = directMessageSlice.actions;
+export const {
+    setQueryFriendList,
+    setFriendIdList,
+    setFriendList,
+    setCurrDirectMessageChannelRef,
+    setDirectMessageChannelRefs,
+    setDirectMessageChannelList,
+    setIsDirectMessagePageOpen,
+    setCurrDirectMessageChannel,
+    setFriendFilter,
+    setIsFriendListPageOpen,
+    toggleDirectMessageSidebar,
+} = directMessageSlice.actions;
 export default directMessageSlice.reducer;

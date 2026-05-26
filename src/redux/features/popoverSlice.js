@@ -1,7 +1,7 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 const popoverSlice = createSlice({
-    name: "popover",
+    name: 'popover',
     initialState: {
         serverSettingsPopover: false,
         userDetailPopover: false,
@@ -9,7 +9,7 @@ const popoverSlice = createSlice({
     },
     reducers: {
         toggleServerSettings: (state, action) => {
-            state.serverSettingsPopover = !state.serverSettingsPopover
+            state.serverSettingsPopover = !state.serverSettingsPopover;
         },
         setUserDetailPopover: (state, action) => {
             state.userDetailPopover = action.payload;
@@ -17,10 +17,10 @@ const popoverSlice = createSlice({
         setMemberDetailPopover: (state, action) => {
             state.memberDetailPopover = action.payload;
         },
-    }
-})
+    },
+});
 
-export const { toggleServerSettings, setUserDetailPopover, setMemberDetailPopover } = popoverSlice.actions;
+export const { toggleServerSettings, setUserDetailPopover, setMemberDetailPopover } =
+    popoverSlice.actions;
 
 export default popoverSlice.reducer;
-
