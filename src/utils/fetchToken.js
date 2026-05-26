@@ -3,18 +3,28 @@ import store from "../redux/store";
 
 export default async function fetchRTCToken(config, channelName) {
     const userId = store.getState().auth.user.id;
-    return new Promise(function (resolve) {
+
+    return new Promise(function (resolve, reject) {
         if (channelName) {
-            const url = `${config.serverUrl}/rtc/${channelName}/publisher/uid/0/?expiry=${config.tokenExpiryTime}`
-            console.log(url)
-            axios.get(url).then(
-                response => {
-                    console.log(response.data.rtcToken)
-                    resolve(response.data.rtcToken);
+            // 调用你的 Cloudflare Worker
+            const workerUrl = config.serverUrl + "/token";
+
+            axios.post(workerUrl, {
+                channelName: channelName,
+                uid: userId || 0,
+                expiry: config.tokenExpiryTime || 3600,
+                role: "publisher"
+            })
+                .then(response => {
+                    console.log("Agora Token retrieved successfully");
+                    resolve(response.data.token);
                 })
                 .catch(error => {
-                    console.log(error);
+                    console.error("Failed to get Agora token:", error);
+                    reject(error);
                 });
+        } else {
+            reject(new Error("channelName is required"));
         }
     });
 }
