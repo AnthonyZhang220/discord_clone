@@ -1,0 +1,698 @@
+@use "sass:color";
+@use "variables" as *;
+
+// ============================================================
+// Discord Mobile Layout
+// ============================================================
+
+// ============================================================
+// 根容器
+// ============================================================
+
+.mobile-app {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    background: $dc-bg-primary;
+    overflow: hidden;
+
+    // iOS safe area 适配
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+// ============================================================
+// 顶部 Header
+// ============================================================
+
+.mobile-header {
+    flex-shrink: 0;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    background: $dc-bg-secondary;
+    border-bottom: 1px solid $dc-divider;
+    z-index: 10;
+
+    &__title {
+        font-size: 16px;
+        font-weight: 600;
+        color: $dc-header-primary;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin-left: 8px;
+    }
+
+    &__icon-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: $dc-radius-full;
+        color: $dc-interactive-normal;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        transition: background 0.15s;
+
+        &:active {
+            background: $dc-bg-modifier-active;
+            color: $dc-interactive-active;
+        }
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+// ============================================================
+// 主内容区（header 和 bottom nav 之间）
+// ============================================================
+
+.mobile-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+// ============================================================
+// 侧边栏（左划展开，服务器列表 + 频道列表）
+// ============================================================
+
+.mobile-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 320px;
+    display: flex;
+    z-index: 20;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &.is-open {
+        transform: translateX(0);
+    }
+
+    // 服务器图标列
+    &__servers {
+        flex-shrink: 0;
+        width: 72px;
+        background: $dc-bg-tertiary;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 8px 0;
+        gap: 8px;
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    // 频道列表
+    &__channels {
+        flex: 1;
+        background: $dc-bg-secondary;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+}
+
+// 侧边栏打开时的遮罩
+.mobile-sidebar-overlay {
+    position: absolute;
+    inset: 0;
+    background: $dc-overlay;
+    z-index: 19;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+
+    &.is-visible {
+        opacity: 1;
+        pointer-events: all;
+    }
+}
+
+// ============================================================
+// 服务器图标
+// ============================================================
+
+.server-icon {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    border-radius: $dc-radius-full;
+    background: $dc-bg-accent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition:
+        border-radius 0.15s,
+        background 0.15s;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    span {
+        font-size: 15px;
+        font-weight: 600;
+        color: $dc-text-normal;
+        text-align: center;
+        line-height: 1;
+    }
+
+    &.is-active {
+        border-radius: $dc-radius-md;
+    }
+
+    &:active {
+        border-radius: $dc-radius-md;
+        background: $dc-brand;
+    }
+
+    // 左侧激活指示条
+    &::before {
+        content: "";
+        position: absolute;
+        left: -12px;
+        top: 50%;
+        transform: translateY(-50%) scaleY(0);
+        width: 4px;
+        height: 8px;
+        background: $dc-text-normal;
+        border-radius: 0 $dc-radius-sm $dc-radius-sm 0;
+        transition:
+            transform 0.15s,
+            height 0.15s;
+    }
+
+    &.is-active::before {
+        transform: translateY(-50%) scaleY(1);
+        height: 36px;
+    }
+}
+
+// ============================================================
+// 频道列表头部（服务器名 + 设置按钮）
+// ============================================================
+
+.channel-list-header {
+    flex-shrink: 0;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid $dc-divider;
+
+    &__name {
+        font-size: 15px;
+        font-weight: 700;
+        color: $dc-header-primary;
+    }
+}
+
+// ============================================================
+// 频道列表内容
+// ============================================================
+
+.channel-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    &__category {
+        padding: 16px 8px 4px 8px;
+        font-size: 11px;
+        font-weight: 700;
+        color: $dc-text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        height: 44px;
+        padding: 0 8px;
+        margin: 1px 8px;
+        border-radius: $dc-radius-sm;
+        color: $dc-interactive-normal;
+        cursor: pointer;
+        transition:
+            background 0.1s,
+            color 0.1s;
+
+        svg {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            opacity: 0.6;
+        }
+
+        span {
+            font-size: 15px;
+            font-weight: 500;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        &:active {
+            background: $dc-bg-modifier-active;
+            color: $dc-interactive-hover;
+        }
+
+        &.is-active {
+            background: $dc-bg-modifier-selected;
+            color: $dc-interactive-active;
+
+            svg {
+                opacity: 1;
+            }
+        }
+
+        &.has-unread {
+            color: $dc-text-normal;
+            font-weight: 600;
+        }
+    }
+}
+
+// ============================================================
+// 主聊天区
+// ============================================================
+
+.mobile-chat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: $dc-bg-primary;
+
+    // 消息列表
+    &__messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px 0 4px;
+        display: flex;
+        flex-direction: column;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    // 输入框区域
+    &__input-area {
+        flex-shrink: 0;
+        padding: 8px 12px;
+        background: $dc-bg-primary;
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
+    }
+}
+
+// ============================================================
+// 输入框
+// ============================================================
+
+.mobile-input {
+    flex: 1;
+    min-height: 44px;
+    max-height: 120px;
+    background: $dc-channeltextarea-bg;
+    border-radius: 22px;
+    display: flex;
+    align-items: flex-end;
+    padding: 10px 16px;
+    gap: 8px;
+
+    &__field {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: $dc-text-normal;
+        font-size: 15px;
+        line-height: 1.4;
+        resize: none;
+        max-height: 100px;
+        overflow-y: auto;
+
+        &::placeholder {
+            color: $dc-input-placeholder;
+        }
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    &__attach-btn {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        color: $dc-interactive-normal;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+.mobile-send-btn {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: $dc-radius-full;
+    background: $dc-brand;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    transition:
+        background 0.15s,
+        transform 0.1s;
+
+    &:active {
+        background: $dc-brand-hover;
+        transform: scale(0.95);
+    }
+
+    svg {
+        width: 22px;
+        height: 22px;
+        color: var(--dc-white);
+    }
+}
+
+// ============================================================
+// 消息气泡
+// ============================================================
+
+.mobile-message {
+    display: flex;
+    gap: 12px;
+    padding: 2px 16px;
+
+    &.is-grouped {
+        padding-left: 52px; // 对齐到头像右侧
+
+        .mobile-message__content {
+            padding-top: 0;
+        }
+    }
+
+    &__avatar {
+        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: $dc-radius-full;
+        overflow: hidden;
+        margin-top: 2px;
+        cursor: pointer;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
+
+    &__content {
+        flex: 1;
+        min-width: 0;
+        padding-top: 2px;
+    }
+
+    &__header {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 2px;
+    }
+
+    &__author {
+        font-size: 15px;
+        font-weight: 600;
+        color: $dc-header-primary;
+        cursor: pointer;
+    }
+
+    &__timestamp {
+        font-size: 11px;
+        color: $dc-text-muted;
+    }
+
+    &__text {
+        font-size: 15px;
+        color: $dc-text-normal;
+        line-height: 1.5;
+        word-break: break-word;
+    }
+}
+
+// ============================================================
+// 底部导航 Tab Bar
+// ============================================================
+
+.mobile-tab-bar {
+    flex-shrink: 0;
+    height: 56px;
+    background: $dc-bg-secondary;
+    border-top: 1px solid $dc-divider;
+    display: flex;
+    align-items: stretch;
+    padding-bottom: env(safe-area-inset-bottom);
+
+    &__tab {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        cursor: pointer;
+        color: $dc-interactive-muted;
+        transition: color 0.15s;
+        position: relative;
+        border: none;
+        background: transparent;
+
+        svg {
+            width: 26px;
+            height: 26px;
+        }
+
+        span {
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.01em;
+        }
+
+        &.is-active {
+            color: $dc-interactive-active;
+        }
+
+        &:active {
+            color: $dc-interactive-hover;
+        }
+
+        // 未读角标
+        &__badge {
+            position: absolute;
+            top: 4px;
+            right: calc(50% - 18px);
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            background: $dc-status-danger;
+            border-radius: $dc-radius-full;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--dc-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid $dc-bg-secondary;
+        }
+    }
+}
+
+// ============================================================
+// DM 列表（Messages tab 内容）
+// ============================================================
+
+.mobile-dm-list {
+    flex: 1;
+    overflow-y: auto;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    &__search {
+        margin: 8px 16px 4px;
+        height: 40px;
+        background: $dc-bg-tertiary;
+        border-radius: $dc-radius-full;
+        display: flex;
+        align-items: center;
+        padding: 0 12px;
+        gap: 8px;
+
+        input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: $dc-text-normal;
+            font-size: 14px;
+
+            &::placeholder {
+                color: $dc-text-muted;
+            }
+        }
+
+        svg {
+            width: 18px;
+            height: 18px;
+            color: $dc-text-muted;
+            flex-shrink: 0;
+        }
+    }
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 16px;
+        cursor: pointer;
+        transition: background 0.1s;
+
+        &:active {
+            background: $dc-bg-modifier-active;
+        }
+    }
+
+    &__avatar {
+        position: relative;
+        flex-shrink: 0;
+        width: 44px;
+        height: 44px;
+
+        img {
+            width: 44px;
+            height: 44px;
+            border-radius: $dc-radius-full;
+            object-fit: cover;
+        }
+    }
+
+    &__status-dot {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 14px;
+        height: 14px;
+        border-radius: $dc-radius-full;
+        border: 2px solid $dc-bg-secondary;
+        background: $dc-status-offline;
+
+        &.online {
+            background: $dc-status-online;
+        }
+        &.idle {
+            background: $dc-status-idle;
+        }
+        &.dnd {
+            background: $dc-status-dnd;
+        }
+    }
+
+    &__info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__row {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+    }
+
+    &__name {
+        font-size: 15px;
+        font-weight: 600;
+        color: $dc-header-primary;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &__time {
+        font-size: 12px;
+        color: $dc-text-muted;
+        flex-shrink: 0;
+    }
+
+    &__preview {
+        font-size: 13px;
+        color: $dc-text-muted;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin-top: 2px;
+    }
+
+    &__unread-dot {
+        flex-shrink: 0;
+        width: 8px;
+        height: 8px;
+        border-radius: $dc-radius-full;
+        background: $dc-text-normal;
+    }
+}

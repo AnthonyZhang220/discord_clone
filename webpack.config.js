@@ -1,21 +1,21 @@
-const DotenvWebpackPlugin = require('dotenv-webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
-const path = require('path');
+const DotenvWebpackPlugin = require("dotenv-webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+const path = require("path");
 
 module.exports = {
-    entry: './index.js',
-    mode: 'development',
+    entry: "./index.js",
+    mode: "development",
     output: {
-        path: path.resolve(__dirname, './dist'),
-        filename: 'index_bundle.js',
-        publicPath: '/',
+        path: path.resolve(__dirname, "./dist"),
+        filename: "index_bundle.js",
+        publicPath: "/",
     },
-    target: 'web',
+    target: "web",
     devServer: {
-        port: '5000',
+        port: "5000",
         static: {
-            directory: path.join(__dirname, 'public')
+            directory: path.join(__dirname, "public"),
         },
         open: true,
         hot: true,
@@ -23,37 +23,43 @@ module.exports = {
         historyApiFallback: true,
     },
     resolve: {
-        extensions: ['.js', '.jsx', '.json'],
+        extensions: [".js", ".jsx", ".json"],
         fallback: {
-            "crypto": require.resolve("crypto-browserify"),
-            "zlib": require.resolve("browserify-zlib"),
-            "stream": require.resolve("stream-browserify")
+            crypto: require.resolve("crypto-browserify"),
+            zlib: require.resolve("browserify-zlib"),
+            stream: require.resolve("stream-browserify"),
         },
         alias: {
-            stream: 'stream-browserify',
-            '@': path.resolve(__dirname, 'src'),
-            '@styles': path.resolve(__dirname, 'src/styles'), // 新增
-        }
+            stream: "stream-browserify",
+            "@": path.resolve(__dirname, "src"),
+            "@styles": path.resolve(__dirname, "src/styles"), // 新增
+        },
     },
     module: {
         rules: [
             {
                 test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
-                use: 'babel-loader',
+                use: "babel-loader",
             },
             {
                 test: /\.scss$/,
                 use: [
-                    'style-loader',
-                    'css-loader',
+                    "style-loader",
                     {
-                        loader: 'sass-loader',
+                        loader: "css-loader",
                         options: {
-                            api: 'modern',
+                            importLoaders: 1,
+                        },
+                    },
+                    {
+                        loader: "sass-loader",
+                        options: {
+                            api: "modern",
                             additionalData: `@use "sass:color";\n@use "variables" as *;\n`,
                             sassOptions: {
-                                loadPaths: [path.resolve(__dirname, 'src/styles')],
+                                loadPaths: [path.resolve(__dirname, "src/styles")],
+                                quietDeps: true,
                             },
                         },
                     },
@@ -61,22 +67,22 @@ module.exports = {
             },
             {
                 test: /\.(woff|woff2|eot|ttf|otf)$/i,
-                type: 'asset/resource',
+                type: "asset/resource",
             },
             {
                 test: /\.js$/,
-                enforce: 'pre',
-                use: ['source-map-loader'],
+                enforce: "pre",
+                use: ["source-map-loader"],
             },
             {
                 test: /\.svg$/,
-                use: ['@svgr/webpack'],
+                use: ["@svgr/webpack"],
             },
         ],
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: path.join(__dirname, 'public', 'index.html')
+            template: path.join(__dirname, "public", "index.html"),
         }),
         new DotenvWebpackPlugin({
             safe: false,

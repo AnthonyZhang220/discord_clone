@@ -1,3 +1,6 @@
+@use "discord-mobile" as *;
+@use "discord-mobile-adapter" as *;
+// variables 已由 webpack additionalData 自动注入，无需手动 @use
 // variables 已由 webpack additionalData 自动注入，无需手动 @use
 
 // ============================================================
@@ -54,6 +57,8 @@
 // ============================================================
 // Base
 // ============================================================
+
+/* Mobile styles (module-based) */
 
 html,
 body {
@@ -122,4 +127,165 @@ svg[id] {
     .button + .button {
         box-shadow: inset 1px 0 0 $border-accent;
     }
+}
+
+.compat-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    z-index: 1300;
+}
+
+.compat-popover {
+    background: var(--menu-bg);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    min-width: 260px;
+    padding: 8px 0;
+}
+
+.modal-paper {
+    background: var(--menu-bg);
+    color: var(--body-color);
+    border-radius: 16px;
+    box-shadow: 0 22px 68px rgba(0, 0, 0, 0.45);
+}
+
+.modal-paper--center {
+    max-width: min(680px, calc(100vw - 40px));
+    width: 100%;
+    padding: 24px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.modal-paper--start {
+    max-width: min(520px, calc(100vw - 40px));
+    width: 100%;
+    padding: 20px;
+    top: 12%;
+    transform: translateX(-50%);
+}
+
+.modal-title {
+    margin-bottom: 16px;
+}
+
+.modal-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.modal-actions--column {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.modal-input-label {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+}
+
+.modal-button-back {
+    color: var(--body-color);
+    opacity: 0.85;
+}
+
+.server-settings-paper {
+    background: var(--menu-bg);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    min-width: 260px;
+    padding: 8px 0;
+}
+
+.server-settings-item {
+    padding: 0;
+}
+
+.server-settings-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: var(--body-color);
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+}
+
+.server-settings-button:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.server-settings-title {
+    font-size: 14px;
+    color: inherit;
+}
+
+.server-settings-icon {
+    font-size: 18px;
+}
+
+.server-settings-danger {
+    color: var(--danger);
+}
+
+.server-settings-divider {
+    margin: 4px 0;
+    background: var(--border-accent);
+}
+
+.modal-listitem-button {
+    width: 100%;
+    text-align: left;
+    padding: 12px 16px;
+}
+
+.modal-listitem-button:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.modal-listitem-text {
+    color: var(--body-color);
+    font-size: 14px;
+}
+
+.modal-image-preview {
+    width: 100%;
+    max-width: 320px;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto 16px;
+}
+
+.modal-iconbutton--mt4 {
+    margin-top: 16px;
+    color: var(--body-color);
+}
+
+.modal-photo-icon {
+    font-size: 28px;
+}
+
+.Create-Channel-Modal {
+    position: relative;
+    max-width: min(520px, calc(100vw - 40px));
+    width: 100%;
+}
+
+.user-detail-popover-paper {
+    background: var(--menu-bg);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    color: var(--body-color);
 }

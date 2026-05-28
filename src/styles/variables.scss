@@ -145,6 +145,16 @@ $dc-scrollbar-thumb: #1a1b1e;
 $dc-scrollbar-track: #2b2d31;
 
 // ============================================================
+// 浅色主题（保留以供白色/浅色样式切换使用）
+// ============================================================
+$dc-light-bg-primary: #ffffff;
+$dc-light-bg-secondary: #f2f3f5;
+$dc-light-bg-tertiary: #e3e5e8;
+$dc-light-text-normal: #2e3338;
+$dc-light-text-muted: #747f8d;
+$dc-light-header-primary: #060607;
+
+// ============================================================
 // 项目变量（引用 dc 变量）
 // ============================================================
 
@@ -284,4 +294,6 @@ $button-bg-active: $dc-btn-secondary-hover;
     --dc-divider: #{$dc-divider};
     --dc-scrollbar-thumb: #{$dc-scrollbar-thumb};
     --dc-scrollbar-track: #{$dc-scrollbar-track};
+    // common utility
+    --dc-white: #{$dc-light-bg-primary};
 }
