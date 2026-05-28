@@ -1,6 +1,5 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { lighten } from "@mui/material";
 import {
     ListItem,
     ListItemButton,
@@ -18,25 +17,20 @@ export const DirectMessageList = ({ id, status, displayName, avatar, createdAt }
         (state) => state.directMessage
     );
     return (
-        <ListItem disablePadding sx={{ p: 0, m: 0 }} className="friend-conversation-item">
+        <ListItem disablePadding className="friend-conversation-item">
             <ListItemButton
                 onClick={() =>
                     handleCurrDirectMessageChannel(id, status, displayName, avatar, createdAt)
                 }
-                sx={{
-                    backgroundColor:
-                        !isFriendListPageOpen && currDirectMessageChannel.id == id
-                            ? lighten("#313338", 0.1)
-                            : "inherit",
-                }}
+                className={`friend-list-button ${!isFriendListPageOpen && currDirectMessageChannel.id == id ? "friend-list-button--active" : ""}`}
             >
-                <ListItemAvatar sx={{ minWidth: "0", mr: 1 }}>
+                <ListItemAvatar className="friend-list-avatar">
                     <Badge
                         overlap="circular"
                         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                         badgeContent={<StatusList status={status} size={12} />}
                     >
-                        <Avatar alt={displayName} src={avatar} sx={{ width: 32, height: 32 }} />
+                        <Avatar alt={displayName} src={avatar} className="friend-avatar" />
                     </Badge>
                 </ListItemAvatar>
                 <ListItemText primary={displayName} />

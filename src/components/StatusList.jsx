@@ -5,13 +5,45 @@ import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 
+// styles moved to ThemeContextProvider / global SCSS
+
 const StatusList = ({ status, size, edge }) => {
     const list = {
-        online: <CircleIcon edge={edge} sx={{ color: "#23a55a", fontSize: size }} />,
-        idle: <DarkModeIcon edge={edge} sx={{ color: "#f0b132", fontSize: size }} />,
-        donotdisturb: <RemoveCircleIcon edge={edge} sx={{ color: "#f23f43", fontSize: size }} />,
-        invisible: <StopCircleIcon edge={edge} sx={{ color: "#80848e", fontSize: size }} />,
-        offline: <StopCircleIcon edge={edge} sx={{ color: "#80848e", fontSize: size }} />,
+        online: (
+            <CircleIcon
+                edge={edge}
+                className={`status-icon status-online`}
+                style={{ fontSize: size }}
+            />
+        ),
+        idle: (
+            <DarkModeIcon
+                edge={edge}
+                className={`status-icon status-idle`}
+                style={{ fontSize: size }}
+            />
+        ),
+        donotdisturb: (
+            <RemoveCircleIcon
+                edge={edge}
+                className={`status-icon status-dnd`}
+                style={{ fontSize: size }}
+            />
+        ),
+        invisible: (
+            <StopCircleIcon
+                edge={edge}
+                className={`status-icon status-muted`}
+                style={{ fontSize: size }}
+            />
+        ),
+        offline: (
+            <StopCircleIcon
+                edge={edge}
+                className={`status-icon status-muted`}
+                style={{ fontSize: size }}
+            />
+        ),
     };
 
     return list[status];

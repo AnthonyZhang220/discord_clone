@@ -105,6 +105,12 @@
                 min-width: 0;
                 overflow: hidden;
             }
+
+            .voicechat-volume-icon {
+                color: var(--server-marker-unread);
+                margin-right: 6px;
+                vertical-align: baseline;
+            }
         }
 
         .gradient-bottom {

@@ -1,6 +1,7 @@
 import React from "react";
 
-import { Box, Tooltip, IconButton, Typography, Link, Breadcrumbs } from "@mui/material";
+import { IconButton, Typography, Link, Breadcrumbs } from "@mui/material";
+import { Tooltip } from "@/components/compat/RadixCompat";
 import { useSelector } from "react-redux";
 import SignalCellularAltRoundedIcon from "@mui/icons-material/SignalCellularAltRounded";
 import CallEndRoundedIcon from "@mui/icons-material/CallEndRounded";
@@ -17,24 +18,23 @@ export default function VoiceControl() {
     );
     const { currVoiceChannel } = useSelector((state) => state.channel);
 
+    const latencyClass =
+        latency < 100 ? "latency-good" : latency < 300 ? "latency-warn" : "latency-bad";
+
     return (
-        <Box component="footer" className="voice-control-container">
-            <Box className="voice-control-upper">
-                <Box className="voice-control-details" sx={{ marginRight: "auto" }}>
-                    <Box
-                        className="voice-control-status"
-                        sx={{ color: connectionState !== "DISCONNECTED" ? "#23a459" : "white" }}
+        <footer className="voice-control-container">
+            <div className="voice-control-upper">
+                <div className="voice-control-details">
+                    <div
+                        className={
+                            "voice-control-status " +
+                            (connectionState !== "DISCONNECTED" ? "voice-control-connected" : "")
+                        }
                     >
                         <Tooltip
                             arrow
-                            sx={{
-                                background:
-                                    latency < 100
-                                        ? "#23a55a"
-                                        : latency < 100
-                                          ? "#f0b132"
-                                          : "#f23f42",
-                                color: "whitesmoke",
+                            componentsProps={{
+                                tooltip: { className: `latency-tooltip ${latencyClass}` },
                             }}
                             title={
                                 <React.Fragment>
@@ -44,21 +44,25 @@ export default function VoiceControl() {
                             placement="top"
                         >
                             <span>
-                                <SignalCellularAltRoundedIcon sx={{ height: 20, width: 20 }} />
+                                <SignalCellularAltRoundedIcon className="voicecontrol-signal-icon" />
                             </span>
                         </Tooltip>
                         <Link
                             underline="hover"
                             variant="body1"
-                            sx={{ color: connectionState !== "DISCONNECTED" ? "#23a459" : "white" }}
+                            className={
+                                connectionState !== "DISCONNECTED"
+                                    ? "voice-control-link voice-control-connected"
+                                    : "voice-control-link"
+                            }
                         >
                             {connectionState}
                         </Link>
-                    </Box>
+                    </div>
                     <Breadcrumbs
                         aria-label="breadcrumb"
                         separator="/"
-                        style={{ color: "whitesmoke" }}
+                        className="voicecontrol-breadcrumbs"
                     >
                         <Link underline="hover" variant="body2">
                             {connectionState !== "DISCONNECTED"
@@ -71,8 +75,8 @@ export default function VoiceControl() {
                                 : connectionState}
                         </Link>
                     </Breadcrumbs>
-                </Box>
-                <Box className="voice-control-disconnected" sx={{ ml: "auto" }}>
+                </div>
+                <div className="voice-control-disconnected">
                     <Tooltip title="Disconnect" placement="top">
                         <IconButton
                             className="voice-control-button"
@@ -81,63 +85,52 @@ export default function VoiceControl() {
                                 handleLeaveVoiceChannel();
                             }}
                         >
-                            <CallEndRoundedIcon sx={{ height: 20, width: 20 }} />
+                            <CallEndRoundedIcon className="voicecontrol-callend-icon" />
                         </IconButton>
                     </Tooltip>
-                </Box>
-            </Box>
-            <Box className="voice-control-lower">
-                <Box className="voice-control-buttons button-group" sx={{ ml: "auto" }}>
+                </div>
+            </div>
+            <div className="voice-control-lower">
+                <div className="voice-control-buttons button-group voice-control-buttons-right">
                     <Tooltip
                         title={isCameraOn ? "Turn Off Camera" : "Turn On Camera"}
                         placement="top"
                     >
-                        <Box
-                            className="voice-control-button"
+                        <div
+                            className={
+                                "voice-control-button toggle-camera " + (isCameraOn ? "on" : "off")
+                            }
                             aria-label={isCameraOn ? "Camera On" : "Camera Off "}
-                            sx={{
-                                backgroundColor: isCameraOn ? "#23a459" : "#2b2d31",
-                                borderRadius: "4px",
-                                width: "40px",
-                                height: "30px",
-                            }}
                             onClick={() => {
                                 toggleCamera();
                             }}
                         >
                             <IconButton>
-                                <VideocamRoundedIcon
-                                    sx={{ height: 20, width: 20, textAlign: "center" }}
-                                />
+                                <VideocamRoundedIcon className="voicecontrol-toggle-icon" />
                             </IconButton>
-                        </Box>
+                        </div>
                     </Tooltip>
                     <Tooltip
                         title={isScreenSharingOn ? "Stop sharing Your Screen" : "Share Your Screen"}
                         placement="top"
                     >
-                        <Box
-                            className="voice-control-button"
+                        <div
+                            className={
+                                "voice-control-button toggle-screenshare " +
+                                (isScreenSharingOn ? "on" : "off")
+                            }
                             aria-label={isScreenSharingOn ? "sharing enabled" : "sharing disabled"}
-                            sx={{
-                                backgroundColor: isScreenSharingOn ? "#23a459" : "#2b2d31",
-                                borderRadius: "4px",
-                                width: "40px",
-                                height: "30px",
-                            }}
                             onClick={() => {
                                 toggleScreenShare();
                             }}
                         >
                             <IconButton>
-                                <ScreenShareRoundedIcon
-                                    sx={{ height: 20, width: 20, textAlign: "center" }}
-                                />
+                                <ScreenShareRoundedIcon className="voicecontrol-toggle-icon" />
                             </IconButton>
-                        </Box>
+                        </div>
                     </Tooltip>
-                </Box>
-            </Box>
-        </Box>
+                </div>
+            </div>
+        </footer>
     );
 }

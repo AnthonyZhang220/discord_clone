@@ -16,6 +16,8 @@
     }
 }
 
+// mobile behavior handled by discord-mobile.scss and adapter
+
 // SERVER
 .server {
     width: 50px;
@@ -52,6 +54,32 @@
     .server-icon > img {
         border-radius: inherit;
         max-width: 100%;
+    }
+
+    .server-divider {
+        background-color: var(--dc-divider);
+        margin: 8px;
+        border-radius: 1px;
+        height: 2px;
+    }
+
+    .tooltip-text {
+        margin: 0.5rem;
+    }
+
+    .server-add-button,
+    .server-explore-button {
+        font-size: 15px;
+        color: var(--success);
+    }
+
+    .server-add-button:hover,
+    .server-explore-button:hover {
+        color: var(--body-color);
+    }
+
+    .server-explore:hover {
+        background-color: var(--success);
     }
 
     &.server-friends {

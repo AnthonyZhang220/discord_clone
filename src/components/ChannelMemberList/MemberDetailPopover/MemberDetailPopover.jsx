@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, ListItem, ListItemText, Avatar, Badge, Popover, Divider } from "@mui/material";
+import { ListItem, ListItemText, Avatar, Badge, Divider } from "@mui/material";
+import { Popover } from "@/components/compat/RadixCompat";
 import { MemberListItemButton } from "@/components/CustomUIComponents";
 import StatusList from "@/components/StatusList";
 import { setMemberDetailPopover } from "@/redux/features/popoverSlice";
@@ -17,18 +18,7 @@ export const MemberDetailPopover = ({ memberRef }) => {
             onClose={() => dispatch(setMemberDetailPopover(false))}
             anchorReference="anchorEl"
             anchorEl={memberRef ? () => memberRef : null}
-            PaperProps={{
-                style: {
-                    background: "var(--servers-bg)",
-                    borderRadius: "8px 8px 8px 8px",
-                    width: "340px",
-                    fontSize: 14,
-                    display: "flex",
-                    flexDirection: "column",
-                    flexGrow: 1,
-                    maxHeight: "calc(100vh - 28px)",
-                },
-            }}
+            PaperProps={{ className: "member-detail-paper__paper" }}
             anchorOrigin={{
                 vertical: 0,
                 horizontal: 0,
@@ -38,20 +28,14 @@ export const MemberDetailPopover = ({ memberRef }) => {
                 horizontal: "right",
             }}
         >
-            <Box className="member-detail-top">
+            <div className="member-detail-top">
                 <svg className="member-detail-banner">
                     <mask id="uid_347">
                         <rect></rect>
                         <circle></circle>
                     </mask>
                     <foreignObject className="member-detail-object">
-                        <Box
-                            sx={{
-                                width: "100%",
-                                height: "60px",
-                                transition: "background-color 0.1s",
-                            }}
-                        ></Box>
+                        <div className="member-detail-banner-box"></div>
                     </foreignObject>
                 </svg>
                 <Badge
@@ -62,13 +46,13 @@ export const MemberDetailPopover = ({ memberRef }) => {
                 >
                     <Avatar
                         alt={memberDetail.displayName}
-                        sx={{ width: "80px", height: "80px" }}
+                        className="member-detail-avatar-img"
                         src={memberDetail.avatar}
                         imgProps={{ crossOrigin: "" }}
                     />
                 </Badge>
-            </Box>
-            <Box className="member-detail-list" sx={{ backgroundColor: "var(--body-bg)" }}>
+            </div>
+            <div className="member-detail-list">
                 <ListItem dense>
                     <MemberListItemButton>
                         <ListItemText
@@ -77,11 +61,7 @@ export const MemberDetailPopover = ({ memberRef }) => {
                         />
                     </MemberListItemButton>
                 </ListItem>
-                <Divider
-                    style={{ backgroundColor: "var(--server-marker-unread)" }}
-                    variant="middle"
-                    light={true}
-                />
+                <Divider className="member-detail-divider" variant="middle" light={true} />
                 <ListItem dense>
                     <MemberListItemButton>
                         <ListItemText
@@ -94,15 +74,11 @@ export const MemberDetailPopover = ({ memberRef }) => {
                                 day: "2-digit",
                                 year: "numeric",
                             })}
-                            secondaryTypographyProps={{
-                                style: {
-                                    color: "white",
-                                },
-                            }}
+                            secondaryTypographyProps={{ className: "member-detail-secondary" }}
                         />
                     </MemberListItemButton>
                 </ListItem>
-            </Box>
+            </div>
         </Popover>
     );
 };

@@ -3,7 +3,6 @@ import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import Chat from "./components/Chat/Chat";
 import ServerList from "./components/ServerList/ServerList";
 import Channel from "./components/Channel/Channel";
-import { Box } from "@mui/system";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import LoginPage, { ResetPasswordPage } from "./components/LoginPage/LoginPage";
 import { RegisterPage } from "./components/LoginPage/LoginPage";
@@ -17,7 +16,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import DirectMessageMenu from "./components/DirectMessage/DirectMessageMenu/DirectMessageMenu";
 import DirectMessageBody from "./components/DirectMessage/DirectMessageBody/DirectMessageBody";
 import PageNotFound from "./components/PageNotFound/PageNotFound";
-import { onAuthStateChanged, getRedirectResult, GoogleAuthProvider } from "firebase/auth";
+import { onAuthStateChanged, getRedirectResult } from "firebase/auth";
 import { getSelectStore } from "./utils/userSelectStore";
 import { setUser, setIsLoggedIn } from "./redux/features/authSlice";
 import { setIsDirectMessagePageOpen } from "./redux/features/directMessageSlice";
@@ -35,27 +34,100 @@ function App() {
     const location = useLocation();
 
     useEffect(() => {
+        try {
+            /* eslint-disable no-console */
+            console.info("initial location:", window.location.href);
+            console.info(
+                "initial localStorage keys:",
+                Object.keys(localStorage).filter((k) =>
+                    /firebase|redirect|PENDING_REDIRECT|redirectUser/i.test(k)
+                )
+            );
+            /* eslint-enable no-console */
+        } catch (e) {
+            // ignore non-browser
+        }
         // Handle OAuth redirect results (optional: access tokens, credentials)
         (async () => {
             try {
                 const result = await getRedirectResult(auth).catch(() => null);
-                if (result) {
+                // eslint-disable-next-line no-console
+                console.info("getRedirectResult:", result);
+                if (result && result.user) {
+                    // If redirect returned a user, ensure app state is populated the same way
                     try {
-                        const credential = GoogleAuthProvider.credentialFromResult(result);
-                        if (credential) {
-                            // OAuth credential available; intentionally not logged in production
+                        const user = result.user;
+                        const userRef = doc(db, "users", user.uid);
+                        const userDoc = await getDoc(userRef);
+
+                        if (userDoc.exists()) {
+                            const userData = userDoc.data();
+                            dispatch(
+                                setUser({
+                                    displayName: userData.displayName,
+                                    avatar: userData.avatar,
+                                    id: userData.id,
+                                    createdAt: userData.createdAt?.seconds
+                                        ? userData.createdAt.seconds
+                                        : null,
+                                    status: userData.status,
+                                    email: userData.email,
+                                    bannerColor: userData.bannerColor,
+                                    friends: userData.friends || [],
+                                })
+                            );
+                        } else {
+                            const newUser = {
+                                displayName: user.displayName,
+                                email: user.email ? user.email : "",
+                                avatar: user.photoURL,
+                                id: user.uid,
+                                createdAt: Timestamp.fromDate(new Date()),
+                                status: "online",
+                                friends: [],
+                                bannerColor: await getBannerColor(user.photoURL),
+                            };
+
+                            await setDoc(userRef, newUser);
+
+                            dispatch(
+                                setUser({
+                                    displayName: newUser.displayName,
+                                    avatar: newUser.avatar,
+                                    id: newUser.id,
+                                    createdAt: newUser.createdAt.seconds,
+                                    status: newUser.status,
+                                    email: newUser.email,
+                                    bannerColor: newUser.bannerColor,
+                                    friends: newUser.friends,
+                                })
+                            );
+                        }
+
+                        getSelectStore();
+                        dispatch(setIsLoggedIn(true));
+                        try {
+                            const cur = window.location.pathname || "";
+                            if (!cur.startsWith("/channels")) {
+                                navigate("/channels");
+                            }
+                        } catch (e) {
+                            navigate("/channels");
                         }
                     } catch (e) {
-                        // provider-specific parsing failed, ignore
-                        console.warn("Could not parse OAuth credential from redirect result", e);
+                        // eslint-disable-next-line no-console
+                        console.error("Error processing redirect user", e);
                     }
                 }
             } catch (err) {
+                // eslint-disable-next-line no-console
                 console.warn("getRedirectResult failed", err);
             }
         })();
 
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            // eslint-disable-next-line no-console
+            console.info("onAuthStateChanged user:", user);
             try {
                 if (user) {
                     const userRef = doc(db, "users", user.uid);
@@ -128,6 +200,7 @@ function App() {
                     }
                 }
             } catch (error) {
+                // eslint-disable-next-line no-console
                 console.error("Error fetching user data", error);
             }
         });
@@ -158,11 +231,11 @@ function App() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route
                     element={
-                        <Box className="app-mount">
-                            <Box className="app-container">
+                        <div className="app-mount">
+                            <div className="app-container">
                                 <Outlet />
-                            </Box>
-                        </Box>
+                            </div>
+                        </div>
                     }
                 >
                     <Route

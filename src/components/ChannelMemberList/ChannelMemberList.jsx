@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import {
-    Box,
     List,
     ListItem,
     ListItemAvatar,
@@ -68,17 +67,14 @@ function ChannelMemberList() {
     };
 
     return (
-        <Box className="userstatus-container">
-            <Box component="aside" className="userstatus-memberlist-wrapper">
-                <Box className="userstatus-memberlist">
-                    <Box component="header" className="userstatus-online focusable">
+        <div className="userstatus-container">
+            <aside className="userstatus-memberlist-wrapper">
+                <div className="userstatus-memberlist">
+                    <header className="userstatus-online focusable">
                         {memberList.find((member) => online(member.status) === true) ? (
                             <List
                                 subheader={
-                                    <ListSubheader
-                                        component="div"
-                                        sx={{ backgroundColor: "#2b2d31", color: "white" }}
-                                    >
+                                    <ListSubheader component="div" className="member-subheader">
                                         Online -{" "}
                                         {
                                             memberList?.filter(
@@ -94,7 +90,7 @@ function ChannelMemberList() {
                                         <ListItem
                                             key={id}
                                             disablePadding
-                                            sx={{ opacity: 1 }}
+                                            className="member-list-item"
                                             ref={(ele) => (memberRefs.current[id] = ele)}
                                         >
                                             <ListItemButton
@@ -123,10 +119,7 @@ function ChannelMemberList() {
                         {memberList.find((member) => online(member.status) === false) ? (
                             <List
                                 subheader={
-                                    <ListSubheader
-                                        component="div"
-                                        sx={{ backgroundColor: "#2b2d31", color: "white" }}
-                                    >
+                                    <ListSubheader component="div" className="member-subheader">
                                         Offline -{" "}
                                         {
                                             memberList?.filter(
@@ -142,7 +135,7 @@ function ChannelMemberList() {
                                         <ListItem
                                             key={id}
                                             disablePadding
-                                            sx={{ opacity: 0.3 }}
+                                            className="member-list-item member-list-item-muted"
                                             ref={(ele) => (memberRefs.current[id] = ele)}
                                         >
                                             <ListItemButton
@@ -166,11 +159,11 @@ function ChannelMemberList() {
                                     ))}
                             </List>
                         ) : null}
-                    </Box>
-                </Box>
-            </Box>
+                    </header>
+                </div>
+            </aside>
             <MemberDetailPopover memberRef={memberRef} />
-        </Box>
+        </div>
     );
 }
 

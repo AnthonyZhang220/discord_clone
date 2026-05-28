@@ -6,17 +6,18 @@ import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import Badge from "@mui/material/Badge";
 
 import {
-    Button,
-    InputLabel,
-    FormControl,
-    Box,
-    InputBase,
-    InputAdornment,
     Dialog,
     DialogActions,
     DialogContent,
     DialogTitle,
     DialogContentText,
+} from "@/components/compat/RadixCompat";
+import {
+    Button,
+    InputLabel,
+    FormControl,
+    InputBase,
+    InputAdornment,
     IconButton,
     ListItemButton,
     ListItemText,
@@ -42,19 +43,20 @@ import { setNewChannelInfo } from "@/redux/features/channelSlice";
 import { handleCreateServer, handleJoinServer } from "@/handlers/serverHandlers";
 import { handleCreateVoiceChannel, handleCreateChannel } from "@/handlers/channelHandlers";
 import styled from "@emotion/styled";
+// modal styles moved to theme / consolidated into global styles
 
 const BootstrapInput = styled(InputBase)(({ theme }) => ({
     "label + &": {
         marginTop: theme.spacing(3),
     },
-    "& .MuiInputBase-input": {
+    "& input": {
         borderRadius: 4,
         position: "relative",
-        backgroundColor: "#1e1f22",
+        backgroundColor: theme.palette.background.paper,
         border: "none",
         fontSize: 16,
         padding: "10px 12px",
-        color: "#ffffff",
+        color: theme.palette.text.primary,
     },
 }));
 
@@ -62,17 +64,11 @@ export function ServerDialog({ createServerModal }) {
     const dispatch = useDispatch();
     return (
         <Dialog
-            PaperProps={{
-                style: {
-                    textAlign: "center",
-                    backgroundColor: "#ffffff",
-                    width: "440px",
-                },
-            }}
+            PaperProps={{ className: "modal-paper modal-paper--center" }}
             open={createServerModal}
             onClose={() => dispatch(setCreateServerModal(false))}
         >
-            <DialogTitle sx={{ color: "#060607" }} variant="h3">
+            <DialogTitle className="modal-title" variant="h3">
                 Create a server
             </DialogTitle>
             <DialogContent>
@@ -81,17 +77,20 @@ export function ServerDialog({ createServerModal }) {
                     talking.
                 </DialogContentText>
                 <ListItemButton
-                    sx={{ borderRadius: "8px", border: "solid 1px #121314" }}
+                    className="modal-listitem-button"
                     onClick={() => dispatch(setCreateServerFormModal(true))}
                 >
                     <PublicIcon />
-                    <ListItemText variant="h5" primaryTypographyProps={{ color: "#121314", ml: 1 }}>
+                    <ListItemText
+                        variant="h5"
+                        primaryTypographyProps={{ className: "modal-listitem-text" }}
+                    >
                         Create My Own
                     </ListItemText>
                     <NavigateNext edge="end" />
                 </ListItemButton>
             </DialogContent>
-            <DialogActions sx={{ backgroundColor: "#f2f3f5", flexDirection: "column" }}>
+            <DialogActions className="modal-actions modal-actions--column">
                 <DialogContentText variant="h4">Have an invite already?</DialogContentText>
                 <Button variant="contained" onClick={() => dispatch(setJoinServerModal(true))}>
                     Join a Server
@@ -115,17 +114,11 @@ export function CreateServerDialog({ createServerFormModal }) {
     };
     return (
         <Dialog
-            PaperProps={{
-                style: {
-                    textAlign: "center",
-                    backgroundColor: "#ffffff",
-                    width: "440px",
-                },
-            }}
+            PaperProps={{ className: "modal-paper modal-paper--center" }}
             open={createServerFormModal}
             onClose={() => dispatch(setCreateServerFormModal(false))}
         >
-            <DialogTitle sx={{ color: "#060607" }} variant="h3">
+            <DialogTitle className="modal-title" variant="h3">
                 Create a server
             </DialogTitle>
             <DialogContent>
@@ -134,44 +127,33 @@ export function CreateServerDialog({ createServerFormModal }) {
                     change it later.
                 </DialogContentText>
                 {uploadFileLocationURL ? (
-                    <Box component="label">
-                        <Box
-                            component="img"
-                            src={uploadFileLocationURL}
-                            sx={{ width: "75px", height: "75px", borderRadius: "50% 50%", mt: 4 }}
-                        />
-                        <Box
-                            component="input"
+                    <label>
+                        <img src={uploadFileLocationURL} className="modal-image-preview" />
+                        <input
                             type="file"
                             onChange={(e) => handleFile(e)}
-                            sx={{ display: "none" }}
+                            className="hidden-input"
                         />
-                    </Box>
+                    </label>
                 ) : (
                     <React.Fragment>
-                        <IconButton sx={{ mt: 4 }}>
-                            <Box component="label">
+                        <IconButton className="modal-iconbutton--mt4">
+                            <label>
                                 <Badge badgeContent={<AddIcon />} color="primary">
-                                    <PhotoCameraIcon sx={{ fontSize: 50 }} />
-                                    <Box
-                                        component="input"
+                                    <PhotoCameraIcon className="modal-photo-icon" />
+                                    <input
                                         type="file"
                                         onChange={(e) => handleFile(e)}
-                                        sx={{ display: "none" }}
+                                        className="hidden-input"
                                     />
                                 </Badge>
-                            </Box>
+                            </label>
                         </IconButton>
                     </React.Fragment>
                 )}
-                <Box component="form">
+                <form>
                     <FormControl variant="standard" required fullWidth>
-                        <InputLabel
-                            shrink
-                            sx={{
-                                color: "#4e5058",
-                            }}
-                        >
+                        <InputLabel shrink className="modal-input-label">
                             SERVER NAME
                         </InputLabel>
                         <InfoInput
@@ -191,12 +173,12 @@ export function CreateServerDialog({ createServerFormModal }) {
                             placeholder={`${user?.displayName}'s Server`}
                         />
                     </FormControl>
-                </Box>
+                </form>
             </DialogContent>
-            <DialogActions sx={{ backgroundColor: "#f2f3f5" }}>
+            <DialogActions className="modal-actions">
                 <Button
                     variant="text"
-                    sx={{ marginRight: "auto", color: "#4e5058" }}
+                    className="modal-button-back"
                     onClick={() => dispatch(setCreateServerFormModal(false))}
                 >
                     Back
@@ -218,31 +200,20 @@ export function JoinServerDialog({ joinServerModal }) {
     const { joinServerId } = useSelector((state) => state.server);
     return (
         <Dialog
-            PaperProps={{
-                style: {
-                    textAlign: "center",
-                    backgroundColor: "#ffffff",
-                    width: "440px",
-                },
-            }}
+            PaperProps={{ className: "modal-paper modal-paper--center" }}
             open={joinServerModal}
             onClose={() => dispatch(setJoinServerModal(false))}
         >
-            <DialogTitle sx={{ color: "#060607" }} variant="h3">
+            <DialogTitle className="modal-title" variant="h3">
                 Join a Server
             </DialogTitle>
             <DialogContent>
                 <DialogContentText variant="h5">
                     Enter an invite below to join an existing server
                 </DialogContentText>
-                <Box component="form">
+                <form>
                     <FormControl variant="standard" required fullWidth>
-                        <InputLabel
-                            shrink
-                            sx={{
-                                color: "#4e5058",
-                            }}
-                        >
+                        <InputLabel shrink className="modal-input-label">
                             Invite ID
                         </InputLabel>
                         <InfoInput
@@ -255,12 +226,12 @@ export function JoinServerDialog({ joinServerModal }) {
                             placeholder="Server ID"
                         />
                     </FormControl>
-                </Box>
+                </form>
             </DialogContent>
-            <DialogActions sx={{ backgroundColor: "#f2f3f5" }}>
+            <DialogActions className="modal-actions">
                 <Button
                     variant="text"
-                    sx={{ marginRight: "auto", color: "#4e5058" }}
+                    className="modal-button-back"
                     onClick={() => dispatch(setJoinServerModal(false))}
                 >
                     Back
@@ -292,26 +263,15 @@ export function InviteDialog({ inviteModal }) {
             className="Create-Channel-Modal"
             open={inviteModal}
             onClose={() => dispatch(setInviteModal(false))}
-            PaperProps={{
-                style: {
-                    textAlign: "start",
-                    backgroundColor: "#313338",
-                    width: "440px",
-                },
-            }}
+            PaperProps={{ className: "modal-paper modal-paper--start" }}
         >
-            <DialogTitle sx={{ color: "#ffffff" }} variant="h3">
+            <DialogTitle className="modal-title" variant="h3">
                 Invite friends to {currServer.name}
             </DialogTitle>
             <DialogContent>
-                <Box component="form">
+                <form>
                     <FormControl variant="standard" required fullWidth>
-                        <InputLabel
-                            shrink
-                            sx={{
-                                color: "#ffffff",
-                            }}
-                        >
+                        <InputLabel shrink className="modal-input-label">
                             OR, SEND A SERVER ID TO A FRIEND
                         </InputLabel>
                         <BootstrapInput
@@ -334,7 +294,7 @@ export function InviteDialog({ inviteModal }) {
                             }
                         />
                     </FormControl>
-                </Box>
+                </form>
             </DialogContent>
         </Dialog>
     );
@@ -349,26 +309,15 @@ export function CreateChannelDialog({ createChannelModal }) {
             className="Create-Channel-Modal"
             open={createChannelModal}
             onClose={() => dispatch(setCreateChannelModal(false))}
-            PaperProps={{
-                style: {
-                    textAlign: "start",
-                    backgroundColor: "#313338",
-                    width: "440px",
-                },
-            }}
+            PaperProps={{ className: "modal-paper modal-paper--start" }}
         >
-            <DialogTitle sx={{ color: "#ffffff" }} variant="h3">
+            <DialogTitle className="modal-title" variant="h3">
                 Create Text Channel
             </DialogTitle>
             <DialogContent>
-                <Box component="form">
+                <form>
                     <FormControl variant="standard" required fullWidth>
-                        <InputLabel
-                            shrink
-                            sx={{
-                                color: "#ffffff",
-                            }}
-                        >
+                        <InputLabel shrink className="modal-input-label">
                             CHANNEL NAME
                         </InputLabel>
                         <BootstrapInput
@@ -382,12 +331,12 @@ export function CreateChannelDialog({ createChannelModal }) {
                             placeholder="new-channel"
                         />
                     </FormControl>
-                </Box>
+                </form>
             </DialogContent>
             <DialogActions>
                 <Button
                     variant="text"
-                    sx={{ marginRight: "auto", color: "#4e5058" }}
+                    className="modal-button-back"
                     onClick={() => dispatch(setCreateChannelModal(false))}
                 >
                     Cancel
@@ -414,26 +363,15 @@ export function CreateVoiceChannelDialog({ createVoiceChannelModal }) {
             className="Create-Channel-Modal"
             open={createVoiceChannelModal}
             onClose={() => dispatch(setCreateChannelModal(false))}
-            PaperProps={{
-                style: {
-                    textAlign: "start",
-                    backgroundColor: "#313338",
-                    width: "440px",
-                },
-            }}
+            PaperProps={{ className: "modal-paper modal-paper--start" }}
         >
-            <DialogTitle sx={{ color: "#ffffff" }} variant="h3">
+            <DialogTitle className="modal-title" variant="h3">
                 Create Voice Channel
             </DialogTitle>
             <DialogContent>
-                <Box component="form">
+                <form>
                     <FormControl variant="standard" required fullWidth>
-                        <InputLabel
-                            shrink
-                            sx={{
-                                color: "#ffffff",
-                            }}
-                        >
+                        <InputLabel shrink className="modal-input-label">
                             CHANNEL NAME
                         </InputLabel>
                         <BootstrapInput
@@ -447,12 +385,12 @@ export function CreateVoiceChannelDialog({ createVoiceChannelModal }) {
                             placeholder="new-channel"
                         />
                     </FormControl>
-                </Box>
+                </form>
             </DialogContent>
             <DialogActions>
                 <Button
                     variant="text"
-                    sx={{ marginRight: "auto", color: "#4e5058" }}
+                    className="modal-button-back"
                     onClick={() => dispatch(setCreateVoiceChannelModal(false))}
                 >
                     Cancel

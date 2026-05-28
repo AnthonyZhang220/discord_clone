@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, SvgIcon, Button, Divider, Typography } from "@mui/material";
+import { SvgIcon, Button, Divider, Typography } from "@mui/material";
 
 import FriendIcon from "@/components/DirectMessage/DirectMessageBody/FriendBody/friend.svg";
 import GroupDMIcon from "@/components/DirectMessage/DirectMessageBody/FriendBody/groupdm.svg";
@@ -26,16 +26,12 @@ export const FriendHeader = () => {
     const { friendFilter } = useSelector((state) => state.directMessage);
 
     return (
-        <Box className="friend-main-header" component="section">
-            <Box className="friend-main-header-name">
+        <section className="friend-main-header">
+            <div className="friend-main-header-name">
                 <SvgIcon
                     component={FriendIcon}
                     inheritViewBox
-                    sx={{
-                        color: "var(--server-marker-unread)",
-                        marginRight: "6px",
-                        alignItems: "baseline",
-                    }}
+                    className="friend-main-header-icon"
                 />
                 <Typography variant="h3" className="friend-main-header-text">
                     Friends
@@ -43,15 +39,9 @@ export const FriendHeader = () => {
                 <Divider
                     orientation="vertical"
                     variant="fullWidth"
-                    sx={{
-                        backgroundColor: "var(--border-accent)",
-                        m: "0 8px",
-                        width: "1px",
-                        flex: "0 0 auto",
-                        height: "24px",
-                    }}
+                    className="friend-main-header-divider"
                 />
-                <Box>
+                <div>
                     <Stack direction="row" spacing={1}>
                         <Button
                             className={`friend-main-header-button ${friendFilter === "online" ? "active" : ""}`}
@@ -90,43 +80,43 @@ export const FriendHeader = () => {
                             Add Friend
                         </Button>
                     </Stack>
-                </Box>
-            </Box>
-            <Box className="friend-main-header-feature">
-                <Box className="friend-main-header-feature-icon">
+                </div>
+            </div>
+            <div className="friend-main-header-feature">
+                <div className="friend-main-header-feature-icon">
                     <FunctionTooltip
                         title={
                             <React.Fragment>
-                                <Typography variant="body1" sx={{ m: 0.5 }}>
+                                <Typography variant="body1" className="tooltip-text">
                                     New Group DM
                                 </Typography>
                             </React.Fragment>
                         }
                         placement="bottom"
                     >
-                        <Box>
+                        <div>
                             <SvgIcon inheritViewBox component={GroupDMIcon} />
-                        </Box>
+                        </div>
                     </FunctionTooltip>
-                </Box>
-                <Box className="friend-main-header-feature-icon">
+                </div>
+                <div className="friend-main-header-feature-icon">
                     <FunctionTooltip
                         title={
                             <React.Fragment>
-                                <Typography variant="body1" sx={{ m: 0.5 }}>
+                                <Typography variant="body1" className="tooltip-text">
                                     Inbox
                                 </Typography>
                             </React.Fragment>
                         }
                         placement="bottom"
                     >
-                        <Box>
+                        <div>
                             <InboxIcon />
-                        </Box>
+                        </div>
                     </FunctionTooltip>
-                </Box>
-            </Box>
-        </Box>
+                </div>
+            </div>
+        </section>
     );
 };
 
@@ -135,27 +125,21 @@ export const PrivateChannelHeader = () => {
     const { currDirectMessageChannel } = useSelector((state) => state.directMessage);
 
     return (
-        <Box className="friend-main-header" component="section">
-            <Box className="friend-main-header-name">
-                <AlternateEmailSharp
-                    sx={{
-                        color: "var(--server-marker-unread)",
-                        marginRight: "6px",
-                        alignItems: "baseline",
-                    }}
-                />
-                <Box component="span" variant="h3" className="friend-main-header-hashtag">
+        <section className="friend-main-header">
+            <div className="friend-main-header-name">
+                <AlternateEmailSharp className="friend-main-header-icon" />
+                <span className="friend-main-header-hashtag">
                     {currDirectMessageChannel.displayName}
-                </Box>
-                <Box>
+                </span>
+                <div>
                     <StatusList status={currDirectMessageChannel.status} size={15} />
-                </Box>
-            </Box>
-            <Box className="friend-main-header-feature">
+                </div>
+            </div>
+            <div className="friend-main-header-feature">
                 <FunctionTooltip
                     title={
                         <React.Fragment>
-                            <Typography variant="body1" sx={{ m: 0.5 }}>
+                            <Typography variant="body1" className="tooltip-text">
                                 More
                             </Typography>
                         </React.Fragment>
@@ -167,7 +151,7 @@ export const PrivateChannelHeader = () => {
                         onClick={() => dispatch(toggleDirectMessageSidebar())}
                     />
                 </FunctionTooltip>
-            </Box>
-        </Box>
+            </div>
+        </section>
     );
 };

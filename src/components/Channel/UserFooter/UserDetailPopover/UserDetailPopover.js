@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, ListItemText, ListItem, Badge, Popover, Avatar, Divider } from "@mui/material";
+import { ListItemText, ListItem, Badge, Avatar, Divider } from "@mui/material";
+import { Popover } from "@/components/compat/RadixCompat";
 import CircleIcon from "@mui/icons-material/Circle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import StopCircleIcon from "@mui/icons-material/StopCircle";
@@ -15,7 +16,7 @@ import { statusFormat } from "@/utils/formatter";
 import { changeStatus } from "@/utils/authentication";
 import { setUserDetailPopover } from "@/redux/features/popoverSlice";
 
-import "./UserDetailPopover.scss";
+// UserDetailPopover styles merged into theme / global styles
 
 //user avatar click
 export const UserDetailPopover = ({ userAvatarRef }) => {
@@ -31,18 +32,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
             onClose={() => dispatch(setUserDetailPopover(false))}
             anchorReference="anchorEl"
             anchorEl={userAvatarRef.current}
-            PaperProps={{
-                style: {
-                    background: "var(--servers-bg)",
-                    borderRadius: "8px 8px 8px 8px",
-                    width: "340px",
-                    fontSize: 14,
-                    display: "flex",
-                    flexDirection: "column",
-                    flexGrow: 1,
-                    maxHeight: "calc(100vh - 28px)",
-                },
-            }}
+            PaperProps={{ className: "user-detail-popover-paper" }}
             anchorOrigin={{
                 vertical: "top",
                 horizontal: 150,
@@ -52,8 +42,8 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                 horizontal: "center",
             }}
         >
-            <Box>
-                <Box className="user-detail-top">
+            <div>
+                <div className="user-detail-top">
                     <svg className="user-detail-banner">
                         <mask id="uid_347">
                             <rect></rect>
@@ -63,13 +53,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             className="user-detail-object"
                             style={{ background: user?.bannerColor?.toString() }}
                         >
-                            <Box
-                                sx={{
-                                    height: "100px",
-                                    width: "100%",
-                                    transition: "background-color 0.1s",
-                                }}
-                            ></Box>
+                            <div className="user-detail-banner-box"></div>
                         </foreignObject>
                     </svg>
                     <Badge
@@ -80,13 +64,13 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                     >
                         <Avatar
                             alt={user?.displayName}
-                            sx={{ width: "80px", height: "80px" }}
+                            className="user-detail-avatar-img"
                             src={user?.avatar}
                             imgProps={{ crossOrigin: "Anonymous" }}
                         />
                     </Badge>
-                </Box>
-                <Box className="user-detail-list" sx={{ backgroundColor: "var(--body-bg)" }}>
+                </div>
+                <div className="user-detail-list user-detail-list-bg">
                     <ListItem dense>
                         <MenuListItemButton>
                             <ListItemText
@@ -120,7 +104,7 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             />
                         </MenuListItemButton>
                     </ListItem>
-                    <Divider style={{ backgroundColor: "#8a8e94" }} variant="middle" light={true} />
+                    <Divider className="user-detail-divider" variant="middle" light={true} />
                     <ListItem dense>
                         <StatusMenu
                             disableFocusListener
@@ -128,94 +112,66 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                             placement="right"
                             title={
                                 <React.Fragment>
-                                    <ListItem sx={{ pl: 1, pr: 1 }}>
+                                    <ListItem className="user-detail-listitem">
                                         <MenuListItemButton
                                             onClick={() => changeStatus("online")}
-                                            sx={{
-                                                "&:hover": {
-                                                    backgroundColor: "var(--primary-color)",
-                                                    borderRadius: "4px",
-                                                },
-                                            }}
+                                            className="menu-listitem-button"
                                         >
                                             <CircleIcon
                                                 edge="start"
-                                                sx={{ mr: 2, color: "var(--accent-green)" }}
+                                                className="status-menu-icon status-online"
                                             />
                                             <ListItemText primary="Online" />
                                         </MenuListItemButton>
                                     </ListItem>
                                     <Divider
-                                        sx={{
-                                            backgroundColor: "var(--body-color)",
-                                            mt: 0.5,
-                                            mb: 0.5,
-                                        }}
+                                        className="user-detail-divider user-detail-divider--thin"
                                         variant="middle"
                                     />
-                                    <ListItem sx={{ pl: 1, pr: 1 }}>
+                                    <ListItem className="user-detail-listitem">
                                         <MenuListItemButton
                                             onClick={() => changeStatus("idle")}
-                                            sx={{
-                                                "&:hover": {
-                                                    backgroundColor: "#5865f2",
-                                                    borderRadius: "4px",
-                                                },
-                                            }}
+                                            className="menu-listitem-button"
                                         >
                                             <DarkModeIcon
                                                 edge="start"
-                                                sx={{ mr: 2, color: "var(--warning-color)" }}
+                                                className="status-menu-icon status-idle"
                                             />
                                             <ListItemText primary="Idle" />
                                         </MenuListItemButton>
                                     </ListItem>
-                                    <ListItem sx={{ pl: 1, pr: 1 }}>
+                                    <ListItem className="user-detail-listitem">
                                         <MenuListItemButton
                                             onClick={() => changeStatus("donotdisturb")}
-                                            sx={{
-                                                "&:hover": {
-                                                    backgroundColor: "#5865f2",
-                                                    borderRadius: "4px",
-                                                },
-                                            }}
+                                            className="menu-listitem-button"
                                         >
                                             <RemoveCircleIcon
                                                 edge="start"
-                                                sx={{ mr: 2, color: "var(--danger-color)" }}
+                                                className="status-menu-icon status-dnd"
                                             />
                                             <ListItemText
                                                 primary="Do Not Disturb"
                                                 secondary="You will not receive any desktop notifications."
                                                 secondaryTypographyProps={{
-                                                    style: {
-                                                        color: "white",
-                                                    },
+                                                    className: "user-detail-secondary",
                                                 }}
                                             />
                                         </MenuListItemButton>
                                     </ListItem>
-                                    <ListItem sx={{ pl: 1, pr: 1 }}>
+                                    <ListItem className="user-detail-listitem">
                                         <MenuListItemButton
                                             onClick={() => changeStatus("invisible")}
-                                            sx={{
-                                                "&:hover": {
-                                                    backgroundColor: "#5865f2",
-                                                    borderRadius: "4px",
-                                                },
-                                            }}
+                                            className="menu-listitem-button"
                                         >
                                             <StopCircleIcon
                                                 edge="start"
-                                                sx={{ color: "var(--muted-color)", mr: 2 }}
+                                                className="status-menu-icon status-muted"
                                             />
                                             <ListItemText
                                                 primary="Invisible"
                                                 secondary="You will not appear online, but will have full access."
                                                 secondaryTypographyProps={{
-                                                    style: {
-                                                        color: "white",
-                                                    },
+                                                    className: "user-detail-secondary",
                                                 }}
                                             />
                                         </MenuListItemButton>
@@ -223,51 +179,37 @@ export const UserDetailPopover = ({ userAvatarRef }) => {
                                 </React.Fragment>
                             }
                         >
-                            <MenuListItemButton
-                                sx={{
-                                    "&:hover": {
-                                        backgroundColor: "#5865f2",
-                                        borderRadius: "4px",
-                                    },
-                                }}
-                            >
+                            <MenuListItemButton className="menu-listitem-button">
                                 <StatusList edge={"start"} status={user?.status} size={15} />
-                                <ListItemText primary={statusFormat(user?.status)} sx={{ ml: 1 }} />
-                                <NavigateNextIcon edge="end" sx={{ color: "var(--body-color)" }} />
+                                <ListItemText
+                                    primary={statusFormat(user?.status)}
+                                    className="user-detail-status-text"
+                                />
+                                <NavigateNextIcon edge="end" className="user-detail-next-icon" />
                             </MenuListItemButton>
                         </StatusMenu>
                     </ListItem>
                     <ListItem dense>
                         <MenuListItemButton
                             onClick={() => dispatch(setUserDetailPopover(false))}
-                            sx={{
-                                "&:hover": {
-                                    backgroundColor: "#5865f2",
-                                    borderRadius: "4px",
-                                },
-                            }}
+                            className="menu-listitem-button"
                         >
-                            <SwapVertIcon edge="start" sx={{ color: "white" }} />
+                            <SwapVertIcon edge="start" className="user-detail-icon" />
                             <ListItemText primary="Switch Accounts" />
-                            <NavigateNextIcon edge="end" sx={{ color: "white" }} />
+                            <NavigateNextIcon edge="end" className="user-detail-next-icon" />
                         </MenuListItemButton>
                     </ListItem>
                     <ListItem dense>
                         <MenuListItemButton
                             onClick={signOut}
-                            sx={{
-                                "&:hover": {
-                                    backgroundColor: "red",
-                                    borderRadius: "4px",
-                                },
-                            }}
+                            className="menu-listitem-button menu-listitem-button-danger"
                         >
                             <ListItemText primary="Log Out" />
-                            <LogoutIcon edge="end" sx={{ color: "white" }} />
+                            <LogoutIcon edge="end" className="user-detail-icon" />
                         </MenuListItemButton>
                     </ListItem>
-                </Box>
-            </Box>
+                </div>
+            </div>
         </Popover>
     );
 };

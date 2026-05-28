@@ -119,6 +119,70 @@
                                 color: hsl(240, 2%, 88%);
                             }
 
+                            .audio-file {
+                                display: flex;
+                                flex-direction: column;
+                            }
+
+                            .form {
+                                position: relative;
+                                -ms-flex-positive: false;
+                                flex-shrink: 0;
+                                padding-left: 16px;
+                                padding-right: 16px;
+                                margin-top: -8px;
+                                color: var(--body-color);
+                            }
+
+                            .message-input {
+                                color: var(--body-color);
+                                border-radius: 8px;
+                                position: relative;
+                                background-color: var(--menu-bg);
+                                border: none;
+                                font-size: 16px;
+                                padding: 10px 12px;
+                                display: flex;
+                                width: 100%;
+                                text-indent: 0;
+                                margin-bottom: 24px;
+                            }
+
+                            .upload-listitembutton {
+                                margin: 0;
+                            }
+
+                            .upload-listitembutton:hover {
+                                background-color: var(--primary-color);
+                                border-radius: 4px;
+                            }
+
+                            .message-button {
+                                cursor: default;
+                                margin: 0;
+                                padding-top: 0;
+                                padding-bottom: 0;
+                            }
+
+                            .chat-divider {
+                                margin: 16px;
+                                font-size: 12px;
+                                color: var(--dc-text-muted);
+                            }
+
+                            .message-date {
+                                display: inline;
+                                color: var(--dc-text-muted);
+                                font-size: 0.8em;
+                                margin-left: 10px;
+                            }
+
+                            .timeblock {
+                                display: none;
+                                font-size: 12px;
+                                color: var(--dc-text-muted);
+                            }
+
                             .scrollerSpacer {
                                 display: block;
                                 height: 30px;

@@ -1,5 +1,5 @@
 import React, { Fragment, useEffect } from "react";
-import { Box, List, Typography } from "@mui/material";
+import { List, Typography } from "@mui/material";
 import { query, collection, where, onSnapshot } from "firebase/firestore";
 import { db } from "@/firebase";
 import FriendTab from "@/components/DirectMessage/DirectMessageBody/FriendBody/FriendTab/FriendTab";
@@ -50,13 +50,13 @@ export default function FriendList() {
     }, [friendIdList, dispatch]);
 
     return (
-        <Box className="friend-list-container">
+        <div className="friend-list-container">
             <List dense>
                 {friendFilter == "all" ? (
                     <Fragment>
-                        <Box sx={{ p: 1 }}>
+                        <div className="friendlist-header">
                             <Typography variant="h6">All - {friendList.length}</Typography>
-                        </Box>
+                        </div>
                         {friendList.map(({ displayName, status, avatar, id }) => (
                             <FriendTab
                                 displayName={displayName}
@@ -69,12 +69,12 @@ export default function FriendList() {
                     </Fragment>
                 ) : (
                     <Fragment>
-                        <Box sx={{ p: 1 }}>
+                        <div className="friendlist-header">
                             <Typography variant="h6">
                                 Online -{" "}
                                 {friendList.filter((obj) => obj.status !== "offline").length}
                             </Typography>
-                        </Box>
+                        </div>
                         {friendList
                             .filter((obj) => obj.status !== "offline")
                             .map(({ displayName, status, avatar, id }) => (
@@ -89,6 +89,6 @@ export default function FriendList() {
                     </Fragment>
                 )}
             </List>
-        </Box>
+        </div>
     );
 }

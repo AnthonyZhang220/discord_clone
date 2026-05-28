@@ -1,10 +1,9 @@
 import React, { useEffect, Fragment } from "react";
 
-import { Box, Typography, SvgIcon, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import { Typography, SvgIcon, ListItem, ListItemButton, ListItemText } from "@mui/material";
 
 import AddIcon from "@mui/icons-material/Add";
 import UserFooter from "@/components/Channel/UserFooter/UserFooter";
-import { lighten } from "@mui/material/styles";
 import FriendIcon from "@/components/DirectMessage/DirectMessageBody/FriendBody/friend.svg";
 import { FunctionTooltip } from "@/components/CustomUIComponents";
 
@@ -69,8 +68,8 @@ function DirectMessageMenu() {
     }, [refsCount, directMessageChannelRefs, dispatch]);
 
     return (
-        <Box component="aside" className="friend-container">
-            <Box component="header" className="friend-header focusable">
+        <aside className="friend-container">
+            <header className="friend-header focusable">
                 <input
                     placeholder="Find or start a conversation"
                     required={true}
@@ -78,34 +77,31 @@ function DirectMessageMenu() {
                     className="form-style"
                     autoComplete="off"
                 />
-            </Box>
-            <Box component="section" className="friend-menu-container">
+            </header>
+            <section className="friend-menu-container">
                 <ListItem disablePadding>
                     <ListItemButton
-                        className="friend-menu-open"
-                        sx={{
-                            borderRadius: "4px",
-                            backgroundColor: isFriendListPageOpen
-                                ? lighten("#313338", 0.1)
-                                : "inherit",
-                        }}
+                        className={`friend-menu-open ${isFriendListPageOpen ? "friend-menu-open--active" : ""}`}
                         onClick={() => dispatch(setIsFriendListPageOpen(true))}
                     >
-                        <SvgIcon edge="start" component={FriendIcon} sx={{ mr: 1 }} />
+                        <SvgIcon edge="start" component={FriendIcon} className="friend-menu-icon" />
                         <ListItemText primary="Friends" />
                     </ListItemButton>
                 </ListItem>
-                <Box component="header" className="friend-menu-header focusable">
-                    <Box>
+                <header className="friend-menu-header focusable">
+                    <div>
                         <Typography component="h6" variant="h6">
                             Direct Messages
                         </Typography>
-                    </Box>
-                    <Box sx={{ marginLeft: "auto", fontSize: 12 }}>
+                    </div>
+                    <div className="friend-menu-right">
                         <FunctionTooltip
                             title={
                                 <Fragment>
-                                    <Typography variant="body1" sx={{ m: 0.5 }}>
+                                    <Typography
+                                        variant="body1"
+                                        className="friend-menu-tooltip-text"
+                                    >
                                         Create DM
                                     </Typography>
                                 </Fragment>
@@ -114,9 +110,9 @@ function DirectMessageMenu() {
                         >
                             <AddIcon />
                         </FunctionTooltip>
-                    </Box>
-                </Box>
-                <Box component="ul" className="friend-menu-conversation">
+                    </div>
+                </header>
+                <ul className="friend-menu-conversation">
                     {directMessageChannelList?.map(
                         ({ displayName, avatar, id, status, createdAt }) => (
                             <DirectMessageList
@@ -129,10 +125,10 @@ function DirectMessageMenu() {
                             />
                         )
                     )}
-                </Box>
-            </Box>
+                </ul>
+            </section>
             <UserFooter />
-        </Box>
+        </aside>
     );
 }
 export default DirectMessageMenu;

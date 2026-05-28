@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, FormHelperText, Button, SvgIcon, FormLabel } from "@mui/material";
+import { Typography, FormHelperText, Button, SvgIcon, FormLabel } from "@mui/material";
 
 import { auth, db } from "@/firebase";
 import { doc, setDoc, getDoc, Timestamp } from "firebase/firestore";
@@ -79,15 +79,15 @@ export function RegisterPage() {
     React.useEffect(() => {}, [newUser.username]);
 
     return (
-        <Box component="main" className="register-page">
-            <Box component="form" className="form-container">
-                <Box className="form-wrapper">
-                    <Box className="form-center">
-                        <Box className="primary-title">
+        <main className="register-page">
+            <form className="form-container">
+                <div className="form-wrapper">
+                    <div className="form-center">
+                        <div className="primary-title">
                             <Typography variant="h3">Create an account</Typography>
-                        </Box>
-                        <Box className="input-position">
-                            <Box className="form-group">
+                        </div>
+                        <div className="input-position">
+                            <div className="form-group">
                                 <FormHelperText className="input-placeholder">Email</FormHelperText>
                                 <input
                                     className="form-style"
@@ -96,8 +96,8 @@ export function RegisterPage() {
                                     onChange={(e) => handleNewUserFormSubmit(e)}
                                     style={{ marginBottom: "20px" }}
                                 />
-                            </Box>
-                            <Box className="form-group">
+                            </div>
+                            <div className="form-group">
                                 <FormHelperText className="input-placeholder">
                                     username
                                 </FormHelperText>
@@ -108,8 +108,8 @@ export function RegisterPage() {
                                     onChange={(e) => handleNewUserFormSubmit(e)}
                                     style={{ marginBottom: "20px" }}
                                 />
-                            </Box>
-                            <Box className="form-group">
+                            </div>
+                            <div className="form-group">
                                 <FormHelperText
                                     id="outlined-weight-helper-text"
                                     className="input-placeholder"
@@ -123,22 +123,22 @@ export function RegisterPage() {
                                     onChange={(e) => handleNewUserFormSubmit(e)}
                                     style={{ marginBottom: "20px" }}
                                 />
-                            </Box>
-                        </Box>
-                        <Box className="btn-position">
+                            </div>
+                        </div>
+                        <div className="btn-position">
                             <Button className="btn" onClick={createNewUser}>
                                 Continue
                             </Button>
-                        </Box>
-                        <Box component="span" className="register-container">
+                        </div>
+                        <span className="register-container">
                             <Link to="/" className="link">
                                 Already have an account?
                             </Link>
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
-        </Box>
+                        </span>
+                    </div>
+                </div>
+            </form>
+        </main>
     );
 }
 
@@ -147,18 +147,18 @@ export function ResetPasswordPage() {
     const navigate = useNavigate();
 
     return (
-        <Box component="main" className="reset-page">
-            <Box component="form" className="form-container">
-                <Box className="form-wrapper">
-                    <Box className="form-center">
+        <main className="reset-page">
+            <form className="form-container">
+                <div className="form-wrapper">
+                    <div className="form-center">
                         <Typography variant="h4">
                             {`A reset email has been sent to ${searchparams.get("email")}. Please check your email and follow the instructions to reset your password.`}
                         </Typography>
                         <Button onClick={() => navigate("/")}>Sign In</Button>
-                    </Box>
-                </Box>
-            </Box>
-        </Box>
+                    </div>
+                </div>
+            </form>
+        </main>
     );
 }
 
@@ -216,20 +216,20 @@ export default function LoginPage() {
     };
 
     return (
-        <Box component="main" className="login-page">
-            <Box component="form" className="form-container">
-                <Box className="form-wrapper">
-                    <Box className="form-center">
-                        <Box className="primary-title">
+        <main className="login-page">
+            <form className="form-container">
+                <div className="form-wrapper">
+                    <div className="form-center">
+                        <div className="primary-title">
                             <Typography variant="h3">Welcome back!</Typography>
-                        </Box>
-                        <Box className="secondary-title">
+                        </div>
+                        <div className="secondary-title">
                             <Typography variant="h5">
                                 We&apos;re so excited to see you again!
                             </Typography>
-                        </Box>
-                        <Box className="input-position">
-                            <Box className="form-group">
+                        </div>
+                        <div className="input-position">
+                            <div className="form-group">
                                 <FormLabel
                                     component="div"
                                     className="input-placeholder"
@@ -246,8 +246,8 @@ export default function LoginPage() {
                                     value={emailSignInInfo.email}
                                     onChange={(e) => handleEmailSignInForm(e)}
                                 />
-                            </Box>
-                            <Box className="form-group">
+                            </div>
+                            <div className="form-group">
                                 <FormLabel
                                     component="div"
                                     required={true}
@@ -264,27 +264,27 @@ export default function LoginPage() {
                                     value={emailSignInInfo.password}
                                     onChange={(e) => handleEmailSignInForm(e)}
                                 />
-                            </Box>
-                        </Box>
-                        <Box className="password-container">
+                            </div>
+                        </div>
+                        <div className="password-container">
                             <Button className="link" onClick={handleResetPassword}>
                                 Forgot your password?
                             </Button>
-                        </Box>
-                        <Box className="btn-position">
+                        </div>
+                        <div className="btn-position">
                             <Button className="btn" onClick={emailSignIn}>
                                 login
                             </Button>
-                        </Box>
-                        <Box component="span" className="register-container">
+                        </div>
+                        <span className="register-container">
                             Need an account?{" "}
                             <Link to="/register" className="link">
                                 Register
                             </Link>
-                        </Box>
-                    </Box>
-                    <Box className="verticalSeparator"></Box>
-                    <Box className="social-login">
+                        </span>
+                    </div>
+                    <div className="verticalSeparator"></div>
+                    <div className="social-login">
                         <SvgIcon
                             className="social-button"
                             component={GoogleButton}
@@ -309,9 +309,9 @@ export default function LoginPage() {
                             inheritViewBox
                             onClick={() => dispatch(signInWithOAuth("github"))}
                         ></SvgIcon>
-                    </Box>
-                </Box>
-            </Box>
-        </Box>
+                    </div>
+                </div>
+            </form>
+        </main>
     );
 }

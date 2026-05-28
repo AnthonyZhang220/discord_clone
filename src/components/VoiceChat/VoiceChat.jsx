@@ -1,5 +1,6 @@
 import React from "react";
-import { Box, Tooltip, Fab } from "@mui/material";
+import { Fab } from "@mui/material";
+import { Tooltip } from "@/components/compat/RadixCompat";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import { AgoraManager } from "@/contexts/agora/agoraManager";
 import AgoraConfig from "@/contexts/agora/config";
@@ -21,27 +22,19 @@ const VoiceChat = () => {
 
     return (
         <AgoraClient>
-            <Box className="voicechat-container">
-                <Box className="voicechat-wrapper">
-                    <Box className="voicechat-grid">
+            <div className="voicechat-container">
+                <div className="voicechat-wrapper">
+                    <div className="voicechat-grid">
                         <AgoraManager config={AgoraConfig}></AgoraManager>
-                    </Box>
-                </Box>
-                <Box className="voicechat-control">
-                    <Box className="gradient-top">
-                        <VolumeUpIcon
-                            sx={{
-                                color: "var(--server-marker-unread)",
-                                marginRight: "6px",
-                                alignItems: "baseline",
-                            }}
-                        />
-                        <Box component="span" variant="h3" className="voicechat-header-title">
-                            {currVoiceChannel.name}
-                        </Box>
-                    </Box>
-                    <Box className="gradient-bottom">
-                        <Box className="fab-group">
+                    </div>
+                </div>
+                <div className="voicechat-control">
+                    <div className="gradient-top">
+                        <VolumeUpIcon className="voicechat-volume-icon" />
+                        <span className="voicechat-header-title">{currVoiceChannel.name}</span>
+                    </div>
+                    <div className="gradient-bottom">
+                        <div className="fab-group">
                             <Fab onClick={() => toggleCamera()}>
                                 {isCameraOn ? (
                                     <Tooltip title="Turn on Camera">
@@ -67,10 +60,10 @@ const VoiceChat = () => {
                             <Fab color="error" onClick={() => handleLeaveVoiceChannel()}>
                                 <CallEndRoundedIcon />
                             </Fab>
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </AgoraClient>
     );
 };

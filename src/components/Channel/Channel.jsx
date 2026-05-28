@@ -4,8 +4,8 @@ import { onSnapshot, query, where, collection, doc, getDoc } from "firebase/fire
 
 import { ListItemText, ListItem, ListItemButton, ListItemAvatar } from "@mui/material";
 import { Avatar, Typography } from "@mui/material";
-import { Box } from "@mui/system";
 import SettingsIcon from "@mui/icons-material/Settings";
+import MenuIcon from "@mui/icons-material/Menu";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
@@ -96,13 +96,23 @@ const Channel = () => {
     }, [selectedServer, dispatch]);
 
     return (
-        <Box component="aside" className="channel-container">
-            <Box
-                component="header"
+        <aside className="channel-container">
+            <header
                 className="channel-header focusable"
                 onClick={() => dispatch(toggleServerSettings())}
                 ref={channelHeaderRef}
             >
+                <IconButton
+                    aria-label="open servers"
+                    className="mobile-servers-toggle"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        document.body.classList.toggle("mobile-sidebar-open");
+                        document.body.classList.add("mobile-app");
+                    }}
+                >
+                    <MenuIcon />
+                </IconButton>
                 <Typography component="h6" className="channel-header-name" variant="h6">
                     {currServer.name}
                 </Typography>
@@ -115,23 +125,23 @@ const Channel = () => {
                         <ExpandMoreIcon />
                     </IconButton>
                 )}
-            </Box>
+            </header>
             <ServerSettings
                 serverSettingsPopover={serverSettingsPopover}
                 channelHeaderRef={channelHeaderRef}
             />
-            <Box component="section" className="channel-list-container">
-                <Box component="header" className="channel-list-header focusable">
-                    <Box>
+            <section className="channel-list-container">
+                <header className="channel-list-header focusable">
+                    <div>
                         <Typography component="h6" variant="h6">
                             Text Channels
                         </Typography>
-                    </Box>
-                    <Box sx={{ marginLeft: "auto", fontSize: 12 }}>
+                    </div>
+                    <div className="channel-header-actions">
                         <FunctionTooltip
                             title={
                                 <Fragment>
-                                    <Typography variant="body1" sx={{ m: 0.5 }}>
+                                    <Typography variant="body1" className="tooltip-text">
                                         Create Channel
                                     </Typography>
                                 </Fragment>
@@ -140,42 +150,37 @@ const Channel = () => {
                         >
                             <AddIcon onClick={() => dispatch(setCreateChannelModal(true))} />
                         </FunctionTooltip>
-                    </Box>
-                </Box>
-                <Box component="ul" className="channel-list-text">
+                    </div>
+                </header>
+                <ul className="channel-list-text">
                     {currChannelList.map(({ name, id }) => (
-                        <Box
+                        <li
                             key={id}
                             id={id}
-                            component="li"
                             className={`channel channel-text ${id === selectedChannel ? "active" : ""}`}
                             onClick={() => {
                                 handleSelectChannel(name, id);
                             }}
                         >
-                            <NumbersIcon
-                                sx={{ color: "var(--server-marker-unread)", marginRight: "6px" }}
-                            />
-                            <Box component="span" className="channel-name">
-                                {name}
-                            </Box>
+                            <NumbersIcon className="channel-item-icon" />
+                            <span className="channel-name">{name}</span>
                             <IconButton aria-label="settings" className="button">
                                 <SettingsIcon />
                             </IconButton>
-                        </Box>
+                        </li>
                     ))}
-                </Box>
-                <Box component="header" className="channel-list-header focusable">
-                    <Box>
+                </ul>
+                <header className="channel-list-header focusable">
+                    <div>
                         <Typography component="h6" variant="h6">
                             Voice Channels
                         </Typography>
-                    </Box>
-                    <Box sx={{ marginLeft: "auto", fontSize: 12 }}>
+                    </div>
+                    <div className="channel-header-actions">
                         <FunctionTooltip
                             title={
                                 <Fragment>
-                                    <Typography variant="body1" sx={{ m: 0.5 }}>
+                                    <Typography variant="body1" className="tooltip-text">
                                         Create Voice Channel
                                     </Typography>
                                 </Fragment>
@@ -184,64 +189,50 @@ const Channel = () => {
                         >
                             <AddIcon onClick={() => dispatch(setCreateVoiceChannelModal(true))} />
                         </FunctionTooltip>
-                    </Box>
-                </Box>
-                <Box component="ul" className="channel-list-text">
+                    </div>
+                </header>
+                <ul className="channel-list-text">
                     {currVoiceChannelList.map(({ name, id, participants }) => (
-                        <Box key={id}>
-                            <Box
+                        <Fragment key={id}>
+                            <li
                                 key={id}
                                 id={id}
-                                component="li"
                                 className={`channel channel-text ${id === currVoiceChannel.id ? "active" : ""}`}
                                 onClick={() => {
                                     handleJoinVoiceChannel(name, id);
                                 }}
                             >
-                                <VolumeUpIcon
-                                    sx={{
-                                        color: "var(--server-marker-unread)",
-                                        marginRight: "6px",
-                                    }}
-                                />
-                                <Box component="span" className="channel-name">
-                                    {name}
-                                </Box>
+                                <VolumeUpIcon className="channel-item-icon" />
+                                <span className="channel-name">{name}</span>
                                 <IconButton aria-label="settings" className="button">
                                     <SettingsIcon />
                                 </IconButton>
-                            </Box>
+                            </li>
                             {participants.map(({ displayName, avatar, id }) => (
-                                <ListItem
-                                    key={id}
-                                    id={id}
-                                    disablePadding
-                                    sx={{ p: 0, m: 0 }}
-                                    className="friend-conversation-item"
-                                >
+                                <ListItem key={id} id={id} className="participant-item">
                                     <ListItemButton>
-                                        <ListItemAvatar sx={{ minWidth: "0", mr: 1, ml: "auto" }}>
+                                        <ListItemAvatar className="participant-avatar-wrap">
                                             <Avatar
                                                 alt={displayName}
                                                 src={avatar}
-                                                sx={{ width: 20, height: 20 }}
+                                                className="participant-avatar"
                                             />
                                         </ListItemAvatar>
                                         <ListItemText primary={displayName} />
                                     </ListItemButton>
                                 </ListItem>
                             ))}
-                        </Box>
+                        </Fragment>
                     ))}
-                </Box>
-            </Box>
+                </ul>
+            </section>
             {(isVoiceChatConnected || isVoiceChatLoading) && <VoiceControl />}
             <UserFooter className="user-footer-container" />
             <InviteDialog selectedServer={selectedServer} inviteModal={inviteModal} />
             <CreateChannelDialog createChannelModal={createChannelModal} />
             <CreateVoiceChannelDialog createVoiceChannelModal={createVoiceChannelModal} />
             {/* <Outlet /> */}
-        </Box>
+        </aside>
     );
 };
 

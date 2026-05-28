@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import { onSnapshot, query, where, collection, orderBy, limitToLast } from "firebase/firestore";
 import { db } from "@/firebase";
 //material ui comp
-import Box from "@mui/material/Box";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
@@ -14,7 +13,6 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { InputAdornment } from "@mui/material";
 import FormControl from "@mui/material/FormControl";
 import InputBase from "@mui/material/InputBase";
-import { ClickAwayListener } from "@mui/material";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { FunctionTooltip } from "@/components/CustomUIComponents";
 import { setDraftDirectMessage } from "@/redux/features/draftSlice";
@@ -45,14 +43,14 @@ function ChatItem({ content, displayName, avatar, createdAt, type, fileName, div
         } else if (type.indexOf("audio/") != -1) {
             return (
                 <React.Fragment>
-                    <Box sx={{ display: "flex", flexDirection: "column" }}>
-                        <Box>
+                    <div className="audio-file">
+                        <div>
                             <Typography variant="p">{fileName}</Typography>
-                        </Box>
-                        <Box>
+                        </div>
+                        <div>
                             <audio controls src={content} preload="none" />
-                        </Box>
-                    </Box>
+                        </div>
+                    </div>
                 </React.Fragment>
             );
         } else if (type.indexOf("video/") != -1) {
@@ -67,17 +65,15 @@ function ChatItem({ content, displayName, avatar, createdAt, type, fileName, div
         return null;
     };
 
-    const [hover, setHover] = useState(false);
-
     return (
         <React.Fragment>
             {dividerDate ? (
-                <Divider sx={{ m: 2, fontSize: 12, color: "#b5bac1" }} variant="middle">
+                <Divider className="chat-divider" variant="middle">
                     {dividerDate}
                 </Divider>
             ) : avatar ? (
-                <ListItem className="message" sx={{ p: 0, m: 0 }}>
-                    <ListItemButton sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}>
+                <ListItem className="message">
+                    <ListItemButton className="message-button">
                         <ListItemAvatar>
                             <Avatar alt={displayName} src={avatar} />
                         </ListItemAvatar>
@@ -86,28 +82,17 @@ function ChatItem({ content, displayName, avatar, createdAt, type, fileName, div
                                 <React.Fragment>
                                     {displayName}
                                     <Typography
-                                        sx={{
-                                            display: "inline",
-                                            color: "#b5bac1",
-                                            fontSize: "0.8em",
-                                        }}
+                                        className="message-date"
                                         component="span"
                                         variant="p"
-                                        color="text.primary"
-                                        marginLeft="10px"
                                     >
                                         {convertDate(createdAt)}
                                     </Typography>
                                     &nbsp;
                                     <Typography
-                                        sx={{
-                                            display: "inline",
-                                            color: "#b5bac1",
-                                            fontSize: "0.8em",
-                                        }}
+                                        className="message-date"
                                         component="span"
                                         variant="p"
-                                        color="text.primary"
                                     >
                                         {convertTime(createdAt)}
                                     </Typography>
@@ -121,27 +106,16 @@ function ChatItem({ content, displayName, avatar, createdAt, type, fileName, div
                             primaryTypographyProps={{ variant: "body1" }}
                             secondaryTypographyProps={{
                                 variant: "body2",
-                                color: "white",
+                                color: "text.primary",
                             }}
                         />
                     </ListItemButton>
                 </ListItem>
             ) : (
-                <ListItem className="message" sx={{ p: 0, m: 0 }}>
-                    <ListItemButton
-                        sx={{ cursor: "default", m: 0, pt: 0, pb: 0 }}
-                        onMouseOver={() => setHover(true)}
-                        onMouseOut={() => setHover(false)}
-                    >
+                <ListItem className="message">
+                    <ListItemButton className="message-button">
                         <ListItemAvatar>
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    display: hover ? "block" : "none",
-                                    fontSize: 12,
-                                    color: "#b5bac1",
-                                }}
-                            >
+                            <Typography variant="body2" className="timeblock">
                                 {convertTime(createdAt)}
                             </Typography>
                         </ListItemAvatar>
@@ -154,7 +128,7 @@ function ChatItem({ content, displayName, avatar, createdAt, type, fileName, div
                             primaryTypographyProps={{ variant: "body1" }}
                             secondaryTypographyProps={{
                                 variant: "body2",
-                                color: "white",
+                                color: "text.primary",
                             }}
                         />
                     </ListItemButton>
@@ -167,6 +141,7 @@ function ChatItem({ content, displayName, avatar, createdAt, type, fileName, div
 export default function PrivateChat() {
     const formRef = useRef();
     const chatScroller = useRef();
+    const uploadAdornmentRef = useRef(null);
     const [openUpload, setOpenUpload] = useState(false);
     const dispatch = useDispatch();
     const { draftDirectMessage } = useSelector((state) => state.draft);
@@ -231,6 +206,25 @@ export default function PrivateChat() {
         setOpenUpload(true);
     };
 
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                openUpload &&
+                uploadAdornmentRef.current &&
+                !uploadAdornmentRef.current.contains(event.target)
+            ) {
+                setOpenUpload(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("touchstart", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+            document.removeEventListener("touchstart", handleClickOutside);
+        };
+    }, [openUpload]);
+
     const ChatList = useMemo(() => {
         return (
             <List component="ol" className="scrollerInner">
@@ -269,51 +263,25 @@ export default function PrivateChat() {
                     )
                 )}
                 {/* <Divider>CENTER</Divider> */}
-                <Box component="span" className="scrollerSpacer" ref={chatScroller}></Box>
+                <span className="scrollerSpacer" ref={chatScroller}></span>
             </List>
         );
     }, [currDirectMessageChannel.displayName, currDirectMessageChannel.avatar, directMessageList]);
 
     return (
-        <Box className="content">
-            <Box className="friend-main-content" component="main">
-                <Box className="messageWrapper">
-                    <Box component="div" className="scroller">
-                        <Box className="scroll-content">{ChatList}</Box>
-                    </Box>
-                </Box>
-                <Box
-                    className="form"
-                    component="form"
-                    ref={formRef}
-                    onSubmit={(e) => handleSubmitDirectMessage(e)}
-                    sx={{
-                        position: "relative",
-                        msFlexPositive: "false",
-                        flexShrink: "0",
-                        paddingLeft: "16px",
-                        paddingRight: "16px",
-                        marginTop: "-8px",
-                        color: "#ffffff",
-                    }}
-                >
+        <div className="content">
+            <main className="friend-main-content">
+                <div className="messageWrapper">
+                    <div className="scroller">
+                        <div className="scroll-content">{ChatList}</div>
+                    </div>
+                </div>
+                <form className="form" ref={formRef} onSubmit={(e) => handleSubmitDirectMessage(e)}>
                     <FormControl variant="standard" required fullWidth>
                         <InputBase
-                            sx={{
-                                color: "#ffffff",
-                                borderRadius: "8px",
-                                position: "relative",
-                                backgroundColor: "#383a40",
-                                border: "none",
-                                fontSize: 16,
-                                padding: "10px 12px",
-                                display: "flex",
-                                width: "100%",
-                                textIndent: "0",
-                                marginBottom: "24px",
-                            }}
+                            className="message-input"
                             startAdornment={
-                                <ClickAwayListener onClickAway={() => setOpenUpload(false)}>
+                                <span ref={uploadAdornmentRef}>
                                     <InputAdornment position="start">
                                         <FunctionTooltip
                                             onClose={() => setOpenUpload(false)}
@@ -322,16 +290,8 @@ export default function PrivateChat() {
                                             disableHoverListener
                                             disableTouchListener
                                             title={
-                                                <Box component="label">
-                                                    <ListItemButton
-                                                        sx={{
-                                                            m: 0,
-                                                            "&:hover": {
-                                                                backgroundColor: "#5865f2",
-                                                                borderRadius: "4px",
-                                                            },
-                                                        }}
-                                                    >
+                                                <label>
+                                                    <ListItemButton className="upload-listitembutton">
                                                         <input
                                                             id="file"
                                                             name="file"
@@ -345,11 +305,11 @@ export default function PrivateChat() {
                                                             primary="Upload a File"
                                                             secondary="Accept format, image, video, audio, text. File size limit <50MB."
                                                             secondaryTypographyProps={{
-                                                                color: "#fff",
+                                                                color: "text.primary",
                                                             }}
                                                         />
                                                     </ListItemButton>
-                                                </Box>
+                                                </label>
                                             }
                                         >
                                             <IconButton onClick={() => handleUploadOpen()}>
@@ -357,7 +317,7 @@ export default function PrivateChat() {
                                             </IconButton>
                                         </FunctionTooltip>
                                     </InputAdornment>
-                                </ClickAwayListener>
+                                </span>
                             }
                             id="name"
                             name="message"
@@ -368,11 +328,11 @@ export default function PrivateChat() {
                             placeholder={`Message @${currDirectMessageChannel.displayName}`}
                         />
                     </FormControl>
-                </Box>
-            </Box>
+                </form>
+            </main>
             {isDirectMessageSidebarOpen && (
                 <UserSidebar currDirectMessageChannel={currDirectMessageChannel} />
             )}
-        </Box>
+        </div>
     );
 }

@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { db } from "@/firebase";
 import { onSnapshot, query, where, collection } from "firebase/firestore";
 
-import { Avatar, Box, Typography, IconButton, Divider } from "@mui/material";
+import { Avatar, Typography, IconButton, Divider } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ExploreIcon from "@mui/icons-material/Explore";
 import { ServerNameTooltip } from "@/components/CustomUIComponents";
@@ -51,9 +51,9 @@ const ServerList = () => {
     const [mouseDown, setMouseDown] = React.useState(false);
 
     return (
-        <Box component="aside" className="servers">
-            <Box className="servers-list">
-                <Box
+        <aside className="servers">
+            <div className="servers-list">
+                <div
                     className={`server focusable server-friends ${isDirectMessagePageOpen ? "active" : ""}`}
                     role="button"
                     aria-label="Discord Friend"
@@ -62,7 +62,7 @@ const ServerList = () => {
                     <ServerNameTooltip
                         title={
                             <React.Fragment>
-                                <Typography variant="body1" sx={{ m: 0.5 }}>
+                                <Typography variant="body1" className="tooltip-text">
                                     Direct Messages
                                 </Typography>
                             </React.Fragment>
@@ -74,19 +74,10 @@ const ServerList = () => {
                             src="https://cdn.discordapp.com/embed/avatars/0.png"
                         />
                     </ServerNameTooltip>
-                </Box>
-                <Divider
-                    variant="fullWidth"
-                    flexItem
-                    sx={{
-                        backgroundColor: "#35363c",
-                        m: "8px",
-                        borderRadius: "1px",
-                        height: "2px",
-                    }}
-                />
+                </div>
+                <Divider variant="fullWidth" flexItem className="server-divider" />
                 {currServerList.map(({ name, avatar, id }) => (
-                    <Box
+                    <div
                         className={`server focusable ${id === selectedServer && !isDirectMessagePageOpen ? "active" : ""} ${mouseDown ? "transformDown" : ""}`}
                         role="button"
                         key={id}
@@ -99,7 +90,7 @@ const ServerList = () => {
                         <ServerNameTooltip
                             title={
                                 <React.Fragment>
-                                    <Typography variant="body1" sx={{ m: 0.5 }}>
+                                    <Typography variant="body1" className="tooltip-text">
                                         {name}
                                     </Typography>
                                 </React.Fragment>
@@ -108,13 +99,13 @@ const ServerList = () => {
                         >
                             <Avatar className="server-icon" src={avatar} />
                         </ServerNameTooltip>
-                    </Box>
+                    </div>
                 ))}
-                <Box className="server">
+                <div className="server">
                     <ServerNameTooltip
                         title={
                             <React.Fragment>
-                                <Typography variant="body1" sx={{ m: 0.5 }}>
+                                <Typography variant="body1" className="tooltip-text">
                                     Add a Server
                                 </Typography>
                             </React.Fragment>
@@ -122,57 +113,36 @@ const ServerList = () => {
                         placement="right"
                     >
                         <IconButton
-                            sx={{
-                                fontSize: 15,
-                                color: "#23a459",
-                                "&:hover": {
-                                    color: "#ffffff",
-                                },
-                            }}
+                            className="server-add-button"
                             onClick={() => dispatch(setCreateServerModal(true))}
                         >
                             <AddIcon className="server-icon" />
                         </IconButton>
                     </ServerNameTooltip>
-                </Box>
+                </div>
                 <ServerNameTooltip
                     title={
                         <React.Fragment>
-                            <Typography variant="body1" sx={{ m: 0.5 }}>
+                            <Typography variant="body1" className="tooltip-text">
                                 Explore Public Servers
                             </Typography>
                         </React.Fragment>
                     }
                     placement="right"
                 >
-                    <Box
-                        className="server"
-                        sx={{
-                            "&:hover": {
-                                backgroundColor: "#23a459",
-                            },
-                        }}
-                    >
-                        <IconButton
-                            sx={{
-                                fontSize: 15,
-                                color: "#23a459",
-                                "&:hover": {
-                                    color: "#ffffff",
-                                },
-                            }}
-                        >
+                    <div className="server server-explore">
+                        <IconButton className="server-explore-button">
                             <ExploreIcon className="server-icon" />
                         </IconButton>
-                    </Box>
+                    </div>
                 </ServerNameTooltip>
-            </Box>
+            </div>
             {}
             <ServerDialog createServerModal={createServerModal} />
             <CreateServerDialog createServerFormModal={createServerFormModal} />
             <JoinServerDialog joinServerModal={joinServerModal} />
             {/* <Outlet /> */}
-        </Box>
+        </aside>
     );
 };
 

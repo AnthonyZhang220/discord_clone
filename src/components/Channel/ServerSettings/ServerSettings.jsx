@@ -1,7 +1,8 @@
 import React from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { Divider } from "@mui/material";
-import { ListItem, ListItemButton, Popover, Typography } from "@mui/material";
+import { Divider, ListItem, ListItemButton, Typography } from "@mui/material";
+import { Popover } from "@/components/compat/RadixCompat";
+// ServerSettings styles merged into theme / global styles
 import { toggleServerSettings } from "@/redux/features/popoverSlice";
 import { handleInviteToServer, handleDeleteServer } from "@/handlers/serverHandlers";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
@@ -18,13 +19,7 @@ export default function ServerSettings({ channelHeaderRef }) {
             onClose={() => dispatch(toggleServerSettings())}
             anchorEl={channelHeaderRef.current}
             anchorReference="anchorEl"
-            PaperProps={{
-                style: {
-                    backgroundColor: "var(--body-bg)",
-                    borderRadius: "4px",
-                    width: "220px",
-                },
-            }}
+            PaperProps={{ className: "server-settings-paper" }}
             anchorOrigin={{
                 vertical: "bottom",
                 horizontal: "center",
@@ -34,67 +29,38 @@ export default function ServerSettings({ channelHeaderRef }) {
                 horizontal: "center",
             }}
         >
-            <ListItem
-                sx={{
-                    p: 0.75,
-                }}
-            >
+            <ListItem className="server-settings-item">
                 <ListItemButton
                     onClick={() => handleInviteToServer()}
-                    sx={{
-                        color: "var(--primary-color)",
-                        borderRadius: "4px",
-                        "&:hover": {
-                            backgroundColor: "var(--primary-color)",
-                            color: "var(--body-color)",
-                        },
-                    }}
+                    className="server-settings-button"
                 >
-                    <Typography variant="h6" sx={{ color: "inherit", marginRight: "auto" }}>
+                    <Typography variant="h6" className="server-settings-title">
                         Invite People
                     </Typography>
-                    <PersonAddAlt1Icon sx={{ marginLeft: "auto", fontSize: 20 }} />
+                    <PersonAddAlt1Icon className="server-settings-icon" />
                 </ListItemButton>
             </ListItem>
-            <ListItem sx={{ p: 0.75 }}>
+            <ListItem className="server-settings-item">
                 <ListItemButton
                     onClick={() => dispatch(toggleServerSettings())}
-                    sx={{
-                        color: "var(--body-color)",
-                        borderRadius: "4px",
-                        "&:hover": {
-                            backgroundColor: "var(--primary-color)",
-                            color: "var(--body-color)",
-                        },
-                    }}
+                    className="server-settings-button"
                 >
-                    <Typography variant="h6" sx={{ color: "inherit", marginRight: "auto" }}>
+                    <Typography variant="h6" className="server-settings-title">
                         Server Settings
                     </Typography>
-                    <SettingsIcon sx={{ marginLeft: "auto", fontSize: 20 }} />
+                    <SettingsIcon className="server-settings-icon" />
                 </ListItemButton>
             </ListItem>
-            <Divider
-                sx={{ backgroundColor: "var(--server-marker-unread)" }}
-                variant="middle"
-                light={true}
-            />
-            <ListItem sx={{ p: 0.75 }}>
+            <Divider className="server-settings-divider" variant="middle" light={true} />
+            <ListItem className="server-settings-item">
                 <ListItemButton
                     onClick={() => handleDeleteServer()}
-                    sx={{
-                        color: "#f23f42",
-                        borderRadius: "4px",
-                        "&:hover": {
-                            backgroundColor: "#f23f42",
-                            color: "#ffffff",
-                        },
-                    }}
+                    className="server-settings-button server-settings-danger"
                 >
-                    <Typography variant="h6" sx={{ color: "inherit", marginRight: "auto" }}>
+                    <Typography variant="h6" className="server-settings-title">
                         Delete Server
                     </Typography>
-                    <DeleteForeverIcon sx={{ marginLeft: "auto", fontSize: 20 }} />
+                    <DeleteForeverIcon className="server-settings-icon" />
                 </ListItemButton>
             </ListItem>
         </Popover>

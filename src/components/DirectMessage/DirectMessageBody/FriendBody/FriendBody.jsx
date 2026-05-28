@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Box } from "@mui/material";
 import FriendActive from "./FriendActive/FriendActive";
 import FriendList from "./FriendList/FriendList";
 import SearchIcon from "@mui/icons-material/Search";
@@ -18,10 +17,10 @@ export default function FriendBody() {
             {friendFilter === "addfriend" ? (
                 <AddFriend noActive={noActive} />
             ) : (
-                <Box className="content">
-                    <Box className="friend-main-content" component="main">
-                        <Box className="friend-search-form">
-                            <Box className="friend-search-inner" component="form">
+                <div className="content">
+                    <main className="friend-main-content">
+                        <div className="friend-search-form">
+                            <form className="friend-search-inner">
                                 <input
                                     className="friend-search-input"
                                     type="search"
@@ -31,18 +30,18 @@ export default function FriendBody() {
                                     autoComplete="off"
                                 />
                                 <SearchIcon />
-                            </Box>
-                        </Box>
-                        <Box className="friendListWrapper">
-                            <Box component="div" className="scroller">
-                                <Box className="scroll-content">
+                            </form>
+                        </div>
+                        <div className="friendListWrapper">
+                            <div className="scroller">
+                                <div className="scroll-content">
                                     <FriendList />
-                                </Box>
-                            </Box>
-                        </Box>
-                    </Box>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
                     <FriendActive noActive={noActive} friendList={friendList} />
-                </Box>
+                </div>
             )}
         </>
     );

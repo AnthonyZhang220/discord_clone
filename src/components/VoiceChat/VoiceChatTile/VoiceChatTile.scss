@@ -2,6 +2,9 @@
     position: relative;
     height: 100%;
     width: 100%;
+    &.voicechat-transition {
+        transition: background-color 0.1s;
+    }
 
     .video-wrapper {
         position: absolute;
@@ -30,6 +33,22 @@
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
+            }
+            .overlay-avatar-large {
+                width: 75px;
+                height: 75px;
+            }
+            .voicechat-button {
+                &.voicechat-button-high {
+                    color: green; /* consider mapping to token */
+                }
+                &.voicechat-button-normal {
+                    color: var(--dc-white);
+                }
+            }
+            .voicechat-iconbutton {
+                color: var(--dc-white);
+                border: solid 1px var(--dc-divider);
             }
             .overlay-bottom {
                 position: absolute;

@@ -1,13 +1,13 @@
 import React from "react";
-import Tooltip, { tooltipClasses } from "@mui/material/Tooltip";
+import { Tooltip, tooltipClasses } from "@/components/compat/RadixCompat";
 import { ListItemButton, InputBase, Button, IconButton } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
 export const StatusMenu = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
-))(() => ({
+))(({ theme }) => ({
     [`& .${tooltipClasses.tooltip}`]: {
-        background: "#111214",
+        background: theme.palette.background.paper,
         borderRadius: "4px",
         width: "340px",
         fontSize: 12,
@@ -24,12 +24,12 @@ export const MenuListItemButton = styled(ListItemButton)(() => ({
 
 export const ServerNameTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} arrow classes={{ popper: className }} />
-))(() => ({
+))(({ theme }) => ({
     [`& .${tooltipClasses.arrow}`]: {
-        color: "#1e2124",
+        color: theme.palette.background.paper,
     },
     [`& .${tooltipClasses.tooltip}`]: {
-        backgroundColor: "#1e2124",
+        backgroundColor: theme.palette.background.paper,
     },
 }));
 
@@ -37,10 +37,10 @@ export const InfoInput = styled(InputBase)(({ theme }) => ({
     "label + &": {
         marginTop: theme.spacing(3),
     },
-    "& .MuiInputBase-input": {
+    "& input": {
         borderRadius: 4,
         position: "relative",
-        backgroundColor: "#e3e5e8",
+        backgroundColor: theme.palette.background.paper,
         border: "none",
         fontSize: 16,
         padding: "10px 12px",
@@ -49,12 +49,12 @@ export const InfoInput = styled(InputBase)(({ theme }) => ({
 
 export const FunctionTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} arrow classes={{ popper: className }} />
-))(() => ({
+))(({ theme }) => ({
     [`& .${tooltipClasses.tooltip}`]: {
-        backgroundColor: "#1e2124",
+        backgroundColor: theme.palette.background.paper,
     },
     [`& .${tooltipClasses.arrow}`]: {
-        color: "#1e2124",
+        color: theme.palette.background.paper,
     },
 }));
 
@@ -62,12 +62,12 @@ export const MemberListItemButton = styled(ListItemButton)(() => ({
     padding: "2px 2px 2px 2px",
 }));
 
-export const FriendTopButton = styled(Button)(() => ({
+export const FriendTopButton = styled(Button)(({ theme }) => ({
     "&:focus": {
-        backgroundColor: "#ffffff",
+        backgroundColor: theme.palette.background.paper,
     },
     "&:hover": {
-        color: "#ffffff",
+        color: theme.palette.text.primary,
     },
 }));
 
@@ -75,24 +75,19 @@ export const SearchFriendInput = styled(InputBase)(({ theme }) => ({
     "label + &": {
         marginTop: theme.spacing(3),
     },
-    "& .MuiInputBase-input": {
+    "& input": {
         borderRadius: 4,
         position: "relative",
-        backgroundColor: "#e3e5e8",
+        backgroundColor: theme.palette.background.paper,
         border: "none",
         fontSize: 16,
         padding: "10px 12px",
     },
 }));
 
-export const FriendMessageIconButton = styled(IconButton)(() => ({
-    "& .MuiIconButton-root": {
-        backgroundColor: "#2b2d31",
-    },
-    "& .MuiButtonBase-root": {
-        backgroundColor: "#2b2d31",
-    },
+export const FriendMessageIconButton = styled(IconButton)(({ theme }) => ({
+    backgroundColor: theme.palette.background.paper,
     "&:hover": {
-        backgroundColor: "#2b2d31",
+        backgroundColor: theme.palette.background.paper,
     },
 }));

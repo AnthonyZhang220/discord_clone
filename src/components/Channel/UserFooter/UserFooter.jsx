@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 
-import { Box, Badge, Avatar, Tooltip } from "@mui/material";
+import { Badge, Avatar } from "@mui/material";
+import { Tooltip } from "@/components/compat/RadixCompat";
 import HeadsetIcon from "@mui/icons-material/Headset";
 import HeadsetOffIcon from "@mui/icons-material/HeadsetOff";
 import MicIcon from "@mui/icons-material/Mic";
@@ -10,10 +11,10 @@ import IconButton from "@mui/material/IconButton";
 import SettingsIcon from "@mui/icons-material/Settings";
 import StatusList from "@/components/StatusList";
 import { UserDetailPopover } from "./UserDetailPopover/UserDetailPopover";
-import "./UserFooter.scss";
 import { useDispatch, useSelector } from "react-redux";
 import { setUserDetailPopover } from "@/redux/features/popoverSlice";
 import { toggleDeafen, toggleMic } from "@/handlers/voiceControlHandlers";
+import "./UserFooter.scss";
 
 const UserFooter = () => {
     const userAvatarRef = useRef(null);
@@ -22,8 +23,8 @@ const UserFooter = () => {
     const { user } = useSelector((state) => state.auth);
 
     return (
-        <Box component="footer" className="user-footer-container" ref={userAvatarRef}>
-            <Box
+        <footer className="user-footer-container" ref={userAvatarRef}>
+            <div
                 onClick={() => dispatch(setUserDetailPopover(true))}
                 className="user-footer-profile"
             >
@@ -34,20 +35,17 @@ const UserFooter = () => {
                 >
                     <Avatar
                         alt={user?.displayName}
-                        sx={{ width: "30px", height: "30px" }}
                         src={user?.avatar}
-                        className="avatar"
+                        className="avatar user-footer-avatar"
                     />
                 </Badge>
-                <Box className="user-footer-details">
-                    <Box className="username" sx={{ fontSize: 14 }}>
-                        {user?.displayName}
-                    </Box>
-                    <Box component="span" className="tag"></Box>
-                </Box>
-            </Box>
+                <div className="user-footer-details">
+                    <div className="username user-footer-username">{user?.displayName}</div>
+                    <span className="tag"></span>
+                </div>
+            </div>
             <UserDetailPopover userAvatarRef={userAvatarRef} />
-            <Box className="user-footer-controls button-group">
+            <div className="user-footer-controls button-group">
                 {isMicOn ? (
                     <Tooltip title="Mute" placement="top">
                         <IconButton
@@ -58,7 +56,7 @@ const UserFooter = () => {
                                 toggleMic();
                             }}
                         >
-                            <MicIcon sx={{ height: 20, width: 20 }} />
+                            <MicIcon className="user-footer-icon" />
                         </IconButton>
                     </Tooltip>
                 ) : (
@@ -71,7 +69,7 @@ const UserFooter = () => {
                                 toggleMic();
                             }}
                         >
-                            <MicOffIcon sx={{ height: 20, width: 20 }} />
+                            <MicOffIcon className="user-footer-icon" />
                         </IconButton>
                     </Tooltip>
                 )}
@@ -83,7 +81,7 @@ const UserFooter = () => {
                             color="error"
                             onClick={() => toggleDeafen()}
                         >
-                            <HeadsetOffIcon sx={{ height: 20, width: 20 }} />
+                            <HeadsetOffIcon className="user-footer-icon" />
                         </IconButton>
                     </Tooltip>
                 ) : (
@@ -94,17 +92,17 @@ const UserFooter = () => {
                             color="success"
                             onClick={() => toggleDeafen()}
                         >
-                            <HeadsetIcon sx={{ height: 20, width: 20 }} />
+                            <HeadsetIcon className="user-footer-icon" />
                         </IconButton>
                     </Tooltip>
                 )}
                 <Tooltip title="Settings">
                     <IconButton className="user-footer-button" aria-label="Settings">
-                        <SettingsIcon sx={{ height: 20, width: 20 }} />
+                        <SettingsIcon className="user-footer-icon" />
                     </IconButton>
                 </Tooltip>
-            </Box>
-        </Box>
+            </div>
+        </footer>
     );
 };
 

@@ -3,7 +3,6 @@ import ChatIcon from "@mui/icons-material/Chat";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { FunctionTooltip, FriendMessageIconButton } from "@/components/CustomUIComponents";
 import {
-    Box,
     Divider,
     ListItem,
     ListItemButton,
@@ -19,8 +18,8 @@ import StatusList from "@/components/StatusList";
 export default function FriendTab({ displayName, avatar, status, id, createdAt }) {
     return (
         <>
-            <Divider variant="fullWidth" flexItem sx={{ backgroundColor: "#3d3f44" }} />
-            <ListItem className="friend-list-item" sx={{ p: 0, m: 0 }} key={id}>
+            <Divider variant="fullWidth" flexItem className="friend-divider" />
+            <ListItem className="friend-list-item" key={id}>
                 <ListItemButton
                     className="friend-list-item-button"
                     onClick={() =>
@@ -46,11 +45,11 @@ export default function FriendTab({ displayName, avatar, status, id, createdAt }
                             textTransform: "capitalize",
                         }}
                     />
-                    <Box sx={{ m: 1 }}>
+                    <div className="action-box">
                         <FunctionTooltip
                             title={
                                 <React.Fragment>
-                                    <Typography variant="body1" sx={{ m: 0.5 }}>
+                                    <Typography variant="body1" className="tooltip-text">
                                         Message
                                     </Typography>
                                 </React.Fragment>
@@ -72,12 +71,12 @@ export default function FriendTab({ displayName, avatar, status, id, createdAt }
                                 <ChatIcon />
                             </FriendMessageIconButton>
                         </FunctionTooltip>
-                    </Box>
-                    <Box sx={{ m: 1 }}>
+                    </div>
+                    <div className="action-box">
                         <FunctionTooltip
                             title={
                                 <React.Fragment>
-                                    <Typography variant="body1" sx={{ m: 0.5 }}>
+                                    <Typography variant="body1" className="tooltip-text">
                                         More
                                     </Typography>
                                 </React.Fragment>
@@ -88,7 +87,7 @@ export default function FriendTab({ displayName, avatar, status, id, createdAt }
                                 <MoreVertIcon />
                             </FriendMessageIconButton>
                         </FunctionTooltip>
-                    </Box>
+                    </div>
                 </ListItemButton>
             </ListItem>
         </>

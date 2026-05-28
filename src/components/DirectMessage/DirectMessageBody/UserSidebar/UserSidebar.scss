@@ -23,4 +23,14 @@
             height: auto;
         }
     }
+
+    .userSidebar-aside {
+        width: 100%;
+        transition: background-color 0.1s;
+    }
+
+    .userSidebar-avatar {
+        width: 80px;
+        height: 80px;
+    }
 }

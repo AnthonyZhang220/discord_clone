@@ -1,5 +1,4 @@
 import React from "react";
-import Box from "@mui/material/Box";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import Avatar from "@mui/material/Avatar";
@@ -11,15 +10,11 @@ import "./UserSidebar.scss";
 
 export const UserSidebar = ({ currDirectMessageChannel }) => {
     return (
-        <Box className="userSidebar-container">
-            <Box
-                component="aside"
-                className="userSidebar-memberlist-wrapper"
-                sx={{ width: "100%", transition: "background-color 0.1s" }}
-            >
-                <Box className="userSidebar-memberlist">
-                    <Box>
-                        <Box className="userSidebar-detail-top">
+        <div className="userSidebar-container">
+            <aside className="userSidebar-memberlist-wrapper userSidebar-aside">
+                <div className="userSidebar-memberlist">
+                    <div>
+                        <div className="userSidebar-detail-top">
                             <svg className="userSidebar-detail-banner">
                                 <mask id="uid_347">
                                     <rect></rect>
@@ -37,13 +32,13 @@ export const UserSidebar = ({ currDirectMessageChannel }) => {
                             >
                                 <Avatar
                                     alt={currDirectMessageChannel.displayName}
-                                    sx={{ width: "80px", height: "80px" }}
+                                    className="userSidebar-avatar"
                                     src={currDirectMessageChannel.avatar}
                                     imgProps={{ crossOrigin: "Anonymous" }}
                                 />
                             </Badge>
-                        </Box>
-                        <Box className="userSidebar-detail-list">
+                        </div>
+                        <div className="userSidebar-detail-list">
                             <ListItem dense>
                                 <MenuListItemButton>
                                     <ListItemText
@@ -82,10 +77,10 @@ export const UserSidebar = ({ currDirectMessageChannel }) => {
                                 variant="middle"
                                 light={true}
                             />
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
-        </Box>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
     );
 };

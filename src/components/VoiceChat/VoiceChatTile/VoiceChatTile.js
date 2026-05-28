@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Avatar, Button, Typography, IconButton } from "@mui/material";
+import { Avatar, Button, Typography, IconButton } from "@mui/material";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import MicOffIcon from "@mui/icons-material/MicOff";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
@@ -10,8 +10,8 @@ import "./VoiceChatTile.scss";
 function VoiceChatTile({ user, volume, hasVideo, hasAudio, videoTrack, audioTrack, localUser }) {
     // no side-effects required
     return (
-        <Box className="voicechat-tile" sx={{ transition: "background-color 0.1s" }}>
-            <Box className="video-wrapper">
+        <div className="voicechat-tile voicechat-transition">
+            <div className="video-wrapper">
                 {localUser ? (
                     <>
                         <LocalVideoTrack track={videoTrack} play={hasVideo} disabled={!hasVideo} />
@@ -24,23 +24,27 @@ function VoiceChatTile({ user, volume, hasVideo, hasAudio, videoTrack, audioTrac
                         <RemoteUser user={user} playVideo={hasVideo} playAudio={hasAudio} />
                     </div>
                 )}
-            </Box>
-            <Box className="video-overlay">
-                <Box className="overlay-container">
-                    <Box className="overlay-top"></Box>
+            </div>
+            <div className="video-overlay">
+                <div className="overlay-container">
+                    <div className="overlay-top"></div>
                     {!hasVideo && (
                         <Avatar
                             src={user.avatar}
                             alt={user.displayName}
-                            className="overlay-avatar"
-                            sx={{ width: 75, height: 75 }}
+                            className="overlay-avatar overlay-avatar-large"
                             imgProps={{ crossOrigin: "Anonymous" }}
                         />
                     )}
-                    <Box className="overlay-bottom">
-                        <Box>
+                    <div className="overlay-bottom">
+                        <div>
                             <Button
-                                sx={{ color: volume > 50 ? "green" : "white" }}
+                                className={
+                                    "voicechat-button " +
+                                    (volume > 50
+                                        ? "voicechat-button-high"
+                                        : "voicechat-button-normal")
+                                }
                                 variant="outlined"
                                 startIcon={hasVideo ? <VideocamIcon /> : <VideocamOffIcon />}
                             >
@@ -49,16 +53,16 @@ function VoiceChatTile({ user, volume, hasVideo, hasAudio, videoTrack, audioTrac
                                     {user.uid}
                                 </Typography>
                             </Button>
-                        </Box>
-                        <Box>
-                            <IconButton sx={{ color: "white", border: "solid 1px" }}>
+                        </div>
+                        <div>
+                            <IconButton className="voicechat-iconbutton">
                                 {hasAudio ? <Mic /> : <MicOffIcon />}
                             </IconButton>
-                        </Box>
-                    </Box>
-                </Box>
-            </Box>
-        </Box>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
 

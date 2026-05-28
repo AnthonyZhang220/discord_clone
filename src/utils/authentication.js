@@ -1,5 +1,5 @@
 import store from "@/redux/store";
-import { signInWithRedirect } from "firebase/auth";
+import { signInWithRedirect, setPersistence, browserLocalPersistence } from "firebase/auth";
 import { auth, db } from "@/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import {
@@ -19,6 +19,13 @@ const GithubProvider = new GithubAuthProvider();
 
 export const signInWithOAuth = (provider) => async () => {
     try {
+        // Ensure persistence is set before redirecting so redirect result can be restored.
+        try {
+            await setPersistence(auth, browserLocalPersistence);
+        } catch (pErr) {
+            console.warn("setPersistence failed, proceeding with redirect", pErr);
+        }
+
         switch (provider) {
             case "google":
                 await signInWithRedirect(auth, GoogleProvider);
@@ -39,6 +46,8 @@ export const signInWithOAuth = (provider) => async () => {
         store.dispatch(setError("signInWithOAuth", error));
     }
 };
+
+// (Removed popup helpers and debug functions to restore redirect-only behavior)
 
 export async function signOut() {
     try {

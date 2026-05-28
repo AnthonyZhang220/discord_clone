@@ -1,6 +1,7 @@
 // ThemeContextProvider.tsx
 import React, { useMemo } from "react";
 import { createTheme, ThemeProvider, responsiveFontSizes } from "@mui/material";
+import { StyledEngineProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 
 function ThemeContextProvider({ children }) {
@@ -68,16 +69,111 @@ function ThemeContextProvider({ children }) {
                         root: { borderColor: "var(--dc-divider)" },
                     },
                 },
+                MuiInputBase: {
+                    styleOverrides: {
+                        input: {
+                            backgroundColor: "var(--menu-bg)",
+                            color: "var(--body-color)",
+                            padding: "10px 12px",
+                            borderRadius: 8,
+                        },
+                    },
+                },
+                MuiListItemButton: {
+                    styleOverrides: {
+                        root: {
+                            borderRadius: 8,
+                            "&:hover": { backgroundColor: "var(--dc-bg-modifier-hover)" },
+                            "&.Mui-selected": { backgroundColor: "var(--dc-bg-modifier-selected)" },
+                        },
+                    },
+                },
+                MuiTooltip: {
+                    styleOverrides: {
+                        tooltip: {
+                            backgroundColor: "var(--menu-bg)",
+                            color: "var(--body-color)",
+                            fontSize: "12px",
+                            borderRadius: "6px",
+                        },
+                        arrow: { color: "var(--menu-bg)" },
+                    },
+                },
+                MuiDialog: {
+                    styleOverrides: {
+                        paper: {
+                            backgroundColor: "var(--menu-bg)",
+                            color: "var(--body-color)",
+                            borderRadius: 12,
+                        },
+                    },
+                },
+                MuiOutlinedInput: {
+                    styleOverrides: {
+                        root: { backgroundColor: "var(--dc-input-background)" },
+                        notchedOutline: { borderColor: "var(--dc-divider)" },
+                    },
+                },
+                MuiListItemText: {
+                    styleOverrides: {
+                        primary: { color: "var(--body-color)" },
+                        secondary: { color: "var(--muted)" },
+                    },
+                },
+                MuiListItemIcon: {
+                    styleOverrides: {
+                        root: { color: "var(--muted)", minWidth: "40px" },
+                    },
+                },
+                MuiAvatar: {
+                    styleOverrides: {
+                        root: { backgroundColor: "var(--menu-bg)", color: "var(--body-color)" },
+                        img: { objectFit: "cover" },
+                    },
+                },
+                MuiDialogTitle: {
+                    styleOverrides: {
+                        root: { color: "var(--body-color)", fontWeight: 600 },
+                    },
+                },
+                MuiDialogActions: {
+                    styleOverrides: {
+                        root: { padding: "16px", backgroundColor: "transparent" },
+                    },
+                },
+                MuiTabs: {
+                    styleOverrides: {
+                        root: { minHeight: 36 },
+                        indicator: { backgroundColor: "var(--primary-color)" },
+                    },
+                },
+                MuiTab: {
+                    styleOverrides: {
+                        root: { textTransform: "none", minHeight: 36 },
+                    },
+                },
+                MuiSnackbar: {
+                    styleOverrides: {
+                        root: { backgroundColor: "var(--menu-bg)", color: "var(--body-color)" },
+                    },
+                },
+                MuiFormControlLabel: {
+                    styleOverrides: {
+                        label: { color: "var(--body-color)" },
+                    },
+                },
             },
         });
         return responsiveFontSizes(t);
     }, []); // 依赖为空，theme 只创建一次
 
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline /> {/* 应用 background.default 到 body */}
-            {children}
-        </ThemeProvider>
+        <StyledEngineProvider injectFirst>
+            <ThemeProvider theme={theme}>
+                <CssBaseline /> {/* 应用 background.default 到 body */}
+                {children}
+            </ThemeProvider>
+        </StyledEngineProvider>
     );
 }
 

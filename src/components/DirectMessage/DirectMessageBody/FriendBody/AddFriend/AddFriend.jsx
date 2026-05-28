@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Box, Typography, FormControl, InputAdornment, InputBase, Divider } from "@mui/material";
+import { Typography, FormControl, InputAdornment, InputBase, Divider } from "@mui/material";
 import FriendActive from "@/components/DirectMessage/DirectMessageBody/FriendBody/FriendActive/FriendActive";
 import SearchIcon from "@mui/icons-material/Search";
 import styled from "@emotion/styled";
@@ -14,14 +14,14 @@ const BootstrapInput = styled(InputBase)(({ theme }) => ({
     "label + &": {
         marginTop: theme.spacing(3),
     },
-    "& .MuiInputBase-input": {
+    "& input": {
         borderRadius: 4,
         position: "relative",
-        backgroundColor: "#1e1f22",
+        backgroundColor: theme.palette.background.paper,
         border: "none",
         fontSize: 16,
         padding: "10px 12px",
-        color: "#ffffff",
+        color: theme.palette.text.primary,
     },
 }));
 
@@ -38,22 +38,18 @@ export default function AddFriend({ noActive }) {
         });
     };
     return (
-        <Box className="content">
-            <Box className="add-friend-content" component="main">
-                <Box className="add-friend-title">
+        <div className="content">
+            <main className="add-friend-content">
+                <div className="add-friend-title">
                     <Typography variant="h4">ADD FRIEND</Typography>
-                </Box>
-                <Box className="add-friend-subtitle">
+                </div>
+                <div className="add-friend-subtitle">
                     <Typography variant="body2">
                         You can add a friend with their unique ID.
                     </Typography>
-                </Box>
-                <Box
-                    className="add-friend-search-form"
-                    component="form"
-                    onSubmit={(e) => e.preventDefault()}
-                >
-                    <Box className="add-friend-search-inner">
+                </div>
+                <form className="add-friend-search-form" onSubmit={(e) => e.preventDefault()}>
+                    <div className="add-friend-search-inner">
                         <input
                             className="add-friend-search-input"
                             type="search"
@@ -63,10 +59,10 @@ export default function AddFriend({ noActive }) {
                             autoComplete="off"
                         />
                         <SearchIcon />
-                    </Box>
-                </Box>
+                    </div>
+                </form>
                 <Divider variant="middle"></Divider>
-                <Box component="form" className="self-id-container">
+                <form className="self-id-container">
                     <FormControl variant="standard" fullWidth>
                         <Typography variant="h4">Your Unique ID:</Typography>
                         <BootstrapInput
@@ -76,7 +72,7 @@ export default function AddFriend({ noActive }) {
                             autoComplete="off"
                             defaultValue={user.id}
                             readOnly
-                            sx={{ marginTop: "16px" }}
+                            className="bootstrap-input-mt"
                             endAdornment={
                                 <InputAdornment position="end">
                                     <LoadingButton
@@ -90,9 +86,9 @@ export default function AddFriend({ noActive }) {
                             }
                         />
                     </FormControl>
-                </Box>
+                </form>
                 <Divider variant="middle"></Divider>
-                <Box>
+                <div>
                     {queryFriendList?.map(({ displayName, status, avatar, id }) => (
                         <FriendTab
                             displayName={displayName}
@@ -102,9 +98,9 @@ export default function AddFriend({ noActive }) {
                             key={id}
                         />
                     ))}
-                </Box>
-            </Box>
+                </div>
+            </main>
             <FriendActive firendList={friendList} noActive={noActive} />
-        </Box>
+        </div>
     );
 }
