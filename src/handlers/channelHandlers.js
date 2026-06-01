@@ -11,36 +11,48 @@ import { doc, getDoc, addDoc, Timestamp, collection } from "firebase/firestore";
 import { setIsVoiceChatPageOpen } from "@/redux/features/voiceChatSlice";
 import { setIsLoading } from "@/redux/features/loadSlice";
 import { setCreateChannelModal, setCreateVoiceChannelModal } from "@/redux/features/modalSlice";
+import { showError } from "@/utils/showError";
+import { setDirectMessageStore } from "@/utils/directMessageStore";
 
 export const handleCreateChannel = async (newChannelInfo) => {
     store.dispatch(setIsLoading(true));
-    const doc = await addDoc(collection(db, "channels"), {
-        name: newChannelInfo.channelName,
-        serverRef: store.getState().userSelectStore.selectedServer,
-        createdAt: Timestamp.fromDate(new Date()),
-        messages: [],
-    });
-    if (doc) {
-        store.dispatch(setNewChannelInfo({ channelName: "" }));
+    try {
+        const created = await addDoc(collection(db, "channels"), {
+            name: newChannelInfo.channelName,
+            serverRef: store.getState().userSelectStore.selectedServer,
+            createdAt: Timestamp.fromDate(new Date()),
+            messages: [],
+        });
+        if (created) {
+            store.dispatch(setNewChannelInfo({ channelName: "" }));
+            store.dispatch(setCreateChannelModal(false));
+        }
+    } catch (error) {
+        console.error("Create channel failed:", error);
+        showError("Channel", error?.message || "Failed to create channel.");
+    } finally {
         store.dispatch(setIsLoading(false));
-        store.dispatch(setCreateChannelModal(false));
-        // handleChannelModalClose();
     }
 };
 
 export const handleCreateVoiceChannel = async (newChannelInfo) => {
     store.dispatch(setIsLoading(true));
-    const doc = await addDoc(collection(db, "voicechannels"), {
-        name: newChannelInfo.channelName,
-        serverRef: store.getState().userSelectStore.selectedServer,
-        createdAt: Timestamp.fromDate(new Date()),
-        participants: [],
-    });
-    if (doc) {
-        store.dispatch(setNewChannelInfo({ channelName: "" }));
+    try {
+        const created = await addDoc(collection(db, "voicechannels"), {
+            name: newChannelInfo.channelName,
+            serverRef: store.getState().userSelectStore.selectedServer,
+            createdAt: Timestamp.fromDate(new Date()),
+            participants: [],
+        });
+        if (created) {
+            store.dispatch(setNewChannelInfo({ channelName: "" }));
+            store.dispatch(setCreateVoiceChannelModal(false));
+        }
+    } catch (error) {
+        console.error("Create voice channel failed:", error);
+        showError("Channel", error?.message || "Failed to create voice channel.");
+    } finally {
         store.dispatch(setIsLoading(false));
-        store.dispatch(setCreateVoiceChannelModal(false));
-        // handleChannelModalClose();
     }
 };
 
@@ -51,6 +63,12 @@ export const handleCurrDirectMessageChannel = async (
     avatar,
     createdAt
 ) => {
+    setDirectMessageStore({
+        isFriendListPageOpen: false,
+        selectedDirectMessageUserId: userId || "",
+    });
+
+    store.dispatch(setIsLoading(true));
     store.dispatch(
         setCurrDirectMessageChannel({
             id: userId,
@@ -60,25 +78,44 @@ export const handleCurrDirectMessageChannel = async (
             createdAt: createdAt,
         })
     );
-    const privateChannels = store.getState().directMessage.directMessageChannelRefs;
-    const channelRef = doc(db, "privatechannels", privateChannels[userId]);
-    const channelDoc = await getDoc(channelRef);
-    const ref = channelDoc.data().channelRef;
-    store.dispatch(setCurrDirectMessageChannelRef(ref));
-    store.dispatch(setIsFriendListPageOpen(false));
+
+    try {
+        const privateChannels = store.getState().directMessage.directMessageChannelRefs;
+        const channelRef = doc(db, "privatechannels", privateChannels[userId]);
+        const channelDoc = await getDoc(channelRef);
+        const ref = channelDoc?.data()?.channelRef;
+        if (ref) store.dispatch(setCurrDirectMessageChannelRef(ref));
+    } catch (error) {
+        console.error("Fetch direct message channel failed:", error);
+        showError("DirectMessage", error?.message || "Failed to open direct message channel.");
+    } finally {
+        store.dispatch(setIsFriendListPageOpen(false));
+        store.dispatch(setIsLoading(false));
+    }
 };
 
 export const handleSelectChannel = (channelName, channelId) => {
-    const storedData = localStorage.getItem("userSelectStore");
-    const userSelectStore = JSON.parse(storedData);
-    const defaultChannels = userSelectStore.selectedChannelIds;
-    const selectedServer = store.getState().userSelectStore.selectedServer;
+    try {
+        const raw = localStorage.getItem("userSelectStore");
+        const userSelectStore = raw
+            ? JSON.parse(raw)
+            : { selectedServerId: "", selectedChannelIds: {} };
+        const selectedServer = store.getState().userSelectStore.selectedServer;
 
-    defaultChannels[selectedServer] = channelId;
+        if (
+            !userSelectStore.selectedChannelIds ||
+            typeof userSelectStore.selectedChannelIds !== "object"
+        ) {
+            userSelectStore.selectedChannelIds = {};
+        }
 
-    const updatedUserSelectStore = JSON.stringify(userSelectStore);
+        userSelectStore.selectedChannelIds[selectedServer] = channelId;
 
-    localStorage.setItem("userSelectStore", updatedUserSelectStore);
+        localStorage.setItem("userSelectStore", JSON.stringify(userSelectStore));
+    } catch (e) {
+        // ignore localStorage failures
+    }
+
     store.dispatch(setIsVoiceChatPageOpen(false));
     store.dispatch(setSelectedChannel(channelId));
     store.dispatch(setCurrChannel({ name: channelName, id: channelId }));

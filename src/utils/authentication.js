@@ -1,5 +1,10 @@
 import store from "@/redux/store";
-import { signInWithRedirect, setPersistence, browserLocalPersistence } from "firebase/auth";
+import {
+    signInWithRedirect,
+    signInWithPopup,
+    setPersistence,
+    browserLocalPersistence,
+} from "firebase/auth";
 import { auth, db } from "@/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import {
@@ -10,15 +15,21 @@ import {
 } from "firebase/auth";
 import { redirect } from "react-router-dom";
 import { setIsLoggedIn, setUser } from "@/redux/features/authSlice";
-import { setError } from "@/redux/features/errorSlice";
+import { showError } from "@/utils/showError";
 
 const GoogleProvider = new GoogleAuthProvider();
 const FacebookProvider = new FacebookAuthProvider();
 const TwitterProvider = new TwitterAuthProvider();
 const GithubProvider = new GithubAuthProvider();
 
-export const signInWithOAuth = (provider) => async () => {
+export const signInWithOAuth = async (provider) => {
     try {
+        try {
+            sessionStorage.setItem("oauthRedirectInFlight", "1");
+        } catch (e) {
+            // ignore storage failures
+        }
+
         // Ensure persistence is set before redirecting so redirect result can be restored.
         try {
             await setPersistence(auth, browserLocalPersistence);
@@ -26,24 +37,49 @@ export const signInWithOAuth = (provider) => async () => {
             console.warn("setPersistence failed, proceeding with redirect", pErr);
         }
 
+        let selectedProvider = null;
         switch (provider) {
             case "google":
-                await signInWithRedirect(auth, GoogleProvider);
+                selectedProvider = GoogleProvider;
                 break;
             case "facebook":
-                await signInWithRedirect(auth, FacebookProvider);
+                selectedProvider = FacebookProvider;
                 break;
             case "twitter":
-                await signInWithRedirect(auth, TwitterProvider);
+                selectedProvider = TwitterProvider;
                 break;
             case "github":
-                await signInWithRedirect(auth, GithubProvider);
+                selectedProvider = GithubProvider;
                 break;
             default:
-            // provider not supported
+                showError("signInWithOAuth", "Unsupported OAuth provider.");
+                return;
         }
+
+        try {
+            await signInWithPopup(auth, selectedProvider);
+            try {
+                sessionStorage.removeItem("oauthRedirectInFlight");
+            } catch (e) {
+                // ignore storage failures
+            }
+            return;
+        } catch (popupError) {
+            const code = popupError?.code || "";
+            const shouldFallbackToRedirect =
+                code === "auth/popup-blocked" ||
+                code === "auth/popup-closed-by-user" ||
+                code === "auth/cancelled-popup-request" ||
+                code === "auth/operation-not-supported-in-this-environment";
+
+            if (!shouldFallbackToRedirect) {
+                throw popupError;
+            }
+        }
+
+        await signInWithRedirect(auth, selectedProvider);
     } catch (error) {
-        store.dispatch(setError("signInWithOAuth", error));
+        showError("signInWithOAuth", error?.message || String(error));
     }
 };
 
@@ -64,7 +100,7 @@ export async function signOut() {
         store.dispatch(setIsLoggedIn(false));
         redirect("/");
     } catch (error) {
-        store.dispatch(setError("signOut", error));
+        showError("signOut", error?.message || String(error));
     }
 }
 

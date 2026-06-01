@@ -6,11 +6,7 @@ import { getDatabase } from "firebase/database";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-import {
-    initializeAuth,
-    browserLocalPersistence,
-    browserPopupRedirectResolver,
-} from "firebase/auth";
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -30,13 +26,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const analytics = getAnalytics(app);
 
-// Initialize Auth with explicit persistence and popupRedirectResolver to
-// improve redirect sign-in recovery across page reloads in production.
-// Using initializeAuth ensures the persistence layer is set early.
-export const auth = initializeAuth(app, {
-    persistence: [browserLocalPersistence],
-    popupRedirectResolver: browserPopupRedirectResolver,
-});
+// Use default web auth initialization for robust redirect session restoration.
+export const auth = getAuth(app);
 
 export const db = getFirestore(app);
 export const storage = getStorage(app);

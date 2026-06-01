@@ -2,23 +2,34 @@ import store from "@/redux/store";
 import { setSelectedChannel, setSelectedServer } from "@/redux/features/userSelectStoreSlice";
 
 export const getSelectStore = () => {
-    const storedData = localStorage.getItem("userSelectStore");
-    const userSelectStore = JSON.parse(storedData);
+    try {
+        const raw = localStorage.getItem("userSelectStore");
+        const userSelectStore = raw ? JSON.parse(raw) : null;
 
-    if (!userSelectStore) {
-        //if user not in the storage, add to the local storage
-        const store = {
-            selectedServerId: "",
-            selectedChannelIds: {},
-        };
-        const updatedUserSelectStore = JSON.stringify(store);
-        localStorage.setItem("userSelectStore", updatedUserSelectStore);
-        store.dispatch(setSelectedServer(""));
-        store.dispatch(setSelectedChannel(""));
-    } else {
-        const defaultServerId = userSelectStore.selectedServerId;
-        const defaultChannelId = userSelectStore[defaultServerId];
+        if (!userSelectStore || typeof userSelectStore !== "object") {
+            const defaultStore = {
+                selectedServerId: "",
+                selectedChannelIds: {},
+            };
+            localStorage.setItem("userSelectStore", JSON.stringify(defaultStore));
+            store.dispatch(setSelectedServer(""));
+            store.dispatch(setSelectedChannel(""));
+            return;
+        }
+
+        const defaultServerId = userSelectStore.selectedServerId || "";
+        const defaultChannelId = (userSelectStore.selectedChannelIds || {})[defaultServerId] || "";
+
         store.dispatch(setSelectedServer(defaultServerId));
         store.dispatch(setSelectedChannel(defaultChannelId));
+    } catch (e) {
+        // if parsing fails, reset to safe defaults
+        try {
+            localStorage.removeItem("userSelectStore");
+        } catch (err) {
+            // ignore
+        }
+        store.dispatch(setSelectedServer(""));
+        store.dispatch(setSelectedChannel(""));
     }
 };

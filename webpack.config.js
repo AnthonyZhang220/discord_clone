@@ -8,7 +8,7 @@ module.exports = {
     mode: "development",
     output: {
         path: path.resolve(__dirname, "./dist"),
-        filename: "index_bundle.js",
+        filename: "[name].[contenthash].js",
         publicPath: "/",
     },
     target: "web",
@@ -50,6 +50,15 @@ module.exports = {
                         loader: "css-loader",
                         options: {
                             importLoaders: 1,
+                            url: {
+                                filter: (url, resourcePath) => {
+                                    // don't attempt to resolve absolute public assets, leave them as-is
+                                    if (typeof url === "string" && url.startsWith("/assets/")) {
+                                        return false;
+                                    }
+                                    return true;
+                                },
+                            },
                         },
                     },
                     {
@@ -91,4 +100,10 @@ module.exports = {
         }),
         new NodePolyfillPlugin(),
     ],
+    optimization: {
+        splitChunks: {
+            chunks: "all",
+        },
+        runtimeChunk: "single",
+    },
 };

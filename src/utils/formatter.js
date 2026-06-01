@@ -33,11 +33,13 @@ export const convertDate = (date) => {
         now.getTime() - new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
     if (timeDiff <= millisecondsInCurrentDay) {
-        return "Today at";
+        return "Today at " + newDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     }
 
     if (timeDiff <= millisecondsInCurrentDay + oneDay) {
-        return "Yesterday at";
+        return (
+            "Yesterday at " + newDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        );
     }
 
     return formattedDate;
