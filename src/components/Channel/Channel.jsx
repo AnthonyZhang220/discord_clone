@@ -1,29 +1,26 @@
-import React, { useEffect, Fragment, useRef } from "react";
+import React, { useEffect, Fragment, useRef, useCallback } from "react";
 import { db } from "@/firebase";
 import { onSnapshot, query, where, collection, doc, getDoc } from "firebase/firestore";
 
-import { ListItemText, ListItem, ListItemButton, ListItemAvatar } from "@mui/material";
-import { Avatar, Typography } from "@mui/material";
+import AvatarWithStatus from "@/components/AvatarWithStatus/AvatarWithStatus";
 import SettingsIcon from "@mui/icons-material/Settings";
 import MenuIcon from "@mui/icons-material/Menu";
-import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import NumbersIcon from "@mui/icons-material/Numbers";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
-import "./Channel.scss";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 import ServerSettings from "./ServerSettings/ServerSettings";
-import UserFooter from "./UserFooter/UserFooter";
-import VoiceControl from "./VoiceControl/VoiceControl";
+import UserFooter from "../AccountTray/AccountTray";
 
-import { FunctionTooltip } from "@/components/CustomUIComponents";
+import { Tooltip } from "@/components/compat/RadixCompat";
 import {
-    CreateChannelDialog,
+    CreateTextChannelDialog,
     CreateVoiceChannelDialog,
-    InviteDialog,
-} from "@/components/Modals/Modals";
+    InviteServerDialog,
+} from "@/components/dialogs/server";
 import { useDispatch, useSelector } from "react-redux";
 import { setCreateChannelModal, setCreateVoiceChannelModal } from "@/redux/features/modalSlice";
 import { setCurrChannelList, setCurrVoiceChannelList } from "@/redux/features/channelSlice";
@@ -31,21 +28,111 @@ import { toggleServerSettings } from "@/redux/features/popoverSlice";
 import { handleSelectChannel } from "@/handlers/channelHandlers";
 import { handleJoinVoiceChannel } from "@/handlers/voiceChannelHandlers";
 import { setCurrServer } from "@/redux/features/serverSlice";
+import "./Channel.scss";
+
+const ChannelListItem = React.memo(function ChannelListItem({
+    id,
+    name,
+    isActive,
+    onSelect,
+    onSettings,
+    Icon,
+}) {
+    return (
+        <li key={id} id={id} className={`channel-list-item ${isActive ? "active" : ""}`}>
+            <button
+                type="button"
+                className={`sidebar-item ${isActive ? "active" : ""}`}
+                onClick={() => onSelect(name, id)}
+            >
+                {Icon ? (
+                    <Icon className="channel-item-icon" />
+                ) : (
+                    <NumbersIcon className="channel-item-icon" />
+                )}
+                <span className="channel-name">{name}</span>
+            </button>
+            <button
+                type="button"
+                aria-label="settings"
+                className="channel-action button"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    if (onSettings) onSettings(id);
+                }}
+            >
+                <SettingsIcon />
+            </button>
+        </li>
+    );
+});
+
+const ParticipantItem = React.memo(function ParticipantItem({
+    displayName,
+    avatar,
+    id,
+    status,
+    onOpen,
+    setRef,
+}) {
+    return (
+        <li key={id} id={id} className="participant-item" ref={(ele) => setRef(id, ele)}>
+            <button
+                type="button"
+                className={`sidebar-item participant-button`}
+                onClick={() => onOpen(id)}
+            >
+                <AvatarWithStatus
+                    containerClassName="participant-avatar-wrap"
+                    avatarClassName="participant-avatar"
+                    alt={displayName}
+                    src={avatar}
+                    status={status}
+                />
+                <div className="participant-text">{displayName}</div>
+            </button>
+        </li>
+    );
+});
 
 const Channel = () => {
     const channelHeaderRef = useRef(null);
     const dispatch = useDispatch();
-    const { createChannelModal, createVoiceChannelModal, inviteModal } = useSelector(
-        (state) => state.modal
+    const onSelectChannel = useCallback((name, id) => {
+        handleSelectChannel(name, id);
+    }, []);
+
+    const onJoinVoice = useCallback((name, id) => {
+        handleJoinVoiceChannel(name, id);
+    }, []);
+
+    const openCreateChannelModal = useCallback(
+        () => dispatch(setCreateChannelModal(true)),
+        [dispatch]
     );
+    const openCreateVoiceChannelModal = useCallback(
+        () => dispatch(setCreateVoiceChannelModal(true)),
+        [dispatch]
+    );
+    const setParticipantRef = useCallback((id, el) => {
+        if (el) {
+            // maintain ref mapping
+            // memberRefs are external in original file; we store on document for compatibility
+            // but Channel uses a local ref map via closure
+            // to keep parity we attach to window (non-ideal) — instead keep as noop if not used
+        }
+    }, []);
+    const createChannelModal = useSelector((state) => state.modal.createChannelModal);
+    const createVoiceChannelModal = useSelector((state) => state.modal.createVoiceChannelModal);
+    const inviteModal = useSelector((state) => state.modal.inviteModal);
     // `user` from auth slice not used here
-    const { selectedServer, selectedChannel } = useSelector((state) => state.userSelectStore);
-    const { currVoiceChannel, currChannelList, currVoiceChannelList } = useSelector(
-        (state) => state.channel
-    );
-    const { currServer } = useSelector((state) => state.server);
-    const { serverSettingsPopover } = useSelector((state) => state.popover);
-    const { isVoiceChatConnected, isVoiceChatLoading } = useSelector((state) => state.voiceChat);
+    const selectedServer = useSelector((state) => state.userSelectStore.selectedServer);
+    const selectedChannel = useSelector((state) => state.userSelectStore.selectedChannel);
+    const currVoiceChannel = useSelector((state) => state.channel.currVoiceChannel);
+    const currChannelList = useSelector((state) => state.channel.currChannelList);
+    const currVoiceChannelList = useSelector((state) => state.channel.currVoiceChannelList);
+    const currServer = useSelector((state) => state.server.currServer);
+    const serverSettingsPopover = useSelector((state) => state.popover.serverSettingsPopover);
 
     //get channel list by server UID
     useEffect(() => {
@@ -95,14 +182,27 @@ const Channel = () => {
         }
     }, [selectedServer, dispatch]);
 
+    // Auto-select the first text channel for the server if none selected
+    useEffect(() => {
+        if (
+            selectedServer &&
+            (!selectedChannel || selectedChannel === "") &&
+            Array.isArray(currChannelList) &&
+            currChannelList.length > 0
+        ) {
+            const first = currChannelList[0];
+            if (first && first.id) {
+                // use existing handler which updates redux + localStorage
+                handleSelectChannel(first.name, first.id);
+            }
+        }
+    }, [selectedServer, selectedChannel, currChannelList]);
+
     return (
         <aside className="channel-container">
-            <header
-                className="channel-header focusable"
-                onClick={() => dispatch(toggleServerSettings())}
-                ref={channelHeaderRef}
-            >
-                <IconButton
+            <header className="channel-header" ref={channelHeaderRef}>
+                <button
+                    type="button"
                     aria-label="open servers"
                     className="mobile-servers-toggle"
                     onClick={(e) => {
@@ -112,125 +212,111 @@ const Channel = () => {
                     }}
                 >
                     <MenuIcon />
-                </IconButton>
-                <Typography component="h6" className="channel-header-name" variant="h6">
-                    {currServer.name}
-                </Typography>
-                {serverSettingsPopover ? (
-                    <IconButton aria-label="dropdown" className="channel-header-dropdown">
-                        <CloseIcon />
-                    </IconButton>
-                ) : (
-                    <IconButton aria-label="dropdown" className="channel-header-dropdown">
-                        <ExpandMoreIcon />
-                    </IconButton>
-                )}
+                </button>
+
+                <DropdownMenu.Root
+                    open={serverSettingsPopover}
+                    onOpenChange={() => dispatch(toggleServerSettings())}
+                >
+                    <DropdownMenu.Trigger asChild>
+                        <button type="button" className="channel-header-name-button">
+                            <span className="channel-header-name">{currServer.name}</span>
+                            <span className="channel-header-dropdown">
+                                {serverSettingsPopover ? <CloseIcon /> : <ExpandMoreIcon />}
+                            </span>
+                        </button>
+                    </DropdownMenu.Trigger>
+
+                    <DropdownMenu.Portal>
+                        <DropdownMenu.Content
+                            sideOffset={8}
+                            align="start"
+                            className="server-settings-paper"
+                        >
+                            <ServerSettings onClose={() => dispatch(toggleServerSettings())} />
+                        </DropdownMenu.Content>
+                    </DropdownMenu.Portal>
+                </DropdownMenu.Root>
             </header>
-            <ServerSettings
-                serverSettingsPopover={serverSettingsPopover}
-                channelHeaderRef={channelHeaderRef}
-            />
             <section className="channel-list-container">
                 <header className="channel-list-header focusable">
-                    <div>
-                        <Typography component="h6" variant="h6">
-                            Text Channels
-                        </Typography>
-                    </div>
+                    <span>Text Channels</span>
                     <div className="channel-header-actions">
-                        <FunctionTooltip
+                        <Tooltip
                             title={
                                 <Fragment>
-                                    <Typography variant="body1" className="tooltip-text">
-                                        Create Channel
-                                    </Typography>
+                                    <span className="tooltip-text">Create Channel</span>
                                 </Fragment>
                             }
                             placement="top"
                         >
-                            <AddIcon onClick={() => dispatch(setCreateChannelModal(true))} />
-                        </FunctionTooltip>
+                            <AddIcon onClick={openCreateChannelModal} />
+                        </Tooltip>
                     </div>
                 </header>
                 <ul className="channel-list-text">
                     {currChannelList.map(({ name, id }) => (
-                        <li
+                        <ChannelListItem
                             key={id}
                             id={id}
-                            className={`channel channel-text ${id === selectedChannel ? "active" : ""}`}
-                            onClick={() => {
-                                handleSelectChannel(name, id);
-                            }}
-                        >
-                            <NumbersIcon className="channel-item-icon" />
-                            <span className="channel-name">{name}</span>
-                            <IconButton aria-label="settings" className="button">
-                                <SettingsIcon />
-                            </IconButton>
-                        </li>
+                            name={name}
+                            isActive={id === selectedChannel}
+                            onSelect={onSelectChannel}
+                            onSettings={() => {}}
+                        />
                     ))}
                 </ul>
                 <header className="channel-list-header focusable">
-                    <div>
-                        <Typography component="h6" variant="h6">
-                            Voice Channels
-                        </Typography>
-                    </div>
+                    <span>Voice Channels</span>
                     <div className="channel-header-actions">
-                        <FunctionTooltip
+                        <Tooltip
                             title={
                                 <Fragment>
-                                    <Typography variant="body1" className="tooltip-text">
-                                        Create Voice Channel
-                                    </Typography>
+                                    <span className="tooltip-text">Create Voice Channel</span>
                                 </Fragment>
                             }
                             placement="top"
                         >
-                            <AddIcon onClick={() => dispatch(setCreateVoiceChannelModal(true))} />
-                        </FunctionTooltip>
+                            <AddIcon onClick={openCreateVoiceChannelModal} />
+                        </Tooltip>
                     </div>
                 </header>
                 <ul className="channel-list-text">
                     {currVoiceChannelList.map(({ name, id, participants }) => (
                         <Fragment key={id}>
-                            <li
+                            <ChannelListItem
                                 key={id}
                                 id={id}
-                                className={`channel channel-text ${id === currVoiceChannel.id ? "active" : ""}`}
-                                onClick={() => {
-                                    handleJoinVoiceChannel(name, id);
-                                }}
-                            >
-                                <VolumeUpIcon className="channel-item-icon" />
-                                <span className="channel-name">{name}</span>
-                                <IconButton aria-label="settings" className="button">
-                                    <SettingsIcon />
-                                </IconButton>
-                            </li>
-                            {participants.map(({ displayName, avatar, id }) => (
-                                <ListItem key={id} id={id} className="participant-item">
-                                    <ListItemButton>
-                                        <ListItemAvatar className="participant-avatar-wrap">
-                                            <Avatar
-                                                alt={displayName}
-                                                src={avatar}
-                                                className="participant-avatar"
-                                            />
-                                        </ListItemAvatar>
-                                        <ListItemText primary={displayName} />
-                                    </ListItemButton>
-                                </ListItem>
-                            ))}
+                                name={name}
+                                isActive={id === currVoiceChannel.id}
+                                onSelect={onJoinVoice}
+                                onSettings={() => {}}
+                                Icon={VolumeUpIcon}
+                            />
+                            <ul className="participant-list">
+                                {participants.map(
+                                    ({ displayName, avatar, id: memberId, status }) => (
+                                        <ParticipantItem
+                                            key={memberId}
+                                            displayName={displayName}
+                                            avatar={avatar}
+                                            id={memberId}
+                                            status={status}
+                                            onOpen={() => {}}
+                                            setRef={setParticipantRef}
+                                        />
+                                    )
+                                )}
+                            </ul>
                         </Fragment>
                     ))}
                 </ul>
             </section>
-            {(isVoiceChatConnected || isVoiceChatLoading) && <VoiceControl />}
-            <UserFooter className="user-footer-container" />
-            <InviteDialog selectedServer={selectedServer} inviteModal={inviteModal} />
-            <CreateChannelDialog createChannelModal={createChannelModal} />
-            <CreateVoiceChannelDialog createVoiceChannelModal={createVoiceChannelModal} />
+            {/* VoiceControl merged into UserFooter */}
+            <UserFooter className="channel-user-footer" />
+            <InviteServerDialog open={inviteModal} />
+            <CreateTextChannelDialog open={createChannelModal} />
+            <CreateVoiceChannelDialog open={createVoiceChannelModal} />
             {/* <Outlet /> */}
         </aside>
     );

@@ -1,68 +1,91 @@
 import React from "react";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import { Divider, ListItem, ListItemButton, Typography } from "@mui/material";
-import { Popover } from "@/components/compat/RadixCompat";
-// ServerSettings styles merged into theme / global styles
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { AlertDialog } from "radix-ui";
 import { toggleServerSettings } from "@/redux/features/popoverSlice";
 import { handleInviteToServer, handleDeleteServer } from "@/handlers/serverHandlers";
 import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
-//server settings menu
-export default function ServerSettings({ channelHeaderRef }) {
+export default function ServerSettings({ onClose }) {
     const dispatch = useDispatch();
-    const { serverSettingsPopover } = useSelector((state) => state.popover);
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
+
+    const confirmDeleteServer = React.useCallback(() => {
+        handleDeleteServer();
+        setConfirmDeleteOpen(false);
+        onClose?.();
+    }, [onClose]);
+
     return (
-        <Popover
-            open={serverSettingsPopover}
-            onClose={() => dispatch(toggleServerSettings())}
-            anchorEl={channelHeaderRef.current}
-            anchorReference="anchorEl"
-            PaperProps={{ className: "server-settings-paper" }}
-            anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "center",
-            }}
-            transformOrigin={{
-                vertical: "top",
-                horizontal: "center",
-            }}
-        >
-            <ListItem className="server-settings-item">
-                <ListItemButton
-                    onClick={() => handleInviteToServer()}
-                    className="server-settings-button"
-                >
-                    <Typography variant="h6" className="server-settings-title">
-                        Invite People
-                    </Typography>
-                    <PersonAddAlt1Icon className="server-settings-icon" />
-                </ListItemButton>
-            </ListItem>
-            <ListItem className="server-settings-item">
-                <ListItemButton
-                    onClick={() => dispatch(toggleServerSettings())}
-                    className="server-settings-button"
-                >
-                    <Typography variant="h6" className="server-settings-title">
-                        Server Settings
-                    </Typography>
-                    <SettingsIcon className="server-settings-icon" />
-                </ListItemButton>
-            </ListItem>
-            <Divider className="server-settings-divider" variant="middle" light={true} />
-            <ListItem className="server-settings-item">
-                <ListItemButton
-                    onClick={() => handleDeleteServer()}
-                    className="server-settings-button server-settings-danger"
-                >
-                    <Typography variant="h6" className="server-settings-title">
-                        Delete Server
-                    </Typography>
-                    <DeleteForeverIcon className="server-settings-icon" />
-                </ListItemButton>
-            </ListItem>
-        </Popover>
+        <>
+            <DropdownMenu.Item
+                className="user-menu-item"
+                onSelect={() => {
+                    handleInviteToServer();
+                    dispatch(toggleServerSettings());
+                    onClose?.();
+                }}
+            >
+                <span className="user-menu-item-label">Invite People</span>
+                <PersonAddAlt1Icon className="user-menu-item-icon" />
+            </DropdownMenu.Item>
+
+            <DropdownMenu.Item
+                className="user-menu-item"
+                onSelect={() => {
+                    dispatch(toggleServerSettings());
+                    onClose?.();
+                }}
+            >
+                <span className="user-menu-item-label">Server Settings</span>
+                <SettingsIcon className="user-menu-item-icon" />
+            </DropdownMenu.Item>
+
+            <div className="user-menu-divider" />
+
+            <DropdownMenu.Item
+                className="user-menu-item user-menu-item--danger"
+                onSelect={(event) => {
+                    event.preventDefault();
+                    setConfirmDeleteOpen(true);
+                }}
+            >
+                <span className="user-menu-item-label">Delete Server</span>
+                <DeleteForeverIcon className="user-menu-item-icon" />
+            </DropdownMenu.Item>
+
+            <AlertDialog.Root open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+                <AlertDialog.Portal>
+                    <AlertDialog.Overlay className="alert-dialog-overlay" />
+                    <AlertDialog.Content className="alert-dialog-content modal-paper modal-paper--center">
+                        <AlertDialog.Title className="modal-title">
+                            Delete Server?
+                        </AlertDialog.Title>
+                        <AlertDialog.Description className="modal-description">
+                            This action cannot be undone. All channels and messages in this server
+                            will be permanently deleted.
+                        </AlertDialog.Description>
+                        <div className="modal-actions">
+                            <AlertDialog.Cancel asChild>
+                                <button type="button" className="modal-button modal-button-back">
+                                    Cancel
+                                </button>
+                            </AlertDialog.Cancel>
+                            <AlertDialog.Action asChild>
+                                <button
+                                    type="button"
+                                    className="modal-button modal-button-contained user-menu-item--danger"
+                                    onClick={confirmDeleteServer}
+                                >
+                                    Delete Server
+                                </button>
+                            </AlertDialog.Action>
+                        </div>
+                    </AlertDialog.Content>
+                </AlertDialog.Portal>
+            </AlertDialog.Root>
+        </>
     );
 }
