@@ -1,7 +1,7 @@
 // SERVERS
 .servers {
     height: 100%;
-    background: $servers-bg;
+    background: var(--servers-bg);
     flex: 0 0 70px;
     display: flex;
     flex-direction: column;
@@ -23,19 +23,20 @@
     width: 50px;
     height: 50px;
     border-radius: 25px;
-    background-color: $servers-bg;
+    background-color: var(--servers-bg);
     background-repeat: no-repeat;
     margin-bottom: 8px;
     cursor: pointer;
     position: relative;
 
-    &:not(.active) {
-        animation: server-hover-out 0.6s ease;
+    transition:
+        background-color 0.2s ease,
+        border-radius 0.2s ease;
 
-        &:hover,
-        &:focus {
-            animation: server-hover-in 0.8s ease forwards;
-        }
+    &:hover,
+    &:focus {
+        background-color: var(--server-bg-active);
+        border-radius: 15px;
     }
 
     .transformDown {
@@ -46,14 +47,16 @@
         border-radius: inherit;
         width: 100%;
         height: 100%;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
     }
 
-    .server-icon > img {
+    .server-icon > img,
+    .server-icon > svg {
         border-radius: inherit;
         max-width: 100%;
+        max-height: 100%;
     }
 
     .server-divider {
@@ -67,42 +70,35 @@
         margin: 0.5rem;
     }
 
-    .server-add-button,
-    .server-explore-button {
-        font-size: 15px;
-        color: var(--success);
+    .server-action-button {
+        all: unset;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        box-sizing: border-box;
     }
 
-    .server-add-button:hover,
-    .server-explore-button:hover {
+    .server-action-button:hover {
         color: var(--body-color);
     }
 
-    .server-explore:hover {
-        background-color: var(--success);
+    .server-add-button {
+        color: var(--success);
+    }
+
+    .server-explore-button {
+        color: var(--primary-color);
     }
 
     &.server-friends {
         text-align: center;
-
-        // svg {
-        // 	max-width: 60%;
-        // 	max-height: 60%;
-        // }
-
-        // &::after {
-        // 	content: "2 ONLINE";
-        // 	color: rgba($body-color, 0.3);
-        // 	pointer-events: none;
-        // 	font-weight: 300;
-        // 	font-size: 0.65rem;
-        // 	position: absolute;
-        // 	bottom: -35px;
-        // 	left: 3px;
-        // 	padding-bottom: 10px;
-        // 	border-bottom: 2px solid color.adjust($servers-bg, $lightness: 5%);
-        // }
-
         // unread/active
         &::before {
             position: absolute;
@@ -117,11 +113,11 @@
 
         &.active {
             border-radius: 15px;
-            background-color: $servers-bg-active;
+            background-color: $server-bg-active;
         }
 
         &.unread::before {
-            background: $server-marker-unread;
+            background: var(--server-marker-unread);
         }
 
         &.active::before {
@@ -145,24 +141,27 @@
         width: 10px;
         height: 10px;
         border-radius: 25px;
+        transition:
+            background 0.2s ease,
+            height 0.2s ease,
+            top 0.2s ease;
     }
 
     &.active {
         border-radius: 15px;
-        background-color: $server-bg-active;
+        background-color: var(--server-bg-active);
     }
 
     &:hover {
         &::before {
-            background: $server-marker-active;
+            background: var(--server-marker-active);
             height: 30px;
             top: 10px;
-            animation: 1.2s ease-in-out forwards;
         }
     }
 
     &.unread::before {
-        background: $server-marker-unread;
+        background: var(--server-marker-unread);
     }
 
     &.active::before {
@@ -178,7 +177,7 @@
 
 // BUTTON
 .button {
-    background: $button-bg;
+    background: var(--button-bg);
     border: 0;
     color: inherit;
     cursor: pointer;
@@ -198,15 +197,15 @@
 .button-group {
     .button:focus,
     .button:active {
-        background: $button-bg-active;
+        background: var(--button-secondary-background-hover);
     }
 
     .button:not(:last-of-type) {
-        border-right: 1px solid $border-accent;
+        border-right: 1px solid var(--border-accent);
     }
 
     .button + .button {
-        box-shadow: inset 1px 0 0 $border-accent;
+        box-shadow: inset 1px 0 0 var(--border-accent);
     }
 }
 
@@ -220,7 +219,7 @@ svg[id] {
 @keyframes server-hover-in {
     0% {
         border-radius: 25px;
-        background-color: $servers-bg;
+        background-color: var(--servers-bg);
     }
 
     40% {
@@ -232,24 +231,24 @@ svg[id] {
     }
 
     80% {
-        background-color: $server-bg-active;
+        background-color: var(--server-bg-active);
     }
 
     100% {
         border-radius: 15px;
-        background-color: $servers-bg;
+        background-color: var(--servers-bg);
     }
 }
 
 @keyframes server-hover-out {
     0% {
         border-radius: 15px;
-        background-color: $server-bg-active;
+        background-color: var(--server-bg-active);
     }
 
     45% {
         border-radius: 25px;
-        background-color: $servers-bg;
+        background-color: var(--servers-bg);
     }
 
     65% {

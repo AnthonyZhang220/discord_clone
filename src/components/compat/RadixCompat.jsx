@@ -1,13 +1,82 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, forwardRef } from "react";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
 export const tooltipClasses = {
     tooltip: "mui-tooltip",
     arrow: "mui-tooltip-arrow",
     popper: "mui-tooltip-popper",
 };
+
+const badgePositionClass = (anchorOrigin) => {
+    const vertical = anchorOrigin?.vertical || "bottom";
+    const horizontal = anchorOrigin?.horizontal || "right";
+    return `radix-badge-indicator--${vertical}-${horizontal}`;
+};
+
+const AvatarInner = forwardRef(function AvatarInner(
+    { className = "", src, alt = "", imgProps = {}, fallback, style, ...props },
+    ref
+) {
+    const hasInitial = alt && alt.trim().length > 0;
+    const content = fallback || (hasInitial ? alt.trim()[0].toUpperCase() : "");
+
+    return (
+        <AvatarPrimitive.Root
+            ref={ref}
+            className={`radix-avatar ${className}`.trim()}
+            style={style}
+            {...props}
+        >
+            {src ? (
+                <AvatarPrimitive.Image
+                    className="radix-avatar-image"
+                    src={src}
+                    alt={alt}
+                    onError={(event) => {
+                        event.currentTarget.style.display = "none";
+                    }}
+                    {...imgProps}
+                />
+            ) : null}
+            <AvatarPrimitive.Fallback className="radix-avatar-fallback" delayMs={0}>
+                {content}
+            </AvatarPrimitive.Fallback>
+        </AvatarPrimitive.Root>
+    );
+});
+
+export const Avatar = React.memo(AvatarInner);
+Avatar.displayName = "Avatar";
+
+export const Badge = forwardRef(
+    (
+        {
+            className = "",
+            badgeContent,
+            // eslint-disable-next-line no-unused-vars
+            _overlap = "circular",
+            anchorOrigin = { vertical: "bottom", horizontal: "right" },
+            children,
+            ...props
+        },
+        ref
+    ) => (
+        <span ref={ref} className={`radix-badge ${className}`.trim()} {...props}>
+            {children}
+            {badgeContent != null ? (
+                <span
+                    className={`radix-badge-indicator ${badgePositionClass(anchorOrigin)}`.trim()}
+                >
+                    {badgeContent}
+                </span>
+            ) : null}
+        </span>
+    )
+);
+Badge.displayName = "Badge";
 
 const getSide = (placement) => {
     if (!placement) return "top";
@@ -100,8 +169,11 @@ export function Popover({
     open,
     onClose,
     anchorEl,
-    anchorOrigin = { vertical: "bottom", horizontal: "left" },
+    // eslint-disable-next-line no-unused-vars
+    _anchorReference,
+    anchorOrigin = { vertical: "", horizontal: "" },
     transformOrigin = { vertical: "top", horizontal: "left" },
+    position: externalPosition,
     PaperProps = {},
     className = "",
     ...props
@@ -109,7 +181,7 @@ export function Popover({
     const [position, setPosition] = useState({ top: 0, left: 0 });
 
     useEffect(() => {
-        if (open && anchorEl) {
+        if (!externalPosition && open && anchorEl) {
             const el = typeof anchorEl === "function" ? anchorEl() : anchorEl;
             if (el?.getBoundingClientRect) {
                 const rect = el.getBoundingClientRect();
@@ -117,37 +189,93 @@ export function Popover({
                 setPosition({ top: anchorPos.y, left: anchorPos.x });
             }
         }
-    }, [open, anchorEl, anchorOrigin]);
+    }, [open, anchorEl, anchorOrigin, externalPosition]);
 
     const transform = transformOriginOffset(transformOrigin);
+    const finalPosition = externalPosition || position;
+    const contentClassName = `compat-popover ${className} ${PaperProps?.className || ""}`.trim();
+    const contentStyle = {
+        position: "fixed",
+        top: finalPosition.top,
+        left: finalPosition.left,
+        transform: `translate(${transform.x}, ${transform.y})`,
+        zIndex: 1300,
+        minWidth: 260,
+        background: "var(--menu-bg)",
+        borderRadius: "16px",
+        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.35)",
+        ...PaperProps?.style,
+    };
 
     return (
         <PopoverPrimitive.Root open={open} onOpenChange={(value) => !value && onClose?.()}>
             <PopoverPrimitive.Portal>
                 <PopoverPrimitive.Content
-                    className={`compat-popover ${className}`}
-                    style={{
-                        position: "fixed",
-                        top: position.top,
-                        left: position.left,
-                        transform: `translate(${transform.x}, ${transform.y})`,
-                        zIndex: 1300,
-                        minWidth: 260,
-                        background: "var(--menu-bg)",
-                        borderRadius: "16px",
-                        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.35)",
-                    }}
+                    className={contentClassName}
+                    style={contentStyle}
                     {...props}
                 >
-                    <div
-                        className={PaperProps?.className || ""}
-                        style={{
-                            width: "100%",
-                            minWidth: 260,
-                        }}
-                    >
-                        {children}
-                    </div>
+                    {children}
+                </PopoverPrimitive.Content>
+            </PopoverPrimitive.Portal>
+        </PopoverPrimitive.Root>
+    );
+}
+
+export function HoverCard({
+    children,
+    content,
+    side = "right",
+    align = "center",
+    sideOffset = 8,
+    className = "",
+    open: controlledOpen,
+    onOpenChange,
+    ...props
+}) {
+    const [open, setOpen] = useState(false);
+    const openState = controlledOpen !== undefined ? controlledOpen : open;
+
+    const setOpenState = (value) => {
+        if (onOpenChange) onOpenChange(value);
+        if (controlledOpen === undefined) {
+            setOpen(value);
+        }
+    };
+
+    const trigger = React.isValidElement(children)
+        ? React.cloneElement(children, {
+              onMouseEnter: (event) => {
+                  children.props.onMouseEnter?.(event);
+                  setOpenState(true);
+              },
+              onMouseLeave: (event) => {
+                  children.props.onMouseLeave?.(event);
+                  setOpenState(false);
+              },
+              onFocus: (event) => {
+                  children.props.onFocus?.(event);
+                  setOpenState(true);
+              },
+              onBlur: (event) => {
+                  children.props.onBlur?.(event);
+                  setOpenState(false);
+              },
+          })
+        : children;
+
+    return (
+        <PopoverPrimitive.Root open={openState} onOpenChange={setOpenState}>
+            <PopoverPrimitive.Trigger asChild>{trigger}</PopoverPrimitive.Trigger>
+            <PopoverPrimitive.Portal>
+                <PopoverPrimitive.Content
+                    side={side}
+                    align={align}
+                    sideOffset={sideOffset}
+                    className={`compat-hovercard ${className}`}
+                    {...props}
+                >
+                    {content}
                 </PopoverPrimitive.Content>
             </PopoverPrimitive.Portal>
         </PopoverPrimitive.Root>
@@ -158,12 +286,22 @@ export function Dialog({
     children,
     open = false,
     onClose,
+    onOpenChange,
     className = "",
     PaperProps = {},
     ...props
 }) {
+    const handleOpenChange = (isOpen) => {
+        if (onOpenChange) {
+            onOpenChange(isOpen);
+        }
+        if (!isOpen && onClose) {
+            onClose();
+        }
+    };
+
     return (
-        <DialogPrimitive.Root open={open} onOpenChange={(isOpen) => !isOpen && onClose?.()}>
+        <DialogPrimitive.Root open={open} onOpenChange={handleOpenChange}>
             <DialogPrimitive.Portal>
                 <DialogPrimitive.Overlay
                     className="compat-dialog-overlay"
@@ -183,11 +321,15 @@ export function Dialog({
                         boxShadow: "0 22px 68px rgba(0, 0, 0, 0.45)",
                         padding: "20px",
                         position: "fixed",
+                        top: "50%",
                         left: "50%",
-                        transform: "translateX(-50%)",
+                        transform: "translate(-50%, -50%)",
                         maxWidth: "min(680px, calc(100vw - 40px))",
                         width: "100%",
                         zIndex: 1400,
+                        maxHeight: "calc(100vh - 40px)",
+                        overflow: "auto",
+                        ...PaperProps?.style,
                     }}
                     {...props}
                 >

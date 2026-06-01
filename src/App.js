@@ -3,7 +3,7 @@ import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import Chat from "./components/Chat/Chat";
 import ServerList from "./components/ServerList/ServerList";
 import Channel from "./components/Channel/Channel";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import LoginPage, { ResetPasswordPage } from "./components/LoginPage/LoginPage";
 import { RegisterPage } from "./components/LoginPage/LoginPage";
 import { db, auth } from "./firebase";
@@ -11,29 +11,130 @@ import { Outlet } from "react-router-dom";
 // import { RtcRole } from "agora-token"
 import VoiceChat from "./components/VoiceChat/VoiceChat";
 import { useDispatch, useSelector } from "react-redux";
-import ThemeContextProvider from "./contexts/ThemeContextProvider";
-import CssBaseline from "@mui/material/CssBaseline";
 import DirectMessageMenu from "./components/DirectMessage/DirectMessageMenu/DirectMessageMenu";
 import DirectMessageBody from "./components/DirectMessage/DirectMessageBody/DirectMessageBody";
 import PageNotFound from "./components/PageNotFound/PageNotFound";
 import { onAuthStateChanged, getRedirectResult } from "firebase/auth";
 import { getSelectStore } from "./utils/userSelectStore";
 import { setUser, setIsLoggedIn } from "./redux/features/authSlice";
-import { setIsDirectMessagePageOpen } from "./redux/features/directMessageSlice";
 import { getBannerColor } from "./utils/getBannerColor";
-import Error from "./components/Error/Error";
+import { joinVoiceChannel, loadVoiceChatSession } from "./redux/features/voiceChatSlice";
+import ToastManager from "./components/ToastManager/ToastManager";
 import "./App.scss";
 
 function App() {
     const dispatch = useDispatch();
     // user state is not used in this component
-    const { isVoiceChatPageOpen } = useSelector((state) => state.voiceChat);
-    const { currVoiceChannel } = useSelector((state) => state.channel);
+    const isVoiceChatPageOpen = useSelector((state) => state.voiceChat.isVoiceChatPageOpen);
+    const currVoiceChannel = useSelector((state) => state.channel.currVoiceChannel);
+    const user = useSelector((state) => state.auth.user);
 
     const navigate = useNavigate();
-    const location = useLocation();
 
     useEffect(() => {
+        const resolveUserPayload = async (authUser) => {
+            const fallbackPayload = {
+                displayName: authUser?.displayName || "User",
+                avatar: authUser?.photoURL || "",
+                id: authUser?.uid || "",
+                createdAt: null,
+                status: "online",
+                email: authUser?.email || "",
+                bannerColor: "rgb(88, 101, 242)",
+                friends: [],
+            };
+
+            if (!authUser?.uid) {
+                return fallbackPayload;
+            }
+
+            try {
+                const userRef = doc(db, "users", authUser.uid);
+                const userDoc = await getDoc(userRef);
+
+                if (userDoc.exists()) {
+                    const userData = userDoc.data() || {};
+                    return {
+                        displayName: userData.displayName || fallbackPayload.displayName,
+                        avatar: userData.avatar || fallbackPayload.avatar,
+                        id: userData.id || fallbackPayload.id,
+                        createdAt: userData.createdAt?.seconds || null,
+                        status: userData.status || "online",
+                        email: userData.email || fallbackPayload.email,
+                        bannerColor: userData.bannerColor || fallbackPayload.bannerColor,
+                        friends: userData.friends || [],
+                    };
+                }
+
+                const createdAt = Timestamp.fromDate(new Date());
+                const newUser = {
+                    displayName: authUser.displayName,
+                    email: authUser.email || "",
+                    avatar: authUser.photoURL,
+                    id: authUser.uid,
+                    createdAt,
+                    status: "online",
+                    friends: [],
+                    bannerColor: await getBannerColor(authUser.photoURL),
+                };
+
+                await setDoc(userRef, newUser);
+
+                return {
+                    displayName: newUser.displayName || fallbackPayload.displayName,
+                    avatar: newUser.avatar || fallbackPayload.avatar,
+                    id: newUser.id,
+                    createdAt: createdAt.seconds,
+                    status: newUser.status,
+                    email: newUser.email,
+                    bannerColor: newUser.bannerColor || fallbackPayload.bannerColor,
+                    friends: newUser.friends,
+                };
+            } catch (error) {
+                return fallbackPayload;
+            }
+        };
+
+        const finalizeLogin = async (authUser) => {
+            const payload = await resolveUserPayload(authUser);
+            dispatch(setUser(payload));
+            getSelectStore();
+            dispatch(setIsLoggedIn(true));
+        };
+
+        const routeAfterLogin = () => {
+            try {
+                const cur = window.location.pathname || "";
+                const hasVisited = localStorage.getItem("hasVisitedDirectMessage");
+                if (!hasVisited) {
+                    localStorage.setItem("hasVisitedDirectMessage", "1");
+                    if (cur !== "/channels/@me") {
+                        navigate("/channels/@me");
+                    }
+                } else if (!cur.startsWith("/channels")) {
+                    navigate("/channels");
+                }
+            } catch (e) {
+                navigate("/channels");
+            }
+        };
+
+        const clearOAuthRedirectMarker = () => {
+            try {
+                sessionStorage.removeItem("oauthRedirectInFlight");
+            } catch (e) {
+                // ignore storage failures
+            }
+        };
+
+        const hasOAuthRedirectMarker = () => {
+            try {
+                return sessionStorage.getItem("oauthRedirectInFlight") === "1";
+            } catch (e) {
+                return false;
+            }
+        };
+
         try {
             /* eslint-disable no-console */
             console.info("initial location:", window.location.href);
@@ -54,66 +155,10 @@ function App() {
                 // eslint-disable-next-line no-console
                 console.info("getRedirectResult:", result);
                 if (result && result.user) {
-                    // If redirect returned a user, ensure app state is populated the same way
                     try {
-                        const user = result.user;
-                        const userRef = doc(db, "users", user.uid);
-                        const userDoc = await getDoc(userRef);
-
-                        if (userDoc.exists()) {
-                            const userData = userDoc.data();
-                            dispatch(
-                                setUser({
-                                    displayName: userData.displayName,
-                                    avatar: userData.avatar,
-                                    id: userData.id,
-                                    createdAt: userData.createdAt?.seconds
-                                        ? userData.createdAt.seconds
-                                        : null,
-                                    status: userData.status,
-                                    email: userData.email,
-                                    bannerColor: userData.bannerColor,
-                                    friends: userData.friends || [],
-                                })
-                            );
-                        } else {
-                            const newUser = {
-                                displayName: user.displayName,
-                                email: user.email ? user.email : "",
-                                avatar: user.photoURL,
-                                id: user.uid,
-                                createdAt: Timestamp.fromDate(new Date()),
-                                status: "online",
-                                friends: [],
-                                bannerColor: await getBannerColor(user.photoURL),
-                            };
-
-                            await setDoc(userRef, newUser);
-
-                            dispatch(
-                                setUser({
-                                    displayName: newUser.displayName,
-                                    avatar: newUser.avatar,
-                                    id: newUser.id,
-                                    createdAt: newUser.createdAt.seconds,
-                                    status: newUser.status,
-                                    email: newUser.email,
-                                    bannerColor: newUser.bannerColor,
-                                    friends: newUser.friends,
-                                })
-                            );
-                        }
-
-                        getSelectStore();
-                        dispatch(setIsLoggedIn(true));
-                        try {
-                            const cur = window.location.pathname || "";
-                            if (!cur.startsWith("/channels")) {
-                                navigate("/channels");
-                            }
-                        } catch (e) {
-                            navigate("/channels");
-                        }
+                        await finalizeLogin(result.user);
+                        clearOAuthRedirectMarker();
+                        routeAfterLogin();
                     } catch (e) {
                         // eslint-disable-next-line no-console
                         console.error("Error processing redirect user", e);
@@ -130,64 +175,13 @@ function App() {
             console.info("onAuthStateChanged user:", user);
             try {
                 if (user) {
-                    const userRef = doc(db, "users", user.uid);
-                    const userDoc = await getDoc(userRef);
-
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        dispatch(
-                            setUser({
-                                displayName: userData.displayName,
-                                avatar: userData.avatar,
-                                id: userData.id,
-                                createdAt: userData.createdAt?.seconds
-                                    ? userData.createdAt.seconds
-                                    : null,
-                                status: userData.status,
-                                email: userData.email,
-                                bannerColor: userData.bannerColor,
-                                friends: userData.friends || [],
-                            })
-                        );
-                    } else {
-                        const newUser = {
-                            displayName: user.displayName,
-                            email: user.email ? user.email : "",
-                            avatar: user.photoURL,
-                            id: user.uid,
-                            createdAt: Timestamp.fromDate(new Date()),
-                            status: "online",
-                            friends: [],
-                            bannerColor: await getBannerColor(user.photoURL),
-                        };
-
-                        await setDoc(userRef, newUser);
-
-                        dispatch(
-                            setUser({
-                                displayName: newUser.displayName,
-                                avatar: newUser.avatar,
-                                id: newUser.id,
-                                createdAt: newUser.createdAt.seconds,
-                                status: newUser.status,
-                                email: newUser.email,
-                                bannerColor: newUser.bannerColor,
-                                friends: newUser.friends,
-                            })
-                        );
-                    }
-
-                    getSelectStore();
-                    dispatch(setIsLoggedIn(true));
-                    try {
-                        const cur = window.location.pathname || "";
-                        if (!cur.startsWith("/channels")) {
-                            navigate("/channels");
-                        }
-                    } catch (e) {
-                        navigate("/channels");
-                    }
+                    await finalizeLogin(user);
+                    clearOAuthRedirectMarker();
+                    routeAfterLogin();
                 } else {
+                    if (hasOAuthRedirectMarker()) {
+                        return;
+                    }
                     dispatch(setUser(null));
                     dispatch(setIsLoggedIn(false));
                     try {
@@ -209,22 +203,15 @@ function App() {
     }, [dispatch, navigate]);
 
     useEffect(() => {
-        try {
-            const path = location.pathname || "";
-            if (path.includes("/channels/@me")) {
-                dispatch(setIsDirectMessagePageOpen(true));
-            } else if (path.startsWith("/channels")) {
-                dispatch(setIsDirectMessagePageOpen(false));
-            }
-        } catch (e) {
-            // ignore in non-browser environments
+        const savedSession = loadVoiceChatSession();
+        if (user && savedSession?.id && !isVoiceChatPageOpen && !currVoiceChannel?.id) {
+            dispatch(joinVoiceChannel({ name: savedSession.name, channelId: savedSession.id }));
         }
-    }, [location.pathname, dispatch]);
+    }, [dispatch, user, isVoiceChatPageOpen, currVoiceChannel?.id]);
 
     return (
-        <ThemeContextProvider>
-            <CssBaseline />
-            <Error />
+        <>
+            <ToastManager />
             <Routes>
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/reset" element={<ResetPasswordPage />} />
@@ -252,11 +239,7 @@ function App() {
                             element={
                                 <Fragment>
                                     <Channel />
-                                    {isVoiceChatPageOpen ? (
-                                        <VoiceChat currVoiceChannel={currVoiceChannel} />
-                                    ) : (
-                                        <Chat />
-                                    )}
+                                    {isVoiceChatPageOpen ? <VoiceChat /> : <Chat />}
                                 </Fragment>
                             }
                         />
@@ -273,7 +256,7 @@ function App() {
                 </Route>
                 <Route path="*" element={<PageNotFound />} />
             </Routes>
-        </ThemeContextProvider>
+        </>
     );
 }
 

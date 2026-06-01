@@ -1,19 +1,16 @@
+@use "../../styles/containers";
+@use "../../styles/sidebar-list" as sidebar;
+@use "../../styles/headers" as headers;
+
 .channel-container {
-    background: $channels-bg;
-    display: flex;
-    flex-direction: column;
-    flex: 0 0 240px;
+    @extend %sidebar-base;
 
     .channel-header {
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        flex: 0 0 56px;
-        padding: 0 20px 0 20px;
-        box-shadow:
-            0 1px 0 color.adjust($channels-bg, $lightness: -4.1%),
-            inset 0 -1px 0 rgba(#000, 0.1);
-        transition: background 0.15s ease;
+        @include headers.app-header-shell;
+        padding: 0 16px;
+        @include headers.app-header-borders;
+        @include transition(background, 0.15s, ease);
 
         .channel-header-dropdown {
             width: 18px;
@@ -26,41 +23,40 @@
             margin-right: 6px;
         }
 
-        .participant-item {
-            padding: 0;
-            margin: 0;
-        }
-
-        .participant-avatar-wrap {
-            min-width: 0;
-            margin-right: 1rem;
-            margin-left: auto;
-        }
-
-        .participant-avatar {
-            width: 20px;
-            height: 20px;
-
-            // use {
-            // 	stroke-dasharray: 7;
-            // 	transform-origin: 50%;
-            // 	transition: stroke-dasharray 0.2s ease, transform 0.2s ease;
-            // }
-        }
-
-        &:hover,
-        &:focus {
-            background: color.adjust($channels-bg, $lightness: 2.5%);
-        }
-
-        // &:focus use {
-        // 	stroke-dasharray: 14;
-        // 	transform: rotate(-90deg);
-        // }
-
         .channel-header-name {
-            font-size: 1rem;
+            font-size: var(--font-size-lg);
             font-weight: 500;
+        }
+
+        /* Server name trigger button (ghost style) */
+        .channel-header-name-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: transparent;
+            border: none;
+            padding: 6px 8px;
+            border-radius: 10px;
+            color: inherit;
+            cursor: pointer;
+            min-width: 0;
+        }
+
+        .channel-header-name-button:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .channel-header-name-button .channel-header-name {
+            display: inline-block;
+            margin: 0;
+            padding: 0;
+        }
+
+        .channel-header-name-button .channel-header-dropdown {
+            margin-left: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .mobile-servers-toggle {
@@ -84,46 +80,107 @@
     .channel-list-container {
         flex: 1 1;
         overflow-y: auto;
-        padding: 0 20px;
+        padding: 12px;
 
         ul {
             list-style: none;
+            margin: 0;
+            padding: 0;
         }
 
         .channel-list-header {
-            cursor: pointer;
-            margin-top: 20px;
-            text-transform: uppercase;
-            color: rgba($body-color, 0.3);
-            font-size: 0.87rem;
-            letter-spacing: 0.04rem;
-            transition: color 0.2s linear;
-            line-height: 30px;
-            position: relative;
-            display: flex;
-
-            &:hover,
-            &:focus {
-                color: $body-color;
-
-                &::after {
-                    opacity: 1;
-                }
-            }
+            @include sidebar.sidebar-list-header;
         }
 
         .channel-header-actions {
             margin-left: auto;
-            font-size: 12px;
+            font-size: var(--font-size-sm);
+
+            svg {
+                color: var(--text-muted);
+                width: 18px;
+                height: 18px;
+            }
         }
 
         .channel-list-text,
         .channel-list-voice {
-            margin: 0 -20px 0 -20px;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Adapt sidebar-item styling from UserSettingsDialog for channel lists */
+        .channel-list-item {
+            @include sidebar.sidebar-list-item;
+        }
+
+        /* Increase channel name font size for text and voice channel lists */
+        .channel-list-item .channel-name {
+            @include sidebar.sidebar-list-name;
+        }
+
+        .channel-list-item .sidebar-item {
+            @include sidebar.sidebar-list-button;
+        }
+
+        /* hover effect now applies when hovering the entire list item (li) */
+        .channel-list-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .channel-list-item.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* show settings/action button only on hover or when active */
+        .channel-list-item .channel-action {
+            opacity: 0;
+            visibility: hidden;
+            transition:
+                opacity 0.15s ease,
+                visibility 0.15s ease;
+            margin-right: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+        }
+
+        .channel-list-item:hover .channel-action,
+        .channel-list-item.active .channel-action {
+            opacity: 0.85;
+            visibility: visible;
+        }
+
+        /* participant items reuse sidebar-item but keep avatar sizing */
+        .participant-list {
+            list-style: none;
+            margin: 4px 0 0 12px; /* indent the whole participant list */
+            padding: 0 0 0 0;
+        }
+
+        .participant-item {
+            padding: 2px 8px;
+            margin: 0;
+            border-radius: 6px;
+            transition: background 0.12s ease;
+        }
+
+        .participant-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .participant-item .sidebar-item {
+            padding: 0; /* padding moved to li */
+            border-radius: 0;
         }
 
         .channel-header-name {
-            font-size: 0.75rem;
+            font-size: var(--font-size-sm);
             font-weight: 500;
         }
 
@@ -131,18 +188,26 @@
             cursor: pointer;
             display: flex;
             align-items: center;
-            padding: 8px 20px 10px 20px;
-            opacity: 0.3;
-            width: 240px;
+            padding: 8px 12px;
+            opacity: 0.48;
+            width: 100%;
+            border-radius: 8px;
+            transition:
+                background 0.2s ease,
+                opacity 0.2s ease;
 
             .button {
-                display: none;
-                opacity: 0.8;
-
-                &:hover,
-                &:focus {
-                    opacity: 1;
-                }
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                opacity: 0;
+                visibility: hidden;
+                transition:
+                    opacity 0.2s ease,
+                    visibility 0.2s ease;
+                width: 18px;
+                height: 18px;
+                color: var(--text-muted);
             }
 
             &.active,
@@ -151,15 +216,17 @@
                 opacity: 1;
 
                 .button {
-                    display: block;
+                    opacity: 0.8;
+                    visibility: visible;
                 }
             }
 
             .channel-name {
-                font-size: 1rem;
-                font-weight: normal;
+                font-size: var(--font-size-sm);
+                font-weight: 400;
                 text-overflow: ellipsis;
-                overflow-x: hidden;
+                overflow: hidden;
+                white-space: nowrap;
             }
 
             .button:first-of-type {
@@ -173,32 +240,90 @@
             }
         }
 
+        .participant-button {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            border: none;
+            background: transparent;
+            color: inherit;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .participant-avatar-wrap {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            margin-right: 0.75rem;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            overflow: visible;
+        }
+
+        .participant-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+        }
+
+        .presence {
+            position: absolute;
+            width: 32%;
+            height: 32%;
+            border-radius: 50%;
+            bottom: 0;
+            right: 0;
+            transform: translate(8%, 8%);
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+            box-sizing: border-box;
+        }
+
+        .presence-online {
+            background: var(--presence-online, #43b581);
+        }
+        .presence-offline {
+            background: var(--presence-offline, #747f8d);
+        }
+        .presence-idle {
+            background: var(--presence-away, #faa61a);
+        }
+        .presence-dnd {
+            background: var(--presence-dnd, #f04747);
+        }
+
+        .participant-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--body-color);
+        }
+
         .channel-text {
             position: relative;
 
             &.active,
             &:hover,
             &:focus {
-                background: linear-gradient(
-                    to right,
-                    color.adjust($channels-bg, $lightness: -1%),
-                    $button-bg
-                );
+                background-color: var(--background-secondary);
 
                 &::before {
-                    content: " ";
-                    width: 2px;
-                    height: 100%;
+                    content: "";
                     position: absolute;
                     left: 0;
-                    background: $server-bg-active;
+                    top: 8px;
+                    bottom: 8px;
+                    width: 3px;
+                    border-radius: 0 3px 3px 0;
+                    background: var(--server-bg-active);
                 }
             }
 
             &:not(.active) {
-                &:focus::before,
-                &:hover::before {
-                    opacity: 0.25;
+                &::before {
+                    opacity: 0;
                 }
             }
         }
@@ -223,21 +348,19 @@
     max-width: 224px;
     display: block;
     border-radius: 4px;
-    -webkit-transition: none;
     transition: none;
     display: flex;
     justify-content: end;
     align-items: end;
 
     .livelist-item {
-        -webkit-box-shadow: none;
         box-shadow: none;
         border-radius: 4px;
         border-color: transparent;
         margin: 1px 0 1px 0;
 
         &:hover {
-            background-color: color.adjust($chat-bg, $lightness: 5%);
+            background-color: var(--background-secondary);
             border-radius: 4px;
         }
     }
@@ -249,3 +372,43 @@
 // 	font-weight: 300;
 // 	color: $server-marker-unread;
 // }
+
+.compat-hovercard {
+    background: var(--menu-bg);
+    color: var(--body-color);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 12px;
+    min-width: 260px;
+}
+
+.member-hovercard {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.member-hovercard-avatar {
+    width: 40px;
+    height: 40px;
+}
+
+.member-hovercard-info {
+    min-width: 0;
+}
+
+.member-hovercard-name {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+}
+
+.member-hovercard-id,
+.member-hovercard-meta {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: var(--font-size-md);
+}
+
+.member-hovercard-meta {
+    margin-top: 0.4rem;
+}
