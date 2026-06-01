@@ -1,0 +1,211 @@
+.call-controls-container {
+    display: flex;
+    align-items: center;
+    margin-top: auto;
+    background: var(--background-secondary);
+    padding: 0.5rem;
+    font-size: var(--font-size-sm);
+    margin-bottom: auto;
+    flex-direction: column;
+
+    .call-controls-upper {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        .call-controls-details {
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 4px;
+            padding-top: 4px;
+            user-select: text;
+            margin-right: 4px;
+            min-width: 0;
+            font-size: var(--font-size-xs);
+
+            .call-controls-status {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                color: var(--body-color);
+            }
+
+            .call-controls-connected {
+                color: var(--success);
+            }
+
+            .call-controls-link {
+                color: var(--body-color);
+            }
+
+            .call-controls-status.call-controls-connected .call-controls-link,
+            .call-controls-link.call-controls-connected {
+                color: var(--success);
+            }
+
+            .callcontrols-breadcrumbs {
+                color: var(--body-color);
+                display: flex;
+                align-items: center;
+                gap: 0.25rem;
+            }
+
+            .breadcrumb-link {
+                border: none;
+                background: none;
+                color: var(--body-color);
+                cursor: pointer;
+                padding: 0;
+                font-size: inherit;
+                font: inherit;
+            }
+
+            .breadcrumb-separator {
+                color: var(--muted);
+            }
+        }
+        .call-controls-disconnected {
+            margin-left: auto;
+        }
+    }
+
+    .latency-tooltip {
+        color: var(--body-color);
+    }
+    .latency-tooltip.latency-good {
+        background-color: var(--success) !important;
+    }
+    .latency-tooltip.latency-warn {
+        background-color: var(--warning) !important;
+    }
+    .latency-tooltip.latency-bad {
+        background-color: var(--danger) !important;
+    }
+
+    .call-controls-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--body-color);
+        transition:
+            background-color 0.2s ease,
+            border-color 0.2s ease,
+            transform 0.1s ease;
+    }
+
+    .call-controls-button:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    .call-controls-button:active {
+        transform: translateY(1px);
+    }
+
+    .call-controls-button.call-controls-disconnect {
+        background-color: rgba(239, 68, 68, 0.12);
+        border-color: rgba(239, 68, 68, 0.28);
+        color: var(--danger);
+    }
+
+    .call-controls-button.call-controls-disconnect:hover {
+        background-color: rgba(239, 68, 68, 0.18);
+        border-color: rgba(239, 68, 68, 0.36);
+    }
+
+    .call-controls-lower {
+        padding: 0.25rem;
+        user-select: text;
+        min-width: 0;
+
+        .call-controls-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+
+            &.call-controls-buttons-right {
+                margin-left: auto;
+            }
+
+            .call-controls-button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 38px;
+                height: 38px;
+                padding: 0;
+                border-radius: 50%;
+                border: 1px solid rgba(255, 255, 255, 0.08);
+                background: rgba(255, 255, 255, 0.04);
+                color: var(--body-color);
+                transition:
+                    background-color 0.2s ease,
+                    border-color 0.2s ease,
+                    transform 0.1s ease;
+            }
+
+            .call-controls-button:hover {
+                background: rgba(255, 255, 255, 0.08);
+                border-color: rgba(255, 255, 255, 0.12);
+            }
+
+            .call-controls-button:active {
+                transform: translateY(1px);
+            }
+
+            .callcontrols-signal-icon {
+                width: 20px;
+                height: 20px;
+            }
+
+            .callcontrols-callend-icon {
+                width: 20px;
+                height: 20px;
+            }
+
+            .callcontrols-toggle-icon {
+                width: 20px;
+                height: 20px;
+                text-align: center;
+            }
+
+            .call-controls-button.toggle-camera,
+            .call-controls-button.toggle-screenshare {
+                width: 38px;
+                height: 38px;
+                border-radius: 50%;
+            }
+
+            .call-controls-button.toggle-camera.on,
+            .call-controls-button.toggle-screenshare.on {
+                background-color: rgba(16, 185, 129, 0.16);
+                border-color: rgba(16, 185, 129, 0.35);
+                color: var(--success);
+            }
+
+            .call-controls-button.toggle-camera.off,
+            .call-controls-button.toggle-screenshare.off {
+                background-color: rgba(255, 255, 255, 0.04);
+                border-color: rgba(255, 255, 255, 0.08);
+                color: var(--body-color);
+            }
+
+            .call-controls-button.call-controls-disconnect {
+                background-color: rgba(239, 68, 68, 0.12);
+                border-color: rgba(239, 68, 68, 0.28);
+                color: var(--danger);
+            }
+
+            .call-controls-button.call-controls-disconnect:hover {
+                background-color: rgba(239, 68, 68, 0.18);
+                border-color: rgba(239, 68, 68, 0.36);
+            }
+        }
+    }
+}

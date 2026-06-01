@@ -5,7 +5,7 @@ export const AgoraClient = ({ children, clientConfig = { mode: "rtc", codec: "vp
     const [client] = useState(() => AgoraRTC.createClient(clientConfig));
     return (
         <AgoraRTCScreenShareProvider client={client}>
-            <AgoraRTCProvider client={client}>{children}</AgoraRTCProvider>;
+            <AgoraRTCProvider client={client}>{children}</AgoraRTCProvider>
         </AgoraRTCScreenShareProvider>
     );
 };

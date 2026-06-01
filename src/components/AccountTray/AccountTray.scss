@@ -1,0 +1,232 @@
+.user-footer-wrapper {
+    position: fixed;
+    left: 12px;
+    bottom: 12px;
+    width: calc(70px + var(--sidebar-width) - 24px);
+    max-width: calc(70px + var(--sidebar-width) - 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 999;
+}
+
+.user-footer-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0;
+    padding: 10px 12px;
+    background: rgba(26, 27, 31, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+    border-radius: 18px;
+    backdrop-filter: blur(18px);
+    user-select: none;
+}
+
+.user-footer-voice {
+    width: 100%;
+    margin-bottom: -8px;
+}
+
+.user-footer-voice .call-controls-container {
+    background: rgba(26, 27, 31, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+    border-radius: 12px 12px 0 0;
+    padding: 8px;
+    width: 100%;
+    border-bottom: none;
+}
+
+.user-footer-voice + .user-footer-container {
+    border-top: none;
+    border-radius: 0 0 18px 18px;
+}
+
+.user-footer-container .user-footer-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 8px 10px;
+    border-radius: 18px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    background: transparent;
+    border: none;
+    appearance: none;
+}
+
+.user-footer-container .user-footer-profile:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.user-footer-container .user-footer-profile:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.18);
+}
+
+.user-footer-container .user-footer-details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.user-footer-container .user-footer-username {
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    color: var(--body-color);
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-footer-container .user-footer-tag {
+    color: var(--text-muted);
+    font-size: var(--font-size-xs);
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+}
+
+.user-footer-container .user-footer-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.user-footer-container .user-footer-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--body-color);
+    transition:
+        background-color 0.2s ease,
+        transform 0.1s ease,
+        border-color 0.2s ease;
+}
+
+.user-footer-container .user-footer-button:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.user-footer-container .user-footer-button:active {
+    transform: translateY(1px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.user-footer-container .user-footer-avatar {
+    position: relative;
+    z-index: 0;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible; /* allow badge indicator to overflow */
+}
+
+/* Tweak Radix Badge/Avatar sizing inside account tray (match ChannelMemberList approach) */
+.user-footer-container .user-footer-avatar .radix-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.user-footer-container .user-footer-avatar .radix-avatar,
+.user-footer-container .user-footer-avatar .avatar {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    border-radius: 50%;
+    display: block;
+}
+
+/* Badge indicator styling pinned to bottom-right and scaled relative to avatar */
+.user-footer-container .user-footer-avatar .radix-badge-indicator {
+    position: absolute;
+    width: var(--avatar-status-indicator-size, 30%);
+    height: var(--avatar-status-indicator-size, 30%);
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    bottom: 0;
+    right: 0;
+    transform: translate(8%, 8%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    box-sizing: border-box;
+    background: transparent;
+}
+
+.user-footer-container .user-footer-avatar .radix-badge-indicator svg,
+.user-footer-container .user-footer-avatar .status-icon {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.control-toggle-button .callcontrols-toggle-icon {
+    width: 18px;
+    height: 18px;
+}
+
+/* User detail popover avatar (large) badge styling */
+.user-detail-avatar {
+    position: relative;
+    z-index: 0;
+    width: 64px;
+    height: 64px;
+    overflow: visible;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-detail-avatar .radix-avatar,
+.user-detail-avatar .user-detail-avatar-img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: block;
+}
+
+.user-detail-avatar .radix-badge-indicator {
+    position: absolute;
+    width: var(--avatar-status-indicator-size, 30%);
+    height: var(--avatar-status-indicator-size, 30%);
+    bottom: 0;
+    right: 0;
+    transform: translate(8%, 8%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    box-sizing: border-box;
+    background: transparent;
+}
+
+.user-detail-avatar .radix-badge-indicator svg,
+.user-detail-avatar .status-icon {
+    width: 100%;
+    height: 100%;
+    display: block;
+}

@@ -1,18 +1,31 @@
 .voicechat-tile {
     position: relative;
-    height: 100%;
     width: 100%;
+    min-height: 220px;
+    height: 100%;
+    box-sizing: border-box;
+    border-radius: 1rem;
+    overflow: hidden;
     &.voicechat-transition {
-        transition: background-color 0.1s;
+        @include transition(background-color, 0.1s, ease);
     }
 
     .video-wrapper {
         position: absolute;
         height: 100%;
         width: 100%;
+        overflow: hidden; /* clip any descendants to the tile rounded corners */
+
+        > div {
+            width: 100%;
+            height: 100%;
+        }
 
         video {
-            border-radius: 1rem;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 0; /* container handles rounding */
         }
     }
 
@@ -24,23 +37,81 @@
         width: 100%;
         height: 100%;
 
+        &.no-video {
+            .overlay-container {
+                /* Pleasant diagonal gradient that keeps content readable */
+                background: linear-gradient(
+                    135deg,
+                    rgba(58, 123, 213, 0.88) 0%,
+                    rgba(99, 102, 241, 0.88) 45%,
+                    rgba(236, 72, 153, 0.88) 100%
+                );
+                border-radius: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 240ms ease;
+                /* Ensure avatar and badges sit above the background */
+                position: relative;
+                overflow: hidden;
+            }
+        }
+
         .overlay-container {
             position: relative;
             width: 100%;
             height: 100%;
+
             .overlay-avatar {
                 position: absolute;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
+                overflow: visible;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .overlay-avatar .radix-badge {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
+            }
+            .overlay-avatar .radix-avatar {
+                width: 100%;
+                height: 100%;
+            }
+            .overlay-avatar .radix-avatar-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                border-radius: 8px;
             }
             .overlay-avatar-large {
-                width: 75px;
-                height: 75px;
+                width: clamp(56px, 18vw, 96px);
+                height: clamp(56px, 18vw, 96px);
+            }
+
+            .overlay-avatar .radix-badge-indicator {
+                position: absolute;
+                width: var(--avatar-status-indicator-size, 30%);
+                height: var(--avatar-status-indicator-size, 30%);
+                bottom: 0;
+                right: 0;
+                transform: translate(8%, 8%);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 999px;
+                box-sizing: border-box;
+                background: transparent;
             }
             .voicechat-button {
                 &.voicechat-button-high {
-                    color: green; /* consider mapping to token */
+                    color: var(--success);
                 }
                 &.voicechat-button-normal {
                     color: var(--dc-white);
@@ -50,19 +121,83 @@
                 color: var(--dc-white);
                 border: solid 1px var(--dc-divider);
             }
+            .tile-status-badge {
+                position: absolute;
+                top: 0.75rem;
+                right: 0.75rem;
+                display: inline-flex;
+                align-items: center;
+                gap: 0.35rem;
+                padding: 0.35rem 0.65rem;
+                border-radius: 999px;
+                font-size: var(--font-size-md);
+                font-weight: 600;
+                background: rgba(0, 0, 0, 0.72);
+                color: var(--dc-white);
+                box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+            }
+            .tile-status-badge.live {
+                background: rgba(35, 166, 95, 0.9);
+            }
+            .tile-status-badge.screen {
+                background: rgba(64, 120, 242, 0.93);
+            }
+            .tile-status-badge.muted,
+            .tile-status-badge.deafen {
+                background: rgba(215, 63, 63, 0.92);
+            }
+            .local-video-placeholder {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+                color: var(--dc-white);
+                background: rgba(0, 0, 0, 0.65);
+                border-radius: 1rem;
+                font-size: var(--font-size-lg);
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+            }
             .overlay-bottom {
                 position: absolute;
                 bottom: 0;
-                left: 50%;
-                transform: translate(-50%, 0%);
+                left: 0;
+                right: 0;
 
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
                 width: 100%;
+                padding: 0.5rem;
 
-                div {
-                    margin: 0.5rem;
+                > div {
+                    margin: 0;
+                }
+
+                /* left name pill (match right badge style) */
+                .tile-name {
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.35rem;
+                    padding: 0.35rem 0.65rem;
+                    border-radius: 999px;
+                    font-size: var(--font-size-md);
+                    font-weight: 600;
+                    background: rgba(0, 0, 0, 0.72);
+                    color: var(--dc-white);
+                    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+                }
+
+                /* ensure the status badge participates in the flex layout when placed here */
+                .tile-status-badge {
+                    position: static;
+                    top: auto;
+                    right: auto;
+                    margin-left: auto;
+                    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+                    background: rgba(0, 0, 0, 0.72);
                 }
             }
         }

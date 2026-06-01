@@ -1,9 +1,7 @@
 import React from "react";
-import { Fab } from "@mui/material";
 import { Tooltip } from "@/components/compat/RadixCompat";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import { AgoraManager } from "@/contexts/agora/agoraManager";
-import AgoraConfig from "@/contexts/agora/config";
 import AgoraClient from "@/contexts/agora/AgoraClient";
 import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
 import VideocamOffRoundedIcon from "@mui/icons-material/VideocamOffRounded";
@@ -25,7 +23,7 @@ const VoiceChat = () => {
             <div className="voicechat-container">
                 <div className="voicechat-wrapper">
                     <div className="voicechat-grid">
-                        <AgoraManager config={AgoraConfig}></AgoraManager>
+                        <AgoraManager />
                     </div>
                 </div>
                 <div className="voicechat-control">
@@ -35,31 +33,39 @@ const VoiceChat = () => {
                     </div>
                     <div className="gradient-bottom">
                         <div className="fab-group">
-                            <Fab onClick={() => toggleCamera()}>
-                                {isCameraOn ? (
-                                    <Tooltip title="Turn on Camera">
-                                        <VideocamRoundedIcon />
-                                    </Tooltip>
-                                ) : (
-                                    <Tooltip title="Turn Off Camera">
-                                        <VideocamOffRoundedIcon />
-                                    </Tooltip>
-                                )}
-                            </Fab>
-                            <Fab onClick={() => toggleMic()}>
-                                {isMicOn ? (
-                                    <Tooltip title="Mute">
-                                        <MicRoundedIcon />
-                                    </Tooltip>
-                                ) : (
-                                    <Tooltip title="Unmute">
-                                        <MicOffRoundedIcon />
-                                    </Tooltip>
-                                )}
-                            </Fab>
-                            <Fab color="error" onClick={() => handleLeaveVoiceChannel()}>
+                            <Tooltip title={isCameraOn ? "Turn off Camera" : "Turn on Camera"}>
+                                <span>
+                                    <button
+                                        type="button"
+                                        className="fab"
+                                        onClick={() => toggleCamera()}
+                                    >
+                                        {isCameraOn ? (
+                                            <VideocamRoundedIcon />
+                                        ) : (
+                                            <VideocamOffRoundedIcon />
+                                        )}
+                                    </button>
+                                </span>
+                            </Tooltip>
+                            <Tooltip title={isMicOn ? "Mute" : "Unmute"}>
+                                <span>
+                                    <button
+                                        type="button"
+                                        className="fab"
+                                        onClick={() => toggleMic()}
+                                    >
+                                        {isMicOn ? <MicRoundedIcon /> : <MicOffRoundedIcon />}
+                                    </button>
+                                </span>
+                            </Tooltip>
+                            <button
+                                type="button"
+                                className="fab fab-error"
+                                onClick={() => handleLeaveVoiceChannel()}
+                            >
                                 <CallEndRoundedIcon />
-                            </Fab>
+                            </button>
                         </div>
                     </div>
                 </div>

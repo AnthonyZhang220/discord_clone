@@ -1,84 +1,148 @@
 import React from "react";
-import { ListItem, ListItemText, Avatar, Badge, Divider } from "@mui/material";
-import { Popover } from "@/components/compat/RadixCompat";
-import { MemberListItemButton } from "@/components/CustomUIComponents";
-import StatusList from "@/components/StatusList";
+import * as HoverCard from "@radix-ui/react-hover-card";
+import AvatarWithStatus from "@/components/AvatarWithStatus/AvatarWithStatus";
+import { useSelector } from "react-redux";
 import { setMemberDetailPopover } from "@/redux/features/popoverSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import { handleCurrDirectMessageChannel } from "@/handlers/channelHandlers";
 
-export const MemberDetailPopover = ({ memberRef }) => {
-    const dispatch = useDispatch();
-    const { memberDetailPopover } = useSelector((state) => state.popover);
+export const MemberDetailContent = ({ member, onClose, showActions = true }) => {
     const { memberDetail } = useSelector((state) => state.memberList);
+    const dispatch = useDispatch();
+
+    const memberData = member ?? memberDetail;
+
+    const createdAtDate = React.useMemo(() => {
+        const raw = memberData?.createdAt;
+        if (!raw) return null;
+        if (typeof raw === "number") return new Date(raw * 1000);
+        if (raw.seconds && typeof raw.seconds === "number") return new Date(raw.seconds * 1000);
+        const parsed = new Date(raw);
+        return isNaN(parsed.getTime()) ? null : parsed;
+    }, [memberData?.createdAt]);
+
+    const handleMessage = () => {
+        if (memberData?.id) {
+            handleCurrDirectMessageChannel(
+                memberData.id,
+                memberData.status,
+                memberData.displayName,
+                memberData.avatar,
+                memberData.createdAt
+            );
+        }
+        if (onClose) onClose();
+        dispatch(setMemberDetailPopover(false));
+    };
 
     return (
-        <Popover
-            className="member-detail-paper"
-            open={memberDetailPopover}
-            onClose={() => dispatch(setMemberDetailPopover(false))}
-            anchorReference="anchorEl"
-            anchorEl={memberRef ? () => memberRef : null}
-            PaperProps={{ className: "member-detail-paper__paper" }}
-            anchorOrigin={{
-                vertical: 0,
-                horizontal: 0,
-            }}
-            transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-            }}
-        >
-            <div className="member-detail-top">
-                <svg className="member-detail-banner">
-                    <mask id="uid_347">
-                        <rect></rect>
-                        <circle></circle>
-                    </mask>
-                    <foreignObject className="member-detail-object">
-                        <div className="member-detail-banner-box"></div>
-                    </foreignObject>
-                </svg>
-                <Badge
-                    overlap="circular"
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    className="member-detail-avatar"
-                    badgeContent={<StatusList status={memberDetail.status} />}
-                >
-                    <Avatar
-                        alt={memberDetail.displayName}
-                        className="member-detail-avatar-img"
-                        src={memberDetail.avatar}
-                        imgProps={{ crossOrigin: "" }}
-                    />
-                </Badge>
+        <div className="user-menu-popover-content">
+            <div
+                className="user-menu-banner"
+                style={{ background: memberData?.bannerColor ?? "#5865f2" }}
+            />
+
+            <div className="user-menu-avatar-row">
+                <AvatarWithStatus
+                    containerClassName="user-menu-avatar"
+                    avatarClassName="user-menu-avatar-img"
+                    alt={memberData?.displayName}
+                    src={memberData?.avatar}
+                    imgProps={{ crossOrigin: "" }}
+                    status={memberData?.status}
+                />
             </div>
-            <div className="member-detail-list">
-                <ListItem dense>
-                    <MemberListItemButton>
-                        <ListItemText
-                            primary={memberDetail.displayName}
-                            primaryTypographyProps={{ variant: "h3" }}
-                        />
-                    </MemberListItemButton>
-                </ListItem>
-                <Divider className="member-detail-divider" variant="middle" light={true} />
-                <ListItem dense>
-                    <MemberListItemButton>
-                        <ListItemText
-                            primary="MEMBER SINCE"
-                            primaryTypographyProps={{ variant: "h5" }}
-                            secondary={new Date(
-                                memberDetail.createdAt?.seconds * 1000
-                            ).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "2-digit",
-                                year: "numeric",
-                            })}
-                            secondaryTypographyProps={{ className: "member-detail-secondary" }}
-                        />
-                    </MemberListItemButton>
-                </ListItem>
+
+            <div className="user-menu-identity">
+                <span className="user-menu-display-name">{memberData?.displayName}</span>
+                <span className="user-menu-tag">{memberData?.username ?? memberData?.email}</span>
             </div>
-        </Popover>
+
+            {createdAtDate && (
+                <>
+                    <div className="user-menu-divider" />
+                    <div className="user-menu-section-label">MEMBER SINCE</div>
+                    <div className="user-menu-section-value">
+                        {createdAtDate.toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                        })}
+                    </div>
+                </>
+            )}
+
+            {showActions && (
+                <>
+                    <div className="user-menu-divider" />
+
+                    <div className="user-menu-list">
+                        <div className="user-menu-listitem">
+                            <button
+                                type="button"
+                                className="menu-listitem-button"
+                                onClick={handleMessage}
+                            >
+                                <div className="user-menu-listitem-text">
+                                    <span className="user-menu-primary">Message</span>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div className="user-menu-listitem">
+                            <button
+                                type="button"
+                                className="menu-listitem-button"
+                                onClick={() => {
+                                    if (onClose) onClose();
+                                    dispatch(setMemberDetailPopover(false));
+                                }}
+                            >
+                                <div className="user-menu-listitem-text">
+                                    <span className="user-menu-primary">View Profile</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </>
+            )}
+        </div>
     );
 };
+
+export const MemberPreviewCard = ({
+    member,
+    children,
+    showActions = false,
+    openDelay = 50,
+    closeDelay = 50,
+}) => {
+    const [open, setOpen] = React.useState(false);
+
+    return (
+        <HoverCard.Root
+            open={open}
+            onOpenChange={setOpen}
+            openDelay={openDelay}
+            closeDelay={closeDelay}
+        >
+            <HoverCard.Trigger asChild>{children}</HoverCard.Trigger>
+            <HoverCard.Portal>
+                <HoverCard.Content
+                    side="right"
+                    align="center"
+                    sideOffset={6}
+                    className="user-menu-popover-paper"
+                >
+                    <MemberDetailContent
+                        member={member}
+                        onClose={() => setOpen(false)}
+                        showActions={showActions}
+                    />
+                </HoverCard.Content>
+            </HoverCard.Portal>
+        </HoverCard.Root>
+    );
+};
+
+export default MemberPreviewCard;

@@ -7,46 +7,28 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 // styles moved to ThemeContextProvider / global SCSS
 
-const StatusList = ({ status, size, edge }) => {
-    const list = {
-        online: (
-            <CircleIcon
-                edge={edge}
-                className={`status-icon status-online`}
-                style={{ fontSize: size }}
-            />
-        ),
-        idle: (
-            <DarkModeIcon
-                edge={edge}
-                className={`status-icon status-idle`}
-                style={{ fontSize: size }}
-            />
-        ),
-        donotdisturb: (
-            <RemoveCircleIcon
-                edge={edge}
-                className={`status-icon status-dnd`}
-                style={{ fontSize: size }}
-            />
-        ),
-        invisible: (
-            <StopCircleIcon
-                edge={edge}
-                className={`status-icon status-muted`}
-                style={{ fontSize: size }}
-            />
-        ),
-        offline: (
-            <StopCircleIcon
-                edge={edge}
-                className={`status-icon status-muted`}
-                style={{ fontSize: size }}
-            />
-        ),
+const StatusList = ({ status, size = 16, edge }) => {
+    const colorMap = {
+        online: "var(--status-online)",
+        idle: "var(--status-idle)",
+        donotdisturb: "var(--status-dnd)",
+        invisible: "var(--status-offline)",
+        offline: "var(--status-offline)",
     };
 
-    return list[status];
+    const color = colorMap[status] || "inherit";
+
+    const commonProps = { edge, style: { fontSize: size, color } };
+
+    const list = {
+        online: <CircleIcon {...commonProps} className={`status-icon status-online`} />,
+        idle: <DarkModeIcon {...commonProps} className={`status-icon status-idle`} />,
+        donotdisturb: <RemoveCircleIcon {...commonProps} className={`status-icon status-dnd`} />,
+        invisible: <StopCircleIcon {...commonProps} className={`status-icon status-muted`} />,
+        offline: <StopCircleIcon {...commonProps} className={`status-icon status-muted`} />,
+    };
+
+    return list[status] || null;
 };
 
 export default memo(StatusList);

@@ -1,31 +1,57 @@
-import React, { useState, useRef, useEffect } from "react";
-import {
-    List,
-    ListItem,
-    ListItemAvatar,
-    ListItemButton,
-    ListItemText,
-    Avatar,
-    Badge,
-    ListSubheader,
-} from "@mui/material";
+import React, { useRef, useEffect, useMemo, useCallback } from "react";
+import AvatarWithStatus from "@/components/AvatarWithStatus/AvatarWithStatus";
 
 import { doc, getDoc, onSnapshot, query, collection, where } from "firebase/firestore";
 import { db } from "@/firebase";
-import StatusList from "@/components/StatusList";
 import { useDispatch, useSelector } from "react-redux";
-import { MemberDetailPopover } from "./MemberDetailPopover/MemberDetailPopover";
+import MemberPreviewCard from "./MemberDetailPopover/MemberDetailPopover";
 import { setMemberList, setMemberDetail } from "@/redux/features/memberListSlice";
 
 import "./ChannelMemberList.scss";
 import { setMemberDetailPopover } from "@/redux/features/popoverSlice";
+
+const MemberListItem = React.memo(function MemberListItem({
+    id,
+    displayName,
+    avatar,
+    status,
+    muted,
+    onClick,
+    setRef,
+}) {
+    const member = { id, displayName, avatar, status };
+
+    return (
+        <div
+            key={id}
+            className={`member-list-item ${muted ? "member-list-item-muted" : ""}`}
+            ref={(ele) => (setRef.current[id] = ele)}
+        >
+            <MemberPreviewCard member={member}>
+                <button
+                    type="button"
+                    className={`sidebar-item member-list-button`}
+                    onClick={() => onClick(id)}
+                >
+                    <AvatarWithStatus
+                        containerClassName="member-list-avatar-wrap"
+                        avatarClassName="avatar"
+                        alt={displayName}
+                        src={avatar}
+                        status={muted ? undefined : status}
+                    />
+                    <div className="member-list-text">{displayName}</div>
+                </button>
+            </MemberPreviewCard>
+        </div>
+    );
+});
 
 function ChannelMemberList() {
     const dispatch = useDispatch();
     const { selectedServer } = useSelector((state) => state.userSelectStore);
     const { memberList } = useSelector((state) => state.memberList);
     const memberRefs = useRef({});
-    const [memberRef, setMemberRef] = useState(null);
 
     useEffect(() => {
         if (selectedServer) {
@@ -43,128 +69,80 @@ function ChannelMemberList() {
                     dispatch(setMemberList(fetchedMemberList));
                 });
 
-                setMemberRef(memberIds);
+                // don't set memberRef here; it should be a DOM element used as anchor
             })();
         }
     }, [selectedServer, dispatch]);
 
-    const handleOpenMemberDetail = (memberId) => {
-        const currentMemberDetail = memberList.find((member) => member.id === memberId);
-        dispatch(setMemberDetail(currentMemberDetail));
+    const handleOpenMemberDetail = useCallback(
+        (memberId) => {
+            const currentMemberDetail = memberList.find((member) => member.id === memberId);
+            dispatch(setMemberDetail(currentMemberDetail));
 
-        const clickedMemberRefs = memberRefs.current[memberId];
+            dispatch(setMemberDetailPopover(true));
+        },
+        [memberList, dispatch]
+    );
 
-        setMemberRef(clickedMemberRefs);
-        dispatch(setMemberDetailPopover(true));
-    };
+    const online = useCallback((status) => {
+        return status === "online" || status === "idle" || status === "donotdisturb";
+    }, []);
 
-    const online = (status) => {
-        if (status === "online" || status === "idle" || status === "donotdisturb") {
-            return true;
-        } else {
-            return false;
-        }
-    };
+    const onlineMembers = useMemo(
+        () => memberList?.filter((m) => online(m.status)) || [],
+        [memberList, online]
+    );
+    const offlineMembers = useMemo(
+        () => memberList?.filter((m) => !online(m.status)) || [],
+        [memberList, online]
+    );
 
     return (
         <div className="userstatus-container">
             <aside className="userstatus-memberlist-wrapper">
                 <div className="userstatus-memberlist">
                     <header className="userstatus-online focusable">
-                        {memberList.find((member) => online(member.status) === true) ? (
-                            <List
-                                subheader={
-                                    <ListSubheader component="div" className="member-subheader">
-                                        Online -{" "}
-                                        {
-                                            memberList?.filter(
-                                                (member) => online(member.status) === true
-                                            ).length
-                                        }
-                                    </ListSubheader>
-                                }
-                            >
-                                {memberList
-                                    ?.filter((member) => online(member.status) === true)
-                                    .map(({ displayName, avatar, status, id }) => (
-                                        <ListItem
-                                            key={id}
-                                            disablePadding
-                                            className="member-list-item"
-                                            ref={(ele) => (memberRefs.current[id] = ele)}
-                                        >
-                                            <ListItemButton
-                                                onClick={() => handleOpenMemberDetail(id)}
-                                            >
-                                                <ListItemAvatar>
-                                                    <Badge
-                                                        overlap="circular"
-                                                        anchorOrigin={{
-                                                            vertical: "bottom",
-                                                            horizontal: "right",
-                                                        }}
-                                                        badgeContent={
-                                                            <StatusList status={status} size={15} />
-                                                        }
-                                                    >
-                                                        <Avatar alt={displayName} src={avatar} />
-                                                    </Badge>
-                                                </ListItemAvatar>
-                                                <ListItemText primary={displayName} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
-                            </List>
+                        {onlineMembers.length > 0 ? (
+                            <div className="member-list">
+                                <div className="member-subheader">
+                                    <span>Online - {onlineMembers.length}</span>
+                                </div>
+                                {onlineMembers.map(({ displayName, avatar, status, id }) => (
+                                    <MemberListItem
+                                        key={id}
+                                        id={id}
+                                        displayName={displayName}
+                                        avatar={avatar}
+                                        status={status}
+                                        onClick={handleOpenMemberDetail}
+                                        setRef={memberRefs}
+                                    />
+                                ))}
+                            </div>
                         ) : null}
-                        {memberList.find((member) => online(member.status) === false) ? (
-                            <List
-                                subheader={
-                                    <ListSubheader component="div" className="member-subheader">
-                                        Offline -{" "}
-                                        {
-                                            memberList?.filter(
-                                                (member) => online(member.status) === false
-                                            ).length
-                                        }
-                                    </ListSubheader>
-                                }
-                            >
-                                {memberList
-                                    ?.filter((member) => online(member.status) === false)
-                                    .map(({ displayName, avatar, id }) => (
-                                        <ListItem
-                                            key={id}
-                                            disablePadding
-                                            className="member-list-item member-list-item-muted"
-                                            ref={(ele) => (memberRefs.current[id] = ele)}
-                                        >
-                                            <ListItemButton
-                                                onClick={() => handleOpenMemberDetail(id)}
-                                            >
-                                                <ListItemAvatar>
-                                                    <Badge
-                                                        overlap="circular"
-                                                        anchorOrigin={{
-                                                            vertical: "bottom",
-                                                            horizontal: "right",
-                                                        }}
-                                                        badgeContent={<StatusList size={15} />}
-                                                    >
-                                                        <Avatar alt={displayName} src={avatar} />
-                                                    </Badge>
-                                                </ListItemAvatar>
-                                                <ListItemText primary={displayName} />
-                                            </ListItemButton>
-                                        </ListItem>
-                                    ))}
-                            </List>
+                        {offlineMembers.length > 0 ? (
+                            <div className="member-list">
+                                <div className="member-subheader">
+                                    <span>Offline - {offlineMembers.length}</span>
+                                </div>
+                                {offlineMembers.map(({ displayName, avatar, id }) => (
+                                    <MemberListItem
+                                        key={id}
+                                        id={id}
+                                        displayName={displayName}
+                                        avatar={avatar}
+                                        muted
+                                        onClick={handleOpenMemberDetail}
+                                        setRef={memberRefs}
+                                    />
+                                ))}
+                            </div>
                         ) : null}
                     </header>
                 </div>
             </aside>
-            <MemberDetailPopover memberRef={memberRef} />
         </div>
     );
 }
 
-export default ChannelMemberList;
+export default React.memo(ChannelMemberList);

@@ -3,17 +3,9 @@
     padding: 60px 0;
     min-width: 0;
     min-height: 0;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: column;
-    flex-direction: column;
+    @include flex(column);
     position: relative;
     overflow: hidden;
-    -webkit-box-flex: 1;
-    -ms-flex: 1 1 auto;
     flex: 1 1 auto;
 
     &:hover {
@@ -24,21 +16,28 @@
     }
 
     .voicechat-wrapper {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
+        @include flex(row, flex-start, stretch);
         position: relative;
-        -webkit-box-flex: 0;
-        -ms-flex: 0 0 auto;
-        flex: 0 0 auto;
+        /* allow wrapper to grow and let the grid fill available vertical space */
+        flex: 1 1 auto;
         z-index: 2;
-        height: 100%;
 
         .voicechat-grid {
             display: grid;
-            grid-template-rows: repeat(auto-fit, minmax(300px, 1fr));
-            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            /* Responsive grid: columns adapt, each column min 260px */
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            /* Rows stretch to fill remaining vertical space */
+            grid-auto-rows: minmax(240px, 1fr);
+            gap: 1rem;
+            /* increase padding so single tiles have breathing room */
+            padding: 2rem 3rem;
             width: 100%;
+            /* make tiles stretch to fill their grid cells so a single tile spans the available width */
+            justify-items: stretch;
+            /* ensure tiles stretch vertically to fill rows */
+            align-items: stretch;
+            align-content: stretch;
+            min-height: 300px;
             height: 100%;
         }
     }
@@ -49,16 +48,7 @@
         right: 0;
         bottom: 0;
         left: 0;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-        flex-direction: column;
-        -webkit-box-pack: justify;
-        -ms-flex-pack: justify;
-        justify-content: space-between;
+        @include flex(column, space-between, stretch);
         z-index: 10;
         opacity: 0;
 
@@ -66,41 +56,23 @@
             flex: 0 0 57px;
             padding: 0 20px 0 20px;
             background: transparent;
-            border-bottom: 1px solid color.adjust($menu-bg, $lightness: -2.5%);
-            align-items: center;
+            border-bottom: 1px solid var(--dc-divider);
             box-shadow:
-                0 1px 0 color.adjust($channels-bg, $lightness: -4.1%),
-                inset 0 -1px 0 rgba(#000, 0.1);
-            transition: background 0.15s ease;
-
-            position: relative;
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            align-items: center;
+                0 1px 0 var(--dc-divider),
+                inset 0 -1px 0 hsla(var(--black-500-hsl) / 0.1);
             min-width: 0;
             width: 100%;
-            -webkit-box-flex: 0;
-            -ms-flex: 0 0 auto;
-            // flex: 0 0 auto;
-            // height: 48px;
-            // padding: 0 8px;
-            font-size: 16px;
+            font-size: var(--font-size-lg);
             line-height: 20px;
             cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 8px;
 
             .voicechat-header-title {
                 position: relative;
-                -webkit-box-flex: 1;
-                -ms-flex: 1 1 auto;
                 flex: 1 1 auto;
-                display: -webkit-box;
-                display: -ms-flexbox;
                 display: flex;
-                -webkit-box-align: center;
-                -ms-flex-align: center;
                 align-items: center;
                 min-width: 0;
                 overflow: hidden;
@@ -117,21 +89,12 @@
             flex: 0 0 57px;
             padding: 0 1rem;
             background: transparent;
-            align-items: center;
-            transition: background 0.15s ease;
+            @include transition(background, 0.15s, ease);
             position: relative;
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            align-items: center;
-            justify-content: center;
+            @include flex(row, center, center);
             min-width: 0;
             width: 100%;
-            -webkit-box-flex: 0;
-            -ms-flex: 0 0 auto;
-            font-size: 16px;
+            font-size: var(--font-size-lg);
             line-height: 20px;
             cursor: default;
 
@@ -141,6 +104,24 @@
 
                 button {
                     margin: 0.5rem;
+                }
+
+                .fab {
+                    border: none;
+                    border-radius: 50%;
+                    background: var(--button-bg);
+                    color: var(--body-color);
+                    width: 48px;
+                    height: 48px;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                }
+
+                .fab-error {
+                    background: var(--red-430);
+                    color: var(--white-500);
                 }
             }
         }

@@ -1,277 +1,193 @@
-// import React, { useEffect } from 'react'
+﻿import { useEffect, useMemo, useRef } from "react";
+import {
+    useJoin,
+    useLocalCameraTrack,
+    useLocalMicrophoneTrack,
+    usePublish,
+    useRTCClient,
+    useRemoteUsers,
+    useClientEvent,
+    useVolumeLevel,
+    useNetworkQuality,
+    useConnectionState,
+    useLocalScreenTrack,
+} from "agora-rtc-react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+    setIsVoiceChatConnected,
+    setLatency,
+    setConnectionState,
+    setIsVoiceChatLoading,
+    setAgoraConfig,
+} from "@/redux/features/voiceChatSlice";
+import { setIsScreenSharingActive, setIsScreenSharingOn } from "@/redux/features/voiceChatSlice";
+import fetchRTCToken from "@/utils/fetchToken";
+import AgoraConfig from "@/contexts/agora/config";
 
-// function useAgora() {
-//     useEffect(() => {
-//         agoraEngine.on("token-privilege-will-expire", async function () {
-//             const token = await FetchToken();
-//             setConfig({ ...config, token: token })
-//             await agoraEngine.renewToken(config.token);
-//         });
-//         //enabled volume indicator
-//         agoraEngine.enableAudioVolumeIndicator();
+export default function useAgora() {
+    const dispatch = useDispatch();
+    const { isMicOn, isCameraOn, isScreenSharingOn, isDeafen, agoraConfig, isVoiceChatPageOpen } =
+        useSelector((state) => state.voiceChat);
+    const { currVoiceChannel } = useSelector((state) => state.channel);
 
-//         agoraEngine.on("volume-indicator", (volumes) => {
-//             handleVolume(volumes)
-//         })
-//         agoraEngine.on("user-published", (user, mediaType) => {
-//             handleUserSubscribe(user, mediaType)
-//             handleUserPublishedToAgora(user, mediaType)
-//         });
-//         agoraEngine.on("user-joined", (user) => {
-//             handleRemoteUserJoinedAgora(user)
-//         })
-//         agoraEngine.on("user-left", (user) => {
-//             handleRemoteUserLeftAgora(user)
-//         })
-//         agoraEngine.on("user-unpublished", (user, mediaType) => {
-//             handleUserUnpublishedFromAgora(user, mediaType)
-//         });
+    const agoraClient = useRTCClient();
+    const connectionState = useConnectionState();
+    const networkQuality = useNetworkQuality();
 
-//         agoraEngine.on("connection-state-change", (currentState, prevState, reason) => {
-//             setConnectionState({ state: currentState, reason: reason })
-//         })
+    const { screenTrack } = useLocalScreenTrack(isScreenSharingOn, {}, "disable");
 
-//         return () => {
-//             removeLiveUserFromFirebase(currentAgoraUID)
+    const shouldJoin =
+        isVoiceChatPageOpen &&
+        Boolean(agoraConfig?.appid && agoraConfig?.channel && agoraConfig?.token);
 
-//             for (const localTrack of localTracks) {
-//                 localTrack.stop();
-//                 localTrack.close();
-//             }
-//             agoraEngine.off("user-published", handleRemoteUserJoinedAgora)
-//             agoraEngine.off("user-left", handleRemoteUserLeftAgora)
-//             agoraEngine.unpublish(localTracks).then(() => agoraEngine.leave())
-//         }
+    const joinConfig = useMemo(
+        () => ({
+            appid: agoraConfig.appid,
+            channel: agoraConfig.channel,
+            uid: agoraConfig.uid,
+            token: agoraConfig.token,
+        }),
+        [agoraConfig]
+    );
 
-//     }, []);
+    const { isConnected, isLoading } = useJoin(joinConfig, shouldJoin);
 
-//     const FetchToken = async () => {
-//         return new Promise(function (resolve) {
-//             if (config.channel) {
-//                 axios.get(config.serverUrl + '/rtc/' + config.channel + '/1/uid/' + "0" + '/?expiry=' + config.ExpireTime)
-//                     .then(
-//                         response => {
-//                             resolve(response.data.rtcToken);
-//                         })
-//                     .catch(error => {
-//                         console.log(error);
-//                     });
-//             }
-//         });
-//     }
+    const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack(
+        isMicOn && !isDeafen,
+        {},
+        "disable"
+    );
+    const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack(
+        isCameraOn,
+        {},
+        "disable"
+    );
+    const volume = useVolumeLevel(localMicrophoneTrack);
+    const remoteUsers = useRemoteUsers();
 
-//     useEffect(() => {
-//         setConfig({ ...config, channel: currentVoiceChannel.uid })
-//     }, [currentVoiceChannel.uid])
+    const trackRef = useRef({
+        screenTrack: null,
+        localCameraTrack: null,
+        localMicrophoneTrack: null,
+    });
 
-//     const [connectionState, setConnectionState] = useState({ state: null, reason: null })
+    useEffect(() => {
+        trackRef.current = {
+            screenTrack,
+            localCameraTrack,
+            localMicrophoneTrack,
+        };
+    }, [screenTrack, localCameraTrack, localMicrophoneTrack]);
 
-//     const handleUserSubscribe = async (user, mediaType) => {
-//         const id = user.uid
-//         await agoraEngine.subscribe(user, mediaType)
-//     }
+    // Reflect actual screen sharing active state when a local screen track appears/disappears.
+    // Only mark active when a track exists AND the UI requested sharing, otherwise treat as inactive.
+    useEffect(() => {
+        try {
+            dispatch(setIsScreenSharingActive(Boolean(screenTrack) && Boolean(isScreenSharingOn)));
+        } catch (e) {
+            // ignore
+        }
+    }, [dispatch, screenTrack, isScreenSharingOn]);
 
-//     const handleVolume = (volumes) => {
-//         setRemoteUsers((previousUsers) => {
-//             if (previousUsers) {
-//                 return previousUsers.map(user => {
-//                     if (user) {
-//                         const volume = volumes.find(v => v.uid == user.uid);
-//                         if (volume) {
-//                             return { ...user, volume: volume.level };
-//                         }
-//                         return user;
-//                     }
-//                 });
-//             }
-//         });
-//     }
+    // If the UI requested screen sharing but no screenTrack appears within a short timeout,
+    // roll back the request so UI doesn't remain in 'on' state when sharing failed/was denied.
+    useEffect(() => {
+        if (!isScreenSharingOn) return undefined;
+        if (screenTrack) return undefined; // already active
 
-//     const handleUserUnpublishedFromAgora = (user, mediaType) => {
-//         updateFirebaseMediaStatus(user.uid, mediaType, false)
+        const timer = setTimeout(() => {
+            // still no track -> revert the request
+            if (!screenTrack) {
+                try {
+                    dispatch(setIsScreenSharingOn(false));
+                } catch (e) {
+                    // ignore
+                }
+            }
+        }, 3000);
 
-//         if (mediaType === "audio") {
-//             setRemoteUsers((previousUsers) => {
-//                 if (previousUsers !== undefined) {
-//                     return (previousUsers.map((User) => {
-//                         if (User) {
-//                             if (User.uid == user.uid) {
-//                                 return { ...User, hasAudio: false, audioTrack: null, uid: user.uid }
-//                             }
-//                             return User
-//                         }
-//                     }))
-//                 }
-//             });
-//         }
+        return () => clearTimeout(timer);
+    }, [dispatch, isScreenSharingOn, screenTrack]);
 
-//         if (mediaType === "video") {
-//             setRemoteUsers((previousUsers) => {
-//                 if (previousUsers !== undefined) {
-//                     return (previousUsers.map((User) => {
-//                         if (User) {
-//                             if (User.uid == user.uid) {
-//                                 return { ...User, hasVideo: false, videoTrack: null, uid: user.uid }
-//                             }
-//                             return User
-//                         }
-//                     }))
-//                 }
-//             });
-//         }
-//     }
+    const publishedTracks = [
+        isMicOn && !isDeafen ? localMicrophoneTrack : null,
+        isCameraOn ? localCameraTrack : null,
+        isScreenSharingOn ? screenTrack : null,
+    ].filter(Boolean);
+    usePublish(publishedTracks);
 
-//     useEffect(() => {
-//         // constantly monitor the state change of user, audio, video
-//         if (currentVoiceChannel.uid) {
-//             const voiceChannelRef = doc(db, "voicechannels", currentVoiceChannel.uid)
-//             const snapshot = onSnapshot(voiceChannelRef, (doc) => {
-//                 const list = doc.data().liveUser
-//                 if (list && list.length != 0) {
-//                     list.forEach((User) => {
-//                         setRemoteUsers((previousUser) => {
-//                             if (previousUser != undefined) {
-//                                 return previousUser.map((user) => {
-//                                     if (user.uid == User.uid) {
-//                                         return { ...user, name: User.name, hasAudio: User.hasAudio, hasVideo: User.hasVideo }
-//                                     }
-//                                     return user;
-//                                 })
-//                             }
-//                         })
-//                     })
-//                 }
-//             })
-//         }
-//     }, [remoteUsers, config.channel])
+    useEffect(() => {
+        if (localCameraTrack?.setEnabled) {
+            localCameraTrack.setEnabled(isCameraOn);
+        }
+    }, [localCameraTrack, isCameraOn]);
 
-//     const updateFirebaseMediaStatus = (agoraID, mediaType, status) => {
+    useEffect(() => {
+        if (localMicrophoneTrack?.setEnabled) {
+            localMicrophoneTrack.setEnabled(isMicOn && !isDeafen);
+        }
+    }, [localMicrophoneTrack, isMicOn, isDeafen]);
 
-//         if (currentVoiceChannel.uid) {
-//             const voiceChannelRef = doc(db, "voicechannels", currentVoiceChannel.uid)
+    useEffect(() => {
+        dispatch(setIsVoiceChatConnected(Boolean(isConnected)));
+    }, [dispatch, isConnected]);
 
-//             getDoc(voiceChannelRef).then((doc) => {
-//                 if (doc.exists()) {
-//                     const arr = doc.data().liveUser
-//                     const updateUser = arr.find(x => x.uid == agoraID)
-//                     console.log(updateUser)
-//                     if (updateUser) {
-//                         if (mediaType === "audio") {
-//                             updateUser.hasAudio = status;
-//                         }
-//                         if (mediaType === "video") {
-//                             updateUser.hasVideo = status;
-//                         }
-//                     }
+    useEffect(() => {
+        dispatch(setConnectionState(connectionState));
+    }, [dispatch, connectionState]);
 
-//                     updateDoc(voiceChannelRef, {
-//                         liveUser: arr
-//                     })
-//                 }
-//             })
-//         }
-//     }
+    useEffect(() => {
+        dispatch(setLatency(networkQuality.delay));
+    }, [dispatch, networkQuality.delay]);
 
-//     const handleUserPublishedToAgora = (user, mediaType) => {
+    useEffect(() => {
+        dispatch(setIsVoiceChatLoading(isLoading));
+    }, [dispatch, isLoading]);
 
-//         updateFirebaseMediaStatus(user.uid, mediaType, true)
+    useClientEvent(agoraClient, "token-privilege-will-expire", async () => {
+        if (AgoraConfig.serverUrl && currVoiceChannel?.name) {
+            try {
+                const token = await fetchRTCToken(AgoraConfig, currVoiceChannel.name);
+                if (token) {
+                    dispatch(setAgoraConfig({ ...agoraConfig, token }));
+                    return agoraClient.renewToken(token);
+                }
+            } catch (error) {
+                // Token renewal failed, connection may be interrupted.
+            }
+        }
+    });
 
-//         setRemoteUsers((previousUsers) => {
-//             if (previousUsers !== undefined) {
-//                 return (previousUsers.map((User) => {
-//                     if (User) {
-//                         if (User.uid == user.uid) {
-//                             if (mediaType === "video") {
-//                                 return { ...User, hasVideo: true, videoTrack: user.videoTrack, uid: user.uid }
-//                             }
+    useEffect(() => {
+        if (!isScreenSharingOn) {
+            trackRef.current.screenTrack?.close();
+            try {
+                dispatch(setIsScreenSharingActive(false));
+            } catch (e) {
+                // ignore
+            }
+        }
+    }, [isScreenSharingOn, dispatch]);
 
-//                             if (mediaType === "audio") {
-//                                 return { ...User, hasAudio: true, audioTrack: user.audioTrack, uid: user.uid }
-//                             }
-//                         }
-//                         return User
-//                     }
-//                 }))
-//             }
-//         })
-//     }
+    useEffect(() => {
+        return () => {
+            trackRef.current.screenTrack?.close();
+            trackRef.current.localCameraTrack?.close();
+            trackRef.current.localMicrophoneTrack?.close();
+        };
+    }, []);
 
-//     const handleRemoteUserJoinedAgora = (user) => {
-
-//         setRemoteUsers((previousUsers) => {
-//             if (previousUsers !== undefined) {
-//                 if (previousUsers.find(User => User.uid != user.uid)) {
-//                     return [...previousUsers, { uid: user.uid, hasAudio: user.hasAudio, audioTrack: user.audioTrack, hasVideo: user.hasVideo, videoTrack: user.videoTrack }]
-//                 }
-//             }
-//         })
-//     }
-
-//     useEffect(() => {
-//         console.log(remoteUsers)
-//     }, [remoteUsers])
-
-//     const handleLocalUserLeftAgora = async () => {
-
-//         removeLiveUserFromFirebase(currentAgoraUID)
-//         setRemoteUsers([])
-
-//         for (const localTrack of localTracks) {
-//             localTrack.stop();
-//             localTrack.close();
-//         }
-
-//         await agoraEngine.unpublish(localTracks)
-//         await agoraEngine.leave()
-
-//         setLocalTracks(null)
-//         console.log("You left the channel");
-//         setCurrentVoiceChannel({ name: null, uid: null })
-//     }
-
-//     const handleRemoteUserLeftAgora = (user) => {
-
-//         setRemoteUsers((previousUsers) => {
-//             if (previousUsers !== undefined) {
-//                 const newArr = previousUsers.filter((User) => User.uid != user.uid)
-//                 return newArr;
-//             }
-//         })
-
-//     }
-
-//     const addLiveUserToFirebase = (userData) => {
-//         const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
-//         getDoc(userRef).then((doc) => {
-//             if (doc.exists()) {
-//                 const arr = doc.data().liveUser;
-//                 if (!arr.find(x => x.firebaseUID == currentUser.uid)) {
-//                     updateDoc(userRef, {
-//                         liveUser: arrayUnion(userData)
-//                     })
-//                 }
-//             }
-//         })
-//     }
-
-//     const removeLiveUserFromFirebase = (agoraID) => {
-//         if (agoraID && currentVoiceChannel.uid) {
-//             const userRef = doc(db, "voicechannels", currentVoiceChannel.uid)
-//             getDoc(userRef).then((doc) => {
-//                 if (doc.exists()) {
-//                     const arr = doc.data().liveUser;
-//                     if (arr.find(x => x.uid == agoraID)) {
-//                         const deleteUser = arr.find(x => x.uid == agoraID)
-//                         console.log(deleteUser)
-//                         updateDoc(userRef, {
-//                             liveUser: arrayRemove(deleteUser)
-//                         })
-//                     }
-//                 }
-//             })
-//         }
-//     }
-//     return []
-// }
-
-// export default useAgora
+    return {
+        localMicrophoneTrack,
+        localCameraTrack,
+        screenTrack,
+        remoteUsers,
+        volume,
+        isLoading,
+        deviceLoading: isLoadingMic || isLoadingCam,
+        isDeafen,
+        isMicOn,
+        isCameraOn,
+        isScreenSharingOn,
+    };
+}

@@ -1,0 +1,21 @@
+.avatar-with-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+}
+
+.avatar-with-status .radix-badge {
+    display: inline-flex;
+    position: relative;
+}
+
+.avatar-with-status .radix-badge .radix-badge-indicator {
+    width: var(--avatar-status-indicator-size, 30%);
+    height: var(--avatar-status-indicator-size, 30%);
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    background: transparent;
+    z-index: 3;
+}

@@ -1,8 +1,140 @@
-// voiceChatSlice.js
-import { createSlice } from "@reduxjs/toolkit";
-import store from "@/redux/store";
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { batch } from "react-redux";
+import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 import { db } from "@/firebase";
+import { setCurrVoiceChannel } from "@/redux/features/channelSlice";
+import AgoraConfig from "@/contexts/agora/config";
+import fetchRTCToken from "@/utils/fetchToken";
+
+const VOICE_CHAT_SESSION_KEY = "voiceChat.lastSession";
+
+const saveVoiceChatSession = (session) => {
+    try {
+        localStorage.setItem(VOICE_CHAT_SESSION_KEY, JSON.stringify(session));
+    } catch (error) {
+        // ignore if storage unavailable
+    }
+};
+
+export const loadVoiceChatSession = () => {
+    try {
+        const raw = localStorage.getItem(VOICE_CHAT_SESSION_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+        return null;
+    }
+};
+
+const clearVoiceChatSession = () => {
+    try {
+        localStorage.removeItem(VOICE_CHAT_SESSION_KEY);
+    } catch (error) {
+        // ignore
+    }
+};
+
+export const joinVoiceChannel = createAsyncThunk(
+    "voiceChat/joinVoiceChannel",
+    async ({ name, channelId }, { dispatch, getState, rejectWithValue }) => {
+        const state = getState();
+        const currUser = state.auth.user;
+        const currServerName = state.server.currServer?.name || "";
+
+        if (!currUser?.id) {
+            return rejectWithValue("User is not authenticated");
+        }
+        if (!channelId) {
+            return rejectWithValue("Voice channel ID is required");
+        }
+
+        dispatch(setIsVoiceChatLoading(true));
+
+        const participant = {
+            id: currUser.id,
+            avatar: currUser.avatar,
+            displayName: currUser.displayName,
+        };
+
+        const channelRef = doc(db, "voicechannels", channelId);
+        try {
+            await updateDoc(channelRef, {
+                participants: arrayUnion(participant),
+            });
+        } catch (error) {
+            dispatch(setIsVoiceChatLoading(false));
+            dispatch(setIsVoiceChatPageOpen(false));
+            return rejectWithValue(error.message || "Failed to add participant to voice channel");
+        }
+
+        saveVoiceChatSession({ name, id: channelId, serverName: currServerName });
+
+        let token;
+        try {
+            token = await fetchRTCToken(AgoraConfig, channelId);
+        } catch (error) {
+            dispatch(setIsVoiceChatLoading(false));
+            dispatch(setIsVoiceChatPageOpen(false));
+            return rejectWithValue(error.message || "Failed to fetch Agora token");
+        }
+
+        if (!token) {
+            dispatch(setIsVoiceChatLoading(false));
+            dispatch(setIsVoiceChatPageOpen(false));
+            return rejectWithValue("Failed to fetch Agora token");
+        }
+
+        batch(() => {
+            dispatch(setCurrVoiceChannel({ name, id: channelId, serverName: currServerName }));
+            dispatch(
+                setAgoraConfig({
+                    appid: AgoraConfig.appId,
+                    channel: channelId,
+                    uid: currUser.id,
+                    token,
+                })
+            );
+            dispatch(setIsVoiceChatPageOpen(true));
+            dispatch(setIsVoiceChatLoading(false));
+        });
+
+        return token;
+    }
+);
+
+export const leaveVoiceChannel = createAsyncThunk(
+    "voiceChat/leaveVoiceChannel",
+    async (_, { dispatch, getState }) => {
+        dispatch(setIsVoiceChatLoading(true));
+        dispatch(setIsVoiceChatConnected(false));
+        dispatch(setIsVoiceChatPageOpen(false));
+
+        const state = getState();
+        const voiceChannel = state.channel.currVoiceChannel;
+        const currUser = state.auth.user;
+
+        if (voiceChannel?.id && currUser?.id) {
+            const participant = {
+                id: currUser.id,
+                avatar: currUser.avatar,
+                displayName: currUser.displayName,
+            };
+            const channelRef = doc(db, "voicechannels", voiceChannel.id);
+            try {
+                await updateDoc(channelRef, {
+                    participants: arrayRemove(participant),
+                });
+            } catch (error) {
+                // Ignore participant cleanup failure; continue with local disconnect.
+            }
+        }
+
+        dispatch(setCurrVoiceChannel({}));
+        dispatch(setAgoraConfig({}));
+        dispatch(setRemoteUsers([]));
+        clearVoiceChatSession();
+        dispatch(setIsVoiceChatLoading(false));
+    }
+);
 
 const voiceChatSlice = createSlice({
     name: "voiceChat",
@@ -11,22 +143,16 @@ const voiceChatSlice = createSlice({
         isDeafen: false,
         isCameraOn: false,
         isScreenSharingOn: false,
+        isScreenSharingActive: false,
         isVoiceChatConnected: false,
         isVoiceChatLoading: false,
         isVoiceChatPageOpen: false,
-        agoraEngine: null,
         agoraConfig: {},
-        screenShareRef: null,
         remoteUsers: [],
-        localTracks: null,
-        currAgoraUID: null,
-        screenTrack: null,
         connectionState: "",
         latency: null,
-        // Add other voice chat-related state here
     },
     reducers: {
-        // Add other voice chat-related reducers here
         setIsMicOn: (state, action) => {
             state.isMicOn = action.payload;
         },
@@ -39,32 +165,20 @@ const voiceChatSlice = createSlice({
         setIsScreenSharingOn: (state, action) => {
             state.isScreenSharingOn = action.payload;
         },
+        setIsScreenSharingActive: (state, action) => {
+            state.isScreenSharingActive = action.payload;
+        },
         setIsVoiceChatConnected: (state, action) => {
             state.isVoiceChatConnected = action.payload;
-        },
-        setAgoraEngine: (state, action) => {
-            state.agoraEngine = action.payload;
-        },
-        setScreenShareRef: (state, action) => {
-            state.screenShareRef = action.payload;
-        },
-        setRemoteUsers: (state, action) => {
-            state.remoteUsers = action.payload;
-        },
-        setLocalTracks: (state, action) => {
-            state.localTracks = action.payload;
-        },
-        setCurrAgoraUID: (state, action) => {
-            state.currAgoraUID = action.payload;
-        },
-        setScreenTrack: (state, action) => {
-            state.screenTrack = action.payload;
         },
         setAgoraConfig: (state, action) => {
             state.agoraConfig = action.payload;
         },
         setIsVoiceChatPageOpen: (state, action) => {
             state.isVoiceChatPageOpen = action.payload;
+        },
+        setRemoteUsers: (state, action) => {
+            state.remoteUsers = action.payload;
         },
         setConnectionState: (state, action) => {
             state.connectionState = action.payload;
@@ -76,167 +190,43 @@ const voiceChatSlice = createSlice({
             state.isVoiceChatLoading = action.payload;
         },
     },
+    extraReducers: (builder) => {
+        builder
+            .addCase(joinVoiceChannel.pending, (state) => {
+                state.isVoiceChatLoading = true;
+            })
+            .addCase(joinVoiceChannel.fulfilled, (state) => {
+                state.isVoiceChatLoading = false;
+            })
+            .addCase(joinVoiceChannel.rejected, (state) => {
+                state.isVoiceChatLoading = false;
+                state.isVoiceChatPageOpen = false;
+            })
+            .addCase(leaveVoiceChannel.pending, (state) => {
+                state.isVoiceChatLoading = true;
+            })
+            .addCase(leaveVoiceChannel.fulfilled, (state) => {
+                state.isVoiceChatLoading = false;
+            })
+            .addCase(leaveVoiceChannel.rejected, (state) => {
+                state.isVoiceChatLoading = false;
+            });
+    },
 });
 
 export const {
     setIsCameraOn,
     setIsMicOn,
     setIsDeafen,
-    setIsVoiceChatConnected,
     setIsScreenSharingOn,
-    setAgoraEngine,
-    setScreenShareRef,
-    setRemoteUsers,
-    setLocalTracks,
-    setCurrAgoraUID,
-    setScreenTrack,
+    setIsScreenSharingActive,
+    setIsVoiceChatConnected,
     setAgoraConfig,
     setIsVoiceChatPageOpen,
+    setRemoteUsers,
     setConnectionState,
     setLatency,
     setIsVoiceChatLoading,
 } = voiceChatSlice.actions;
+
 export default voiceChatSlice.reducer;
-
-// Helpers to access current runtime state and dispatch actions
-const getState = () => store.getState();
-const getCurrentVoiceChannel = () =>
-    getState().server?.currentVoiceChannel ||
-    getState().voiceChat?.currentVoiceChannel || { uid: null };
-const getCurrentUser = () => getState().auth?.user || {};
-const getLocalTracks = () => getState().voiceChat?.localTracks || [];
-const getAgoraEngine = () => getState().voiceChat?.agoraEngine;
-const dispatch = (action) => store.dispatch(action);
-const setCurrentVoiceChannel = (val) =>
-    dispatch({ type: "server/setCurrentVoiceChannel", payload: val });
-
-export const handleVolume = (volumes) => {
-    const previousUsers = getState().voiceChat.remoteUsers || [];
-    const next = previousUsers.map((user) => {
-        if (user) {
-            const volume = volumes.find((v) => v.uid == user.uid);
-            if (volume) return { ...user, volume: volume.level };
-            return user;
-        }
-        return user;
-    });
-    dispatch(voiceChatSlice.actions.setRemoteUsers(next));
-};
-
-// Note: handleUserUnpublishedFromAgora removed because it was unused; keep remote user handlers minimal
-
-export const updateFirebaseMediaStatus = (agoraID, mediaType, status) => {
-    const cv = getCurrentVoiceChannel();
-    if (cv && cv.uid) {
-        const voiceChannelRef = doc(db, "voicechannels", cv.uid);
-
-        getDoc(voiceChannelRef).then((d) => {
-            if (d.exists()) {
-                const arr = d.data().liveUser || [];
-                const updateUser = arr.find((x) => x.uid == agoraID);
-                if (updateUser) {
-                    if (mediaType === "audio") updateUser.hasAudio = status;
-                    if (mediaType === "video") updateUser.hasVideo = status;
-                }
-
-                updateDoc(voiceChannelRef, {
-                    liveUser: arr,
-                });
-            }
-        });
-    }
-};
-
-export const handleUserPublishedToAgora = (user, mediaType) => {
-    updateFirebaseMediaStatus(user.uid, mediaType, true);
-
-    const previousUsers = getState().voiceChat.remoteUsers || [];
-    const next = previousUsers.map((User) => {
-        if (User && User.uid == user.uid) {
-            if (mediaType === "video")
-                return { ...User, hasVideo: true, videoTrack: user.videoTrack, uid: user.uid };
-            if (mediaType === "audio")
-                return { ...User, hasAudio: true, audioTrack: user.audioTrack, uid: user.uid };
-        }
-        return User;
-    });
-    dispatch(voiceChatSlice.actions.setRemoteUsers(next));
-};
-
-export const handleRemoteUserJoinedAgora = (user) => {
-    const previousUsers = getState().voiceChat.remoteUsers || [];
-    if (!previousUsers.find((User) => User.uid == user.uid)) {
-        const next = [
-            ...previousUsers,
-            {
-                uid: user.uid,
-                hasAudio: user.hasAudio,
-                audioTrack: user.audioTrack,
-                hasVideo: user.hasVideo,
-                videoTrack: user.videoTrack,
-            },
-        ];
-        dispatch(voiceChatSlice.actions.setRemoteUsers(next));
-    }
-};
-
-export const handleLocalUserLeftAgora = async () => {
-    removeLiveUserFromFirebase(getState().voiceChat.currAgoraUID);
-    dispatch(voiceChatSlice.actions.setRemoteUsers([]));
-
-    for (const localTrack of getLocalTracks()) {
-        if (localTrack) {
-            localTrack.stop();
-            localTrack.close();
-        }
-    }
-
-    const engine = getAgoraEngine();
-    if (engine) {
-        await engine.unpublish(getLocalTracks());
-        await engine.leave();
-    }
-
-    dispatch(voiceChatSlice.actions.setLocalTracks(null));
-    // user left the channel
-    setCurrentVoiceChannel({ name: null, uid: null });
-};
-
-export const handleRemoteUserLeftAgora = (user) => {
-    const previousUsers = getState().voiceChat.remoteUsers || [];
-    const newArr = previousUsers.filter((User) => User.uid != user.uid);
-    dispatch(voiceChatSlice.actions.setRemoteUsers(newArr));
-};
-
-export const addLiveUserToFirebase = (userData) => {
-    const cv = getCurrentVoiceChannel();
-    const userRef = doc(db, "voicechannels", cv.uid);
-    getDoc(userRef).then((d) => {
-        if (d.exists()) {
-            const arr = d.data().liveUser || [];
-            if (!arr.find((x) => x.firebaseUID == getCurrentUser().uid)) {
-                updateDoc(userRef, {
-                    liveUser: arrayUnion(userData),
-                });
-            }
-        }
-    });
-};
-
-export const removeLiveUserFromFirebase = (agoraID) => {
-    const cv = getCurrentVoiceChannel();
-    if (agoraID && cv && cv.uid) {
-        const userRef = doc(db, "voicechannels", cv.uid);
-        getDoc(userRef).then((d) => {
-            if (d.exists()) {
-                const arr = d.data().liveUser || [];
-                if (arr.find((x) => x.uid == agoraID)) {
-                    const deleteUser = arr.find((x) => x.uid == agoraID);
-                    updateDoc(userRef, {
-                        liveUser: arrayRemove(deleteUser),
-                    });
-                }
-            }
-        });
-    }
-};
