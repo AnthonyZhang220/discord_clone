@@ -1,0 +1,254 @@
+@use "./variables" as *;
+
+@mixin chat-message-list {
+    .scrollerInner {
+        min-height: 0;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        color: hsl(240, 2%, 88%);
+
+        .message {
+            position: relative;
+            outline: none;
+            color: var(--body-color);
+            padding: 8px 12px;
+            margin: 0;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            width: 100%;
+            transition: background-color 0.2s ease;
+        }
+
+        .message:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 8px;
+        }
+
+        .message-avatar-wrap {
+            width: 50px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            overflow: visible; /* allow badge indicator to overflow */
+        }
+
+        /* Tweak Radix Badge/Avatar sizing inside chat messages */
+        .message-avatar-wrap .radix-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .message-avatar-wrap .radix-avatar,
+        .message-avatar-wrap .avatar {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            min-height: 40px;
+            border-radius: 50%;
+            display: block;
+        }
+
+        /* In chat rows, ensure fallback initials are visible when avatar URL is missing/broken. */
+        .message-avatar-wrap .radix-avatar-fallback {
+            z-index: 0;
+        }
+
+        .message-avatar-wrap .radix-badge-indicator {
+            position: absolute;
+            width: var(--avatar-status-indicator-size, 30%);
+            height: var(--avatar-status-indicator-size, 30%);
+            bottom: 0;
+            right: 0;
+            transform: translate(8%, 8%);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            box-sizing: border-box;
+            background: transparent;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .message-avatar-spacer {
+            width: 50px;
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        .message-avatar-spacer.message-avatar-spacer-continuation {
+            width: 50px;
+            height: 1px;
+        }
+
+        .message-main {
+            position: relative;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .message-time-col {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            position: absolute;
+            top: 3px;
+            left: -50px;
+            width: 40px;
+            pointer-events: none;
+        }
+
+        .message-group-start .message-time-col {
+            display: none;
+        }
+
+        .message-time-hover {
+            display: inline-flex;
+            font-size: var(--font-size-xs);
+            color: var(--dc-text-muted);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+
+        .message-group-continuation:hover .message-time-hover {
+            opacity: 1;
+        }
+
+        .message-body {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: var(--font-size-sm);
+            color: var(--dc-text-muted);
+            line-height: 1.2;
+            min-width: 0;
+        }
+
+        .message-author {
+            font-weight: 600;
+            color: var(--body-color);
+            min-width: 0;
+        }
+
+        .message-meta {
+            color: var(--dc-text-muted);
+            font-weight: 400;
+            white-space: nowrap;
+        }
+
+        .message-bubble {
+            position: relative;
+            display: block;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            max-width: min(900px, 100%);
+            color: var(--body-color);
+            word-break: break-word;
+        }
+
+        .message-bubble:hover {
+            background: none;
+        }
+
+        .message-group-continuation .message-header {
+            display: none;
+        }
+
+        .chat-divider {
+            margin: 16px 0;
+            font-size: var(--font-size-sm);
+            color: var(--dc-text-muted);
+            display: flex;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .chat-divider::before,
+        .chat-divider::after {
+            content: "";
+            display: block;
+            flex: 1 1 auto;
+            height: 1px;
+            background-color: var(--dc-divider);
+        }
+
+        .chat-divider > * {
+            padding: 0 12px;
+            white-space: nowrap;
+        }
+
+        .message-date {
+            display: none !important;
+            color: var(--dc-text-muted) !important;
+            font-size: var(--font-size-sm) !important;
+            margin-left: 10px !important;
+        }
+
+        .message:hover .message-date,
+        .message .message-button:hover .message-date {
+            display: inline !important;
+        }
+
+        .message:hover .timeblock,
+        .message .message-button:hover .timeblock {
+            display: block !important;
+        }
+
+        .timeblock {
+            display: none !important;
+            font-size: var(--font-size-sm);
+            color: var(--dc-text-muted);
+        }
+
+        .format-audio-column {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .scrollerSpacer {
+            display: block;
+            height: 30px;
+            width: 1px;
+            flex: 0 0 auto;
+            pointer-events: none;
+            color: hsl(240, 2%, 88%);
+        }
+
+        .message-image,
+        .message-video {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 12px;
+            display: block;
+        }
+
+        .audio-title {
+            font-size: var(--font-size-sm);
+            color: var(--dc-text-muted);
+            margin-bottom: 8px;
+        }
+    }
+}

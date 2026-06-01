@@ -1,0 +1,14 @@
+// Shared sidebar/container base styles
+%sidebar-base {
+    background: var(--channels-bg);
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    border-left: 1px solid var(--divider-primary);
+}
+
+/* Provide a class too so we can @extend or reuse if needed */
+.sidebar-base {
+    @extend %sidebar-base;
+}

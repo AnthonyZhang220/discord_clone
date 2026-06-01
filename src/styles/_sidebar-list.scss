@@ -1,0 +1,79 @@
+@use "./variables" as *;
+
+@mixin sidebar-list-header {
+    cursor: pointer;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    letter-spacing: 0.12rem;
+    transition: color 0.2s linear;
+    line-height: 24px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border-bottom: none;
+
+    &::before {
+        content: "▾";
+        display: inline-block;
+        margin-right: 8px;
+        font-size: var(--font-size-sm);
+        color: var(--text-muted);
+        transform: rotate(0deg);
+    }
+
+    &:hover,
+    &:focus {
+        color: var(--body-color);
+    }
+}
+
+@mixin sidebar-list-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    transition: background 0.12s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.06);
+    }
+}
+
+@mixin sidebar-list-item-active {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+@mixin sidebar-list-container {
+    flex: 1 1;
+    overflow-y: auto;
+    padding: 12px;
+
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+}
+
+@mixin sidebar-list-button {
+    flex: 1 1 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border: none;
+    text-align: left;
+    color: var(--body-color);
+    cursor: pointer;
+}
+
+@mixin sidebar-list-name {
+    font-size: var(--font-size-md);
+    font-weight: 500;
+}

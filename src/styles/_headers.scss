@@ -1,0 +1,16 @@
+// Shared app header shell so sidebar/chat/friend headers stay in sync.
+$app-header-height: 56px;
+
+@mixin app-header-shell($height: $app-header-height) {
+    flex: 0 0 $height;
+    min-height: $height;
+    height: $height;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+@mixin app-header-borders($top: var(--divider-primary), $bottom: var(--dc-divider)) {
+    border-top: 1px solid $top;
+    border-bottom: 1px solid $bottom;
+}

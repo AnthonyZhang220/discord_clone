@@ -1,0 +1,106 @@
+/* Shared avatar + badge styles */
+
+.radix-avatar {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 50%;
+}
+
+.radix-avatar .radix-avatar-fallback,
+.radix-avatar .radix-avatar-image {
+    position: relative;
+    z-index: 0;
+}
+
+.radix-avatar-status--online {
+    background: var(--status-online);
+}
+
+.radix-avatar-status--idle {
+    background: var(--status-idle);
+}
+
+.radix-avatar-status--donotdisturb {
+    background: var(--status-dnd);
+}
+
+.radix-avatar-status--invisible,
+.radix-avatar-status--offline {
+    background: var(--status-offline);
+}
+
+.radix-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.radix-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* More specific selectors to override generic badge styles in App.scss */
+.radix-badge .radix-badge-indicator {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: var(--avatar-status-indicator-size, 30%);
+    height: var(--avatar-status-indicator-size, 30%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    box-sizing: border-box;
+    transform: translate(8%, 8%);
+    background: transparent;
+    z-index: 3;
+    overflow: hidden;
+}
+
+.radix-badge .radix-badge-indicator svg,
+.radix-badge .status-icon,
+.radix-badge .presence-dot {
+    width: 100%;
+    height: 100%;
+    display: block;
+    fill: currentColor;
+    color: inherit;
+}
+
+/* Ensure bottom-right variant used by avatars is positioned/sized correctly */
+.radix-badge .radix-badge-indicator--bottom-right {
+    bottom: 0;
+    right: 0;
+    transform: translate(8%, 8%);
+}
+
+.presence {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    transform: translate(8%, 8%);
+    box-sizing: border-box;
+}
+
+.presence-online {
+    background: var(--presence-online, #43b581);
+}
+.presence-offline {
+    background: var(--presence-offline, #747f8d);
+}
+.presence-idle {
+    background: var(--presence-away, #faa61a);
+}
+.presence-dnd {
+    background: var(--presence-dnd, #f04747);
+}
