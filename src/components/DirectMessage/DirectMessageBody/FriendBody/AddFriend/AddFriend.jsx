@@ -95,7 +95,7 @@ export default function AddFriend({ noActive }) {
                             );
                         })
                     ) : hasSearched && !isLoading ? (
-                        <div className="no-search-results">无搜索结果</div>
+                        <div className="no-search-results">No Search Results</div>
                     ) : null}
                 </div>
             </main>

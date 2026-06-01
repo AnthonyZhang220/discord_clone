@@ -3,9 +3,7 @@ import {
     useJoin,
     useLocalCameraTrack,
     useLocalMicrophoneTrack,
-    usePublish,
     useRTCClient,
-    useRemoteUsers,
     useClientEvent,
     useVolumeLevel,
     useNetworkQuality,
@@ -19,8 +17,10 @@ import {
     setConnectionState,
     setIsVoiceChatLoading,
     setAgoraConfig,
+    setIsScreenSharingActive,
+    setIsScreenSharingOn,
 } from "@/redux/features/voiceChatSlice";
-import { setIsScreenSharingActive, setIsScreenSharingOn } from "@/redux/features/voiceChatSlice";
+import { useAgoraTrack } from "@/hooks/useAgoraTrack";
 import fetchRTCToken from "@/utils/fetchToken";
 import AgoraConfig from "@/contexts/agora/config";
 
@@ -33,9 +33,9 @@ export default function useAgora() {
     const agoraClient = useRTCClient();
     const connectionState = useConnectionState();
     const networkQuality = useNetworkQuality();
+    const isConnected = connectionState === "CONNECTED";
 
-    const { screenTrack } = useLocalScreenTrack(isScreenSharingOn, {}, "disable");
-
+    // ── Join ──────────────────────────────────────────────────────────────
     const shouldJoin =
         isVoiceChatPageOpen &&
         Boolean(agoraConfig?.appid && agoraConfig?.channel && agoraConfig?.token);
@@ -50,86 +50,81 @@ export default function useAgora() {
         [agoraConfig]
     );
 
-    const { isConnected, isLoading } = useJoin(joinConfig, shouldJoin);
+    const { isLoading } = useJoin(joinConfig, shouldJoin);
 
+    // ── Tracks：始终创建 ──────────────────────────────────────────────────
     const { isLoading: isLoadingMic, localMicrophoneTrack } = useLocalMicrophoneTrack(
-        isMicOn && !isDeafen,
+        true,
         {},
         "disable"
     );
-    const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack(
-        isCameraOn,
-        {},
-        "disable"
-    );
-    const volume = useVolumeLevel(localMicrophoneTrack);
-    const remoteUsers = useRemoteUsers();
+    const { isLoading: isLoadingCam, localCameraTrack } = useLocalCameraTrack(true, {}, "disable");
+    const { screenTrack } = useLocalScreenTrack(isScreenSharingOn, {}, "disable");
 
-    const trackRef = useRef({
-        screenTrack: null,
-        localCameraTrack: null,
-        localMicrophoneTrack: null,
+    const volume = useVolumeLevel(localMicrophoneTrack);
+
+    // ── Publish / unpublish（竞态安全）────────────────────────────────────
+    useAgoraTrack({
+        track: localMicrophoneTrack,
+        shouldPublish: isMicOn && !isDeafen,
+        isConnected,
+        client: agoraClient,
+        name: "mic",
     });
 
-    useEffect(() => {
-        trackRef.current = {
-            screenTrack,
-            localCameraTrack,
-            localMicrophoneTrack,
-        };
-    }, [screenTrack, localCameraTrack, localMicrophoneTrack]);
+    useAgoraTrack({
+        track: localCameraTrack,
+        shouldPublish: isCameraOn,
+        isConnected,
+        client: agoraClient,
+        name: "camera",
+    });
 
-    // Reflect actual screen sharing active state when a local screen track appears/disappears.
-    // Only mark active when a track exists AND the UI requested sharing, otherwise treat as inactive.
+    useAgoraTrack({
+        track: screenTrack,
+        shouldPublish: isScreenSharingOn,
+        isConnected,
+        client: agoraClient,
+        name: "screen",
+    });
+
+    // ── Screen share active state ─────────────────────────────────────────
     useEffect(() => {
-        try {
-            dispatch(setIsScreenSharingActive(Boolean(screenTrack) && Boolean(isScreenSharingOn)));
-        } catch (e) {
-            // ignore
-        }
+        dispatch(setIsScreenSharingActive(Boolean(screenTrack) && Boolean(isScreenSharingOn)));
     }, [dispatch, screenTrack, isScreenSharingOn]);
 
-    // If the UI requested screen sharing but no screenTrack appears within a short timeout,
-    // roll back the request so UI doesn't remain in 'on' state when sharing failed/was denied.
+    // screen share 请求超时回退
+    const screenTrackRef = useRef(screenTrack);
     useEffect(() => {
-        if (!isScreenSharingOn) return undefined;
-        if (screenTrack) return undefined; // already active
+        screenTrackRef.current = screenTrack;
+    }, [screenTrack]);
 
+    useEffect(() => {
+        if (!isScreenSharingOn || screenTrack) return;
         const timer = setTimeout(() => {
-            // still no track -> revert the request
-            if (!screenTrack) {
-                try {
-                    dispatch(setIsScreenSharingOn(false));
-                } catch (e) {
-                    // ignore
-                }
-            }
+            if (!screenTrackRef.current) dispatch(setIsScreenSharingOn(false));
         }, 3000);
-
         return () => clearTimeout(timer);
     }, [dispatch, isScreenSharingOn, screenTrack]);
 
-    const publishedTracks = [
-        isMicOn && !isDeafen ? localMicrophoneTrack : null,
-        isCameraOn ? localCameraTrack : null,
-        isScreenSharingOn ? screenTrack : null,
-    ].filter(Boolean);
-    usePublish(publishedTracks);
-
     useEffect(() => {
-        if (localCameraTrack?.setEnabled) {
-            localCameraTrack.setEnabled(isCameraOn);
-        }
-    }, [localCameraTrack, isCameraOn]);
+        if (!screenTrack) return;
 
-    useEffect(() => {
-        if (localMicrophoneTrack?.setEnabled) {
-            localMicrophoneTrack.setEnabled(isMicOn && !isDeafen);
-        }
-    }, [localMicrophoneTrack, isMicOn, isDeafen]);
+        const handleTrackEnded = () => {
+            dispatch(setIsScreenSharingOn(false));
+            dispatch(setIsScreenSharingActive(false));
+        };
 
+        screenTrack.on("track-ended", handleTrackEnded);
+
+        return () => {
+            screenTrack.off("track-ended", handleTrackEnded);
+        };
+    }, [screenTrack, dispatch]);
+
+    // ── Redux sync ────────────────────────────────────────────────────────
     useEffect(() => {
-        dispatch(setIsVoiceChatConnected(Boolean(isConnected)));
+        dispatch(setIsVoiceChatConnected(isConnected));
     }, [dispatch, isConnected]);
 
     useEffect(() => {
@@ -144,30 +139,31 @@ export default function useAgora() {
         dispatch(setIsVoiceChatLoading(isLoading));
     }, [dispatch, isLoading]);
 
+    // ── Token renewal ─────────────────────────────────────────────────────
     useClientEvent(agoraClient, "token-privilege-will-expire", async () => {
         if (AgoraConfig.serverUrl && currVoiceChannel?.name) {
             try {
                 const token = await fetchRTCToken(AgoraConfig, currVoiceChannel.name);
                 if (token) {
                     dispatch(setAgoraConfig({ ...agoraConfig, token }));
-                    return agoraClient.renewToken(token);
+                    agoraClient.renewToken(token);
                 }
-            } catch (error) {
-                // Token renewal failed, connection may be interrupted.
-            }
-        }
-    });
-
-    useEffect(() => {
-        if (!isScreenSharingOn) {
-            trackRef.current.screenTrack?.close();
-            try {
-                dispatch(setIsScreenSharingActive(false));
             } catch (e) {
                 // ignore
             }
         }
-    }, [isScreenSharingOn, dispatch]);
+    });
+
+    // ── Cleanup on unmount ────────────────────────────────────────────────
+    const trackRef = useRef({
+        screenTrack: null,
+        localCameraTrack: null,
+        localMicrophoneTrack: null,
+    });
+
+    useEffect(() => {
+        trackRef.current = { screenTrack, localCameraTrack, localMicrophoneTrack };
+    }, [screenTrack, localCameraTrack, localMicrophoneTrack]);
 
     useEffect(() => {
         return () => {
@@ -181,7 +177,6 @@ export default function useAgora() {
         localMicrophoneTrack,
         localCameraTrack,
         screenTrack,
-        remoteUsers,
         volume,
         isLoading,
         deviceLoading: isLoadingMic || isLoadingCam,

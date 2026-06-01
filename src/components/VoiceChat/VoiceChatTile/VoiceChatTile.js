@@ -17,6 +17,12 @@ function VoiceChatTile({
     const videoRef = useRef(null);
 
     useEffect(() => {
+        console.log("[Tile] videoTrack:", videoTrack);
+        console.log("[Tile] hasVideo:", hasVideo);
+        console.log("[Tile] videoRef.current:", videoRef.current);
+    }, [videoTrack, hasVideo]);
+
+    useEffect(() => {
         if (!videoTrack || !videoRef.current) {
             // clear any previous video element
             if (videoRef.current) videoRef.current.innerHTML = "";

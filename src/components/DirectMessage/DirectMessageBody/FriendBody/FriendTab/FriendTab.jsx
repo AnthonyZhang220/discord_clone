@@ -30,7 +30,6 @@ export default function FriendTab({
 
     return (
         <>
-            <hr className="friend-divider" />
             <div className="friend-list-item" data-id={id}>
                 <div className="friend-list-row">
                     <button type="button" className="sidebar-item" onClick={handlePrimaryClick}>
