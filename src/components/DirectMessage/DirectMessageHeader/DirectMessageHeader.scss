@@ -1,48 +1,34 @@
+@use "../../../styles/headers" as headers;
+
 .friend-main-header {
-    flex: 0 0 57px;
+    @include headers.app-header-shell;
     padding: 0 20px 0 20px;
-    background: $menu-bg;
-    border-bottom: 1px solid color.adjust($menu-bg, $lightness: -2.5%);
-    align-items: center;
-    box-shadow:
-        0 1px 0 color.adjust($channels-bg, $lightness: -4.1%),
-        inset 0 -1px 0 rgba(#000, 0.1);
-    transition: background 0.15s ease;
+    background: var(--menu-bg);
+    @include headers.app-header-borders;
+    @include transition(background, 0.15s, ease);
 
     position: relative;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
     align-items: center;
     min-width: 0;
     width: 100%;
-    -webkit-box-flex: 0;
-    -ms-flex: 0 0 auto;
     // flex: 0 0 auto;
     // height: 48px;
     // padding: 0 8px;
-    font-size: 16px;
+    font-size: var(--font-size-lg);
     line-height: 20px;
     cursor: default;
 
     .friend-main-header-name {
         position: relative;
-        -webkit-box-flex: 1;
-        -ms-flex: 1 1 auto;
         flex: 1 1 auto;
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -webkit-box-align: center;
-        -ms-flex-align: center;
         align-items: center;
         min-width: 0;
         overflow: hidden;
 
         .friend-main-header-text {
-            font-size: 1.2rem;
+            font-size: var(--font-size-xl);
             font-weight: 300;
         }
 
@@ -66,26 +52,40 @@
         }
 
         .friend-main-header-button {
+            border: none;
+            background: transparent;
+            color: var(--body-color);
+            cursor: pointer;
+            padding: 6px 10px;
+            font: inherit;
+
             &:hover {
-                background-color: color.adjust(#3e4046, $lightness: -10%);
+                background-color: var(--dc-bg-modifier-active);
                 border-radius: 4px;
             }
 
             &.active {
-                background-color: color.adjust($body-color, $lightness: -60%);
+                background-color: var(--background-secondary);
             }
         }
 
+        .button-stack {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
         .addfriend-button {
-            background-color: $success-color;
-            color: $body-color;
+            background-color: var(--success);
+            color: var(--body-color);
 
             &:hover {
-                background-color: color.adjust($body-color, $lightness: -40%);
+                opacity: 0.92;
                 border-radius: 4px;
             }
             &.active {
-                background-color: color.adjust($success-color, $lightness: -10%);
+                opacity: 0.88;
             }
         }
     }
@@ -93,25 +93,47 @@
     .friend-main-header-feature {
         margin-left: auto;
 
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -webkit-box-align: center;
-        -ms-flex-align: center;
         align-items: center;
 
-        -webkit-box-flex: 0;
-        -ms-flex: 0 0 auto;
         flex: 0 0 auto;
         min-width: 0;
         .friend-main-header-feature-icon {
             position: relative;
             height: 24px;
             width: auto;
-            -webkit-box-flex: 0;
-            -ms-flex: 0 0 auto;
             flex: 0 0 auto;
             margin: 0 8px;
+
+            .inbox-icon-button {
+                border: none;
+                background: transparent;
+                color: inherit;
+                padding: 0;
+                margin: 0;
+                cursor: pointer;
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .inbox-count-badge {
+                position: absolute;
+                top: -7px;
+                right: -8px;
+                min-width: 16px;
+                height: 16px;
+                padding: 0 4px;
+                border-radius: 999px;
+                background: var(--status-dnd);
+                color: var(--dc-white);
+                font-size: 10px;
+                line-height: 16px;
+                text-align: center;
+                font-weight: 700;
+                box-sizing: border-box;
+            }
         }
     }
 }

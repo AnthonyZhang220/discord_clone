@@ -10,7 +10,7 @@ const chatListSlice = createSlice({
     },
     reducers: {
         setDirectMessageList: (state, action) => {
-            state.draftDirectMessage = action.payload;
+            state.directMessageList = action.payload;
         },
         setMessageList: (state, action) => {
             state.messageList = action.payload;

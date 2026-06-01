@@ -1,106 +1,105 @@
 import React, { useState } from "react";
-import { Typography, FormControl, InputAdornment, InputBase, Divider } from "@mui/material";
 import FriendActive from "@/components/DirectMessage/DirectMessageBody/FriendBody/FriendActive/FriendActive";
-import SearchIcon from "@mui/icons-material/Search";
-import styled from "@emotion/styled";
 import { useSelector } from "react-redux";
-import { LoadingButton } from "@mui/lab";
 import { handleSearchFriend } from "@/handlers/searchHandlers";
-import { debounce } from "@/handlers/searchHandlers";
+import { ADD_FRIEND_DEBOUNCE } from "@/config/searchConfig";
+import SearchBox from "@/components/Search/SearchBox";
 import FriendTab from "@/components/DirectMessage/DirectMessageBody/FriendBody/FriendTab/FriendTab";
+import { sendFriendRequest } from "@/handlers/friendHandlers";
 import "./AddFriend.scss";
-
-const BootstrapInput = styled(InputBase)(({ theme }) => ({
-    "label + &": {
-        marginTop: theme.spacing(3),
-    },
-    "& input": {
-        borderRadius: 4,
-        position: "relative",
-        backgroundColor: theme.palette.background.paper,
-        border: "none",
-        fontSize: 16,
-        padding: "10px 12px",
-        color: theme.palette.text.primary,
-    },
-}));
 
 export default function AddFriend({ noActive }) {
     const { user } = useSelector((state) => state.auth);
-    const { friendList, queryFriendList } = useSelector((state) => state.directMessage);
-    const [loading, setLoading] = useState(false);
+    const { friendList, queryFriendList, pendingOutgoingList, blockedIdList, friendIdList } =
+        useSelector((state) => state.directMessage);
+    const { isLoading } = useSelector((state) => state.load);
+    const [copyLoading, setCopyLoading] = useState(false);
     const [copyed, setCopyed] = React.useState(false);
+    const [searchValue, setSearchValue] = useState("");
+    const hasSearched = String(searchValue || "").trim().length >= 2;
     const copyToClip = () => {
-        setLoading(true);
+        setCopyLoading(true);
         navigator.clipboard.writeText(user.id).then(() => {
-            setLoading(false);
+            setCopyLoading(false);
             setCopyed(true);
         });
     };
+
+    // stable debounced search function handled by SearchBox
     return (
         <div className="content">
             <main className="add-friend-content">
                 <div className="add-friend-title">
-                    <Typography variant="h4">ADD FRIEND</Typography>
+                    <h4>ADD FRIEND</h4>
                 </div>
                 <div className="add-friend-subtitle">
-                    <Typography variant="body2">
-                        You can add a friend with their unique ID.
-                    </Typography>
+                    <span>You can add a friend with their unique ID.</span>
                 </div>
-                <form className="add-friend-search-form" onSubmit={(e) => e.preventDefault()}>
-                    <div className="add-friend-search-inner">
-                        <input
-                            className="add-friend-search-input"
-                            type="search"
-                            name="search"
-                            placeholder="Enter unique friend ID or their username"
-                            onChange={(e) => debounce(handleSearchFriend(e), 5000)}
-                            autoComplete="off"
-                        />
-                        <SearchIcon />
-                    </div>
-                </form>
-                <Divider variant="middle"></Divider>
-                <form className="self-id-container">
-                    <FormControl variant="standard" fullWidth>
-                        <Typography variant="h4">Your Unique ID:</Typography>
-                        <BootstrapInput
-                            id="name"
-                            name="name"
-                            variant="outlined"
-                            autoComplete="off"
-                            defaultValue={user.id}
-                            readOnly
-                            className="bootstrap-input-mt"
-                            endAdornment={
-                                <InputAdornment position="end">
-                                    <LoadingButton
-                                        onClick={() => copyToClip()}
-                                        loading={loading}
-                                        variant="contained"
-                                    >
-                                        {copyed ? <span>Copied!</span> : <span>Copy</span>}
-                                    </LoadingButton>
-                                </InputAdornment>
-                            }
-                        />
-                    </FormControl>
-                </form>
-                <Divider variant="middle"></Divider>
-                <div>
-                    {queryFriendList?.map(({ displayName, status, avatar, id }) => (
-                        <FriendTab
-                            displayName={displayName}
-                            avatar={avatar}
-                            id={id}
-                            status={status}
-                            key={id}
-                        />
-                    ))}
+                <div className="add-friend-search-form">
+                    <SearchBox
+                        placeholder="Enter unique friend ID or their username"
+                        onSearch={handleSearchFriend}
+                        onChangeValue={setSearchValue}
+                        debounceMs={ADD_FRIEND_DEBOUNCE}
+                    />
+                </div>
+                <hr className="divider" />
+                <div className="self-id-container">
+                    <span>Your Unique ID:</span>
+                    <input
+                        className="bootstrap-input-base bootstrap-input-mt"
+                        id="name"
+                        name="name"
+                        autoComplete="off"
+                        defaultValue={user.id}
+                        readOnly
+                    />
+                    <button
+                        type="button"
+                        className="copy-button"
+                        onClick={() => copyToClip()}
+                        disabled={copyLoading}
+                    >
+                        {copyed ? <span>Copied!</span> : <span>Copy</span>}
+                    </button>
+                </div>
+                <hr className="divider" />
+                <div className="add-friend-results">
+                    {queryFriendList && queryFriendList.length > 0 ? (
+                        queryFriendList.map(({ displayName, status, avatar, id }) => {
+                            const isSelf = user?.id === id;
+                            const isFriend = friendIdList.includes(id);
+                            const isBlocked = blockedIdList.includes(id);
+                            const isPending = pendingOutgoingList.some(
+                                (request) => request.toUserId === id
+                            );
+                            const disableAdd = isSelf || isFriend || isBlocked || isPending;
+
+                            let relationStatus = status;
+                            if (isSelf) relationStatus = "you";
+                            else if (isFriend) relationStatus = "already friends";
+                            else if (isBlocked) relationStatus = "blocked";
+                            else if (isPending) relationStatus = "pending";
+
+                            return (
+                                <FriendTab
+                                    displayName={displayName}
+                                    avatar={avatar}
+                                    id={id}
+                                    status={relationStatus}
+                                    key={id}
+                                    actionType="search"
+                                    disableAdd={disableAdd}
+                                    onAdd={() => sendFriendRequest({ id, displayName, avatar })}
+                                />
+                            );
+                        })
+                    ) : hasSearched && !isLoading ? (
+                        <div className="no-search-results">无搜索结果</div>
+                    ) : null}
                 </div>
             </main>
-            <FriendActive firendList={friendList} noActive={noActive} />
+            <FriendActive friendList={friendList} noActive={noActive} />
         </div>
     );
 }

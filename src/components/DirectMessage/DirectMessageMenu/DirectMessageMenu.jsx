@@ -1,20 +1,21 @@
-import React, { useEffect, Fragment } from "react";
-
-import { Typography, SvgIcon, ListItem, ListItemButton, ListItemText } from "@mui/material";
+import React, { useEffect, Fragment, useState } from "react";
 
 import AddIcon from "@mui/icons-material/Add";
-import UserFooter from "@/components/Channel/UserFooter/UserFooter";
+import UserFooter from "@/components/AccountTray/AccountTray";
 import FriendIcon from "@/components/DirectMessage/DirectMessageBody/FriendBody/friend.svg";
-import { FunctionTooltip } from "@/components/CustomUIComponents";
+import { Tooltip } from "@/components/compat/RadixCompat";
 
 import { onSnapshot, query, collection, where } from "firebase/firestore";
 import { db } from "@/firebase";
 import { useDispatch, useSelector } from "react-redux";
+import SearchBox from "@/components/Search/SearchBox";
+import { FRIEND_LIST_DEBOUNCE } from "@/config/searchConfig";
 import {
     setIsFriendListPageOpen,
     setDirectMessageChannelList,
     setDirectMessageChannelRefs,
 } from "@/redux/features/directMessageSlice";
+import { getDirectMessageStore, setDirectMessageStore } from "@/utils/directMessageStore";
 import { DirectMessageList } from "./DirectMessageList/DirectMessageList";
 import "./DirectMessageMenu.scss";
 
@@ -25,96 +26,116 @@ function DirectMessageMenu() {
         useSelector((state) => state.directMessage);
 
     useEffect(() => {
-        if (user.id) {
-            const q = query(
-                collection(db, "privatechannels"),
-                where("memberRef", "array-contains", user.id)
-            );
-            let data = {};
-            onSnapshot(q, (QuerySnapshot) => {
-                QuerySnapshot.forEach((doc) => {
-                    const userRef = doc.data().memberRef;
-                    const channelRef = doc.id;
-                    const firstUser = userRef[0];
-                    const secondUser = userRef[1];
-                    if (firstUser === user.id) {
-                        data[secondUser] = channelRef;
-                    } else if (secondUser === user.id) {
-                        data[firstUser] = channelRef;
-                    }
-                });
-                dispatch(setDirectMessageChannelRefs(data));
+        const stored = getDirectMessageStore();
+        dispatch(setIsFriendListPageOpen(Boolean(stored.isFriendListPageOpen)));
+    }, [dispatch]);
+
+    useEffect(() => {
+        if (!user.id) return undefined;
+
+        const q = query(
+            collection(db, "privatechannels"),
+            where("memberRef", "array-contains", user.id)
+        );
+        const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+            const pairs = new Map();
+
+            QuerySnapshot.forEach((doc) => {
+                const userRef = doc.data().memberRef;
+                const channelRef = doc.id;
+                const firstUser = userRef[0];
+                const secondUser = userRef[1];
+                if (firstUser === user.id) {
+                    pairs.set(secondUser, channelRef);
+                } else if (secondUser === user.id) {
+                    pairs.set(firstUser, channelRef);
+                }
             });
-        }
+
+            const nextRefs = Object.fromEntries(pairs);
+            dispatch(setDirectMessageChannelRefs(nextRefs));
+        });
+
+        return () => {
+            unsubscribe();
+        };
     }, [user.id, dispatch]);
 
     const refsCount = Object.keys(directMessageChannelRefs).length;
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
-        if (refsCount) {
-            let userArr = [];
-            for (const key in directMessageChannelRefs) {
-                userArr.push(key);
-            }
-            const q = query(collection(db, "users"), where("id", "in", userArr));
-            onSnapshot(q, (QuerySnapshot) => {
-                let dmList = [];
-                QuerySnapshot.forEach((doc) => {
-                    dmList.push(doc.data());
-                });
-                dispatch(setDirectMessageChannelList(dmList));
-            });
+        if (!refsCount) {
+            dispatch(setDirectMessageChannelList([]));
+            return undefined;
         }
+
+        const userArr = Object.keys(directMessageChannelRefs);
+        const q = query(collection(db, "users"), where("id", "in", userArr));
+        const unsubscribe = onSnapshot(q, (QuerySnapshot) => {
+            const dmList = [];
+            QuerySnapshot.forEach((doc) => {
+                dmList.push(doc.data());
+            });
+            dispatch(setDirectMessageChannelList(dmList));
+        });
+
+        return () => {
+            unsubscribe();
+        };
     }, [refsCount, directMessageChannelRefs, dispatch]);
 
     return (
         <aside className="friend-container">
             <header className="friend-header focusable">
-                <input
+                <SearchBox
                     placeholder="Find or start a conversation"
-                    required={true}
-                    name="search"
-                    className="form-style"
-                    autoComplete="off"
+                    onSearch={(v) => setSearch(v)}
+                    debounceMs={FRIEND_LIST_DEBOUNCE}
+                    noResultsText={null}
                 />
             </header>
             <section className="friend-menu-container">
-                <ListItem disablePadding>
-                    <ListItemButton
-                        className={`friend-menu-open ${isFriendListPageOpen ? "friend-menu-open--active" : ""}`}
-                        onClick={() => dispatch(setIsFriendListPageOpen(true))}
+                <div className={`friend-menu-item ${isFriendListPageOpen ? "active" : ""}`}>
+                    <button
+                        type="button"
+                        className="friend-menu-open"
+                        onClick={() => {
+                            dispatch(setIsFriendListPageOpen(true));
+                            setDirectMessageStore({
+                                isFriendListPageOpen: true,
+                                selectedDirectMessageUserId: "",
+                            });
+                        }}
                     >
-                        <SvgIcon edge="start" component={FriendIcon} className="friend-menu-icon" />
-                        <ListItemText primary="Friends" />
-                    </ListItemButton>
-                </ListItem>
+                        <FriendIcon className="friend-menu-icon" aria-hidden="true" />
+                        <div className="friend-menu-item-text">Friends</div>
+                    </button>
+                </div>
                 <header className="friend-menu-header focusable">
-                    <div>
-                        <Typography component="h6" variant="h6">
-                            Direct Messages
-                        </Typography>
-                    </div>
+                    <span>Direct Messages</span>
                     <div className="friend-menu-right">
-                        <FunctionTooltip
+                        <Tooltip
                             title={
                                 <Fragment>
-                                    <Typography
-                                        variant="body1"
-                                        className="friend-menu-tooltip-text"
-                                    >
-                                        Create DM
-                                    </Typography>
+                                    <span className="friend-menu-tooltip-text">Create DM</span>
                                 </Fragment>
                             }
                             placement="top"
                         >
                             <AddIcon />
-                        </FunctionTooltip>
+                        </Tooltip>
                     </div>
                 </header>
-                <ul className="friend-menu-conversation">
-                    {directMessageChannelList?.map(
-                        ({ displayName, avatar, id, status, createdAt }) => (
+                <ul className="friend-menu-conversation channel-list-text">
+                    {directMessageChannelList
+                        ?.filter((u) => {
+                            if (!search) return true;
+                            return String(u.displayName || "")
+                                .toLowerCase()
+                                .includes(search.toLowerCase());
+                        })
+                        .map(({ displayName, avatar, id, status, createdAt }) => (
                             <DirectMessageList
                                 key={id}
                                 id={id}
@@ -123,8 +144,7 @@ function DirectMessageMenu() {
                                 status={status}
                                 createdAt={createdAt}
                             />
-                        )
-                    )}
+                        ))}
                 </ul>
             </section>
             <UserFooter />

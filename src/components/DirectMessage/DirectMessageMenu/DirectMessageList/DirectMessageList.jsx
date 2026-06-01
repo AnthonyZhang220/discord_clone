@@ -1,15 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import {
-    ListItem,
-    ListItemButton,
-    ListItemText,
-    ListItemAvatar,
-    Badge,
-    Avatar,
-} from "@mui/material";
+import AvatarWithStatus from "@/components/AvatarWithStatus/AvatarWithStatus";
 import { handleCurrDirectMessageChannel } from "@/handlers/channelHandlers";
-import StatusList from "@/components/StatusList";
 import "./DirectMessageList.scss";
 
 export const DirectMessageList = ({ id, status, displayName, avatar, createdAt }) => {
@@ -17,24 +9,27 @@ export const DirectMessageList = ({ id, status, displayName, avatar, createdAt }
         (state) => state.directMessage
     );
     return (
-        <ListItem disablePadding className="friend-conversation-item">
-            <ListItemButton
+        <li
+            key={id}
+            id={id}
+            className={`channel-list-item ${!isFriendListPageOpen && currDirectMessageChannel.id == id ? "active" : ""}`}
+        >
+            <button
+                type="button"
                 onClick={() =>
                     handleCurrDirectMessageChannel(id, status, displayName, avatar, createdAt)
                 }
-                className={`friend-list-button ${!isFriendListPageOpen && currDirectMessageChannel.id == id ? "friend-list-button--active" : ""}`}
+                className={`sidebar-item ${!isFriendListPageOpen && currDirectMessageChannel.id == id ? "active" : ""}`}
             >
-                <ListItemAvatar className="friend-list-avatar">
-                    <Badge
-                        overlap="circular"
-                        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                        badgeContent={<StatusList status={status} size={12} />}
-                    >
-                        <Avatar alt={displayName} src={avatar} className="friend-avatar" />
-                    </Badge>
-                </ListItemAvatar>
-                <ListItemText primary={displayName} />
-            </ListItemButton>
-        </ListItem>
+                <AvatarWithStatus
+                    containerClassName="friend-list-avatar"
+                    avatarClassName="friend-avatar"
+                    alt={displayName}
+                    src={avatar}
+                    status={status}
+                />
+                <span className="channel-name">{displayName}</span>
+            </button>
+        </li>
     );
 };

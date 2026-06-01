@@ -1,36 +1,180 @@
-.userSidebar-container {
+.us-container {
     position: relative;
     width: 340px;
     height: 100%;
-    background-color: $channels-bg;
+    background: var(--chat-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
 
-    .userSidebar-memberlist-wrapper {
-        -webkit-box-pack: center;
-        -ms-flex-pack: center;
-        justify-content: center;
-        position: relative;
-        max-height: 100%;
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
+// ── Scrollable body ────────────────────────────────────────────────────────
 
-        .userSidebar-memberlist {
-            width: 340px;
-            padding: 0 12px 12px;
-            -webkit-box-flex: 0;
-            -ms-flex: 0 0 auto;
-            flex: 0 0 auto;
-            height: auto;
-        }
+.us-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.08) transparent;
+}
+
+// ── Banner ─────────────────────────────────────────────────────────────────
+
+.us-banner {
+    height: 100px;
+    width: 100%;
+    background: var(--dc-brand-color);
+    flex-shrink: 0;
+}
+
+// ── Avatar ─────────────────────────────────────────────────────────────────
+
+.us-avatar-wrap {
+    padding: 0 16px;
+    margin-top: -40px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+}
+
+.us-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 6px solid var(--channels-bg);
+    flex-shrink: 0;
+    overflow: visible;
+}
+
+.us-avatar-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: block;
+}
+
+// ── Identity ───────────────────────────────────────────────────────────────
+
+.us-identity {
+    padding: 0 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.us-display-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--body-color, #fff);
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+.us-tag {
+    font-size: 13px;
+    color: var(--text-muted, #949ba4);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
+}
+
+.us-dot {
+    color: var(--text-muted, #949ba4);
+}
+
+// ── Divider ────────────────────────────────────────────────────────────────
+
+.us-divider {
+    height: 1px;
+    margin: 4px 0;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+// ── Card (Bio + Member Since) ──────────────────────────────────────────────
+
+.us-card {
+    margin: 8px 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.us-card-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--body-color, #dbdee1);
+    margin-bottom: 4px;
+    letter-spacing: 0.01em;
+}
+
+.us-card-text {
+    font-size: 13px;
+    color: var(--text-muted, #949ba4);
+    line-height: 1.5;
+}
+
+.us-bio {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+// ── Row buttons (Mutual Servers / Friends) ─────────────────────────────────
+
+.us-row-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: var(--body-color, #dbdee1);
+    cursor: pointer;
+    font: inherit;
+    transition: background 0.1s;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.04);
     }
+}
 
-    .userSidebar-aside {
-        width: 100%;
-        transition: background-color 0.1s;
-    }
+.us-row-label {
+    font-size: 14px;
+    font-weight: 500;
+}
 
-    .userSidebar-avatar {
-        width: 80px;
-        height: 80px;
+.us-row-chevron {
+    font-size: var(--font-size-lg);
+    color: var(--text-muted, #949ba4);
+    flex-shrink: 0;
+}
+
+// ── Footer ─────────────────────────────────────────────────────────────────
+
+.us-footer {
+    flex-shrink: 0;
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--chat-bg);
+}
+
+.us-footer-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: var(--body-color, #dbdee1);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    font: inherit;
+    transition: background 0.1s;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.06);
     }
 }

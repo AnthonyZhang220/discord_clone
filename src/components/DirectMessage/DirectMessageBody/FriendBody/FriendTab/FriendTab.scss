@@ -1,28 +1,126 @@
-.friend-list-item {
-    opacity: 1;
+@use "../../../../../styles/sidebar-list" as sidebar;
 
-    .friend-list-item-button {
-        // background: #3d3f44;
-        -webkit-box-shadow: none;
-        box-shadow: none;
-        border-radius: 8px;
-        border-color: transparent;
+.friend-list-item {
+    @include sidebar.sidebar-list-item;
+    margin: 0;
+    padding: 0;
+
+    .friend-list-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+    }
+
+    .sidebar-item {
+        @include sidebar.sidebar-list-button;
+        gap: 10px;
+        padding: 6px 8px;
+        display: inline-flex;
+        align-items: center;
+        flex: 1 1 auto;
+    }
+
+    .friend-list-avatar-wrap {
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        margin-right: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .friend-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+    }
+
+    .friend-list-text {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .friend-list-primary {
+            @include sidebar.sidebar-list-name;
+            color: var(--body-color);
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .friend-list-secondary {
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            text-transform: capitalize;
+        }
+    }
+
+    .friend-actions {
+        display: inline-flex;
+        gap: 6px;
+        margin-left: 8px;
+        align-items: center;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+            opacity 0.12s ease,
+            visibility 0.12s ease;
+    }
+
+    .friend-actions.friend-actions-visible {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .friend-action {
+        background: transparent;
+        border: none;
+        color: var(--text-muted);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .friend-action-pill {
+        border: 1px solid var(--dc-divider);
+        background: var(--background-tertiary);
+        color: var(--body-color);
+        border-radius: 6px;
+        padding: 4px 10px;
+        min-height: 28px;
+        font-size: var(--font-size-sm);
+        cursor: pointer;
 
         &:hover {
-            background-color: color.adjust($chat-bg, $lightness: 5%);
-            border-radius: 8px;
+            background: var(--background-secondary-alt);
+        }
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    }
+
+    &:hover,
+    &:focus-within {
+        background: rgba(255, 255, 255, 0.06);
+
+        .friend-actions {
+            opacity: 0.85;
+            visibility: visible;
         }
     }
 
     .friend-divider {
-        background-color: #3d3f44;
-    }
-
-    .action-box {
-        margin: 0.5rem;
-    }
-
-    .tooltip-text {
-        margin: 0.5rem;
+        height: 1px;
+        border: none;
+        background: var(--divider-secondary);
+        margin: 6px 0;
     }
 }

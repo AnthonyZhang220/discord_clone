@@ -1,20 +1,17 @@
+@use "../../../styles/containers";
+@use "../../../styles/sidebar-list" as sidebar;
+@use "../../../styles/headers" as headers;
+
 .friend-container {
-    background: $channels-bg;
-    display: flex;
-    flex-direction: column;
-    flex: 0 0 240px;
+    @extend %sidebar-base;
 
     .friend-header {
         cursor: pointer;
-        display: flex;
-        align-items: center;
-        flex: 0 0 56px;
+        @include headers.app-header-shell;
         padding: 0 10px 0 10px;
-        box-shadow:
-            0 1px 0 color.adjust($channels-bg, $lightness: -4.1%),
-            inset 0 -1px 0 rgba(#000, 0.1);
-        transition: background 0.15s ease;
-        border-radius: 8px;
+        @include headers.app-header-borders;
+        @include transition(background, 0.15s, ease);
+        border-radius: 0;
 
         .form-style {
             position: relative;
@@ -22,74 +19,50 @@
             padding: 5px;
             width: 100%;
             font-weight: normal;
-            font-size: 16px;
+            font-size: var(--font-size-lg);
             line-height: 22px;
             letter-spacing: 0.5px;
-            color: color.adjust($body-color, $lightness: 10%);
-            background-color: $servers-bg;
-            border: 1px solid color.adjust($servers-bg, $lightness: -8%);
-            border-radius: 3px;
-            outline: none;
-            -webkit-transition: all 200ms linear;
-            transition: border-color 0.2s ease-in-out;
-        }
-
-        .friend-header-dropdown {
-            width: 18px;
-            height: 18px;
-            margin-left: auto;
-
-            // use {
-            // 	stroke-dasharray: 7;
-            // 	transform-origin: 50%;
-            // 	transition: stroke-dasharray 0.2s ease, transform 0.2s ease;
-            // }
-        }
-
-        // &:focus use {
-        // 	stroke-dasharray: 14;
-        // 	transform: rotate(-90deg);
-        // }
-
-        .friend-header-name {
-            font-size: 1rem;
-            font-weight: 500;
+            color: var(--text-muted);
+            background-color: var(--servers-bg);
+            border: 1px solid var(--dc-divider);
         }
     }
 
     .friend-menu-container {
-        flex: 1 1;
-        overflow-y: auto;
-        padding: 0 10px;
+        @include sidebar.sidebar-list-container;
 
-        ul {
-            list-style: none;
-        }
-        .friend-menu-open {
-            &:hover {
-                background-color: color.adjust($body-color, $lightness: -60%);
-                border-radius: 4px;
+        .friend-menu-item {
+            @include sidebar.sidebar-list-item;
+            margin: 0 0 6px 0;
+
+            .friend-menu-open {
+                @include sidebar.sidebar-list-button;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                width: 100%;
+                padding: 8px 10px;
+                border-radius: 6px;
             }
-            &--active {
-                background-color: $server-bg-active;
+
+            &:hover {
+                background: rgba(255, 255, 255, 0.06);
+            }
+
+            &.active {
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .friend-menu-icon {
+                margin-right: 8px;
             }
         }
 
         .friend-menu-header {
-            cursor: pointer;
-            text-transform: uppercase;
-            color: rgba($body-color, 0.3);
-            font-size: 0.87rem;
-            letter-spacing: 0.04rem;
-            transition: color 0.2s linear;
-            line-height: 30px;
-            position: relative;
-            display: flex;
-            margin: 20px 10px 0px 10px;
+            @include sidebar.sidebar-list-header;
 
             .friend-menu-right {
                 margin-left: auto;
-                font-size: 12px;
             }
 
             .friend-menu-icon {
@@ -99,30 +72,13 @@
             .friend-menu-tooltip-text {
                 margin: 0.5rem 0;
             }
-
-            &:hover,
-            &:focus {
-                color: $body-color;
-
-                &::after {
-                    opacity: 1;
-                }
-            }
         }
 
         .friend-menu-conversation {
-            margin-top: 10px;
-            font-weight: 500;
-            font-size: 16px;
-            line-height: 20px;
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-            max-width: 224px;
-            display: block;
-            border-radius: 4px;
-            -webkit-transition: none;
-            transition: none;
+            margin: 10px 0 0;
+            padding: 0;
+            width: 100%;
+            list-style: none;
         }
     }
 }

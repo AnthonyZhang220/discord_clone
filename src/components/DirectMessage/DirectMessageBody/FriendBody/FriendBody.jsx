@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import FriendActive from "./FriendActive/FriendActive";
 import FriendList from "./FriendList/FriendList";
-import SearchIcon from "@mui/icons-material/Search";
-
 import AddFriend from "./AddFriend/AddFriend";
 import { useSelector } from "react-redux";
 import { handleSearchFriend } from "@/handlers/searchHandlers";
+import { FRIEND_LIST_DEBOUNCE } from "@/config/searchConfig";
+import SearchBox from "@/components/Search/SearchBox";
 import "./FriendBody.scss";
 
 export default function FriendBody() {
@@ -20,17 +20,12 @@ export default function FriendBody() {
                 <div className="content">
                     <main className="friend-main-content">
                         <div className="friend-search-form">
-                            <form className="friend-search-inner">
-                                <input
-                                    className="friend-search-input"
-                                    type="search"
-                                    name="search"
-                                    placeholder="Search"
-                                    onChange={(e) => handleSearchFriend(e)}
-                                    autoComplete="off"
-                                />
-                                <SearchIcon />
-                            </form>
+                            <SearchBox
+                                placeholder="Search"
+                                onSearch={handleSearchFriend}
+                                debounceMs={FRIEND_LIST_DEBOUNCE}
+                                noResultsText={null}
+                            />
                         </div>
                         <div className="friendListWrapper">
                             <div className="scroller">

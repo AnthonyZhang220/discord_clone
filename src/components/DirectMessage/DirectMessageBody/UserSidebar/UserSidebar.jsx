@@ -1,86 +1,99 @@
 import React from "react";
-import ListItem from "@mui/material/ListItem";
-import ListItemText from "@mui/material/ListItemText";
-import Avatar from "@mui/material/Avatar";
-import { Badge, Divider } from "@mui/material";
-import { MenuListItemButton } from "@/components/CustomUIComponents";
-import StatusList from "@/components/StatusList";
-
+import AvatarWithStatus from "@/components/AvatarWithStatus/AvatarWithStatus";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import "./UserSidebar.scss";
 
 export const UserSidebar = ({ currDirectMessageChannel }) => {
+    const createdAtDate = React.useMemo(() => {
+        const raw = currDirectMessageChannel?.createdAt;
+        if (!raw) return null;
+        if (typeof raw === "number") return new Date(raw * 1000);
+        if (raw.seconds && typeof raw.seconds === "number") return new Date(raw.seconds * 1000);
+        const parsed = new Date(raw);
+        return isNaN(parsed.getTime()) ? null : parsed;
+    }, [currDirectMessageChannel?.createdAt]);
+
+    const u = currDirectMessageChannel;
+
     return (
-        <div className="userSidebar-container">
-            <aside className="userSidebar-memberlist-wrapper userSidebar-aside">
-                <div className="userSidebar-memberlist">
-                    <div>
-                        <div className="userSidebar-detail-top">
-                            <svg className="userSidebar-detail-banner">
-                                <mask id="uid_347">
-                                    <rect></rect>
-                                    <circle></circle>
-                                </mask>
-                                <foreignObject className="userSidebar-detail-object"></foreignObject>
-                            </svg>
-                            <Badge
-                                overlap="circular"
-                                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                                className="userSidebar-detail-avatar"
-                                badgeContent={
-                                    <StatusList status={currDirectMessageChannel.status} />
-                                }
-                            >
-                                <Avatar
-                                    alt={currDirectMessageChannel.displayName}
-                                    className="userSidebar-avatar"
-                                    src={currDirectMessageChannel.avatar}
-                                    imgProps={{ crossOrigin: "Anonymous" }}
-                                />
-                            </Badge>
-                        </div>
-                        <div className="userSidebar-detail-list">
-                            <ListItem dense>
-                                <MenuListItemButton>
-                                    <ListItemText
-                                        primary={currDirectMessageChannel.displayName}
-                                        primaryTypographyProps={{ variant: "h3" }}
-                                    />
-                                </MenuListItemButton>
-                            </ListItem>
-                            <Divider
-                                style={{ backgroundColor: "var(--server-marker-unread)" }}
-                                variant="middle"
-                                light={true}
-                            />
-                            <ListItem dense>
-                                <MenuListItemButton>
-                                    <ListItemText
-                                        primary="MEMBER SINCE"
-                                        primaryTypographyProps={{ variant: "h5" }}
-                                        secondary={new Date(
-                                            currDirectMessageChannel.createdAt?.seconds * 1000
-                                        ).toLocaleDateString("en-US", {
-                                            month: "short",
-                                            day: "2-digit",
-                                            year: "numeric",
-                                        })}
-                                        secondaryTypographyProps={{
-                                            style: {
-                                                color: "white",
-                                            },
-                                        }}
-                                    />
-                                </MenuListItemButton>
-                            </ListItem>
-                            <Divider
-                                style={{ backgroundColor: "var(--server-marker-unread)" }}
-                                variant="middle"
-                                light={true}
-                            />
-                        </div>
-                    </div>
+        <div className="us-container">
+            <div className="us-scroll">
+                {/* ── Banner + Avatar ── */}
+                <div
+                    className="us-banner"
+                    style={{ background: u?.bannerColor ?? "var(--dc-brand-color)" }}
+                />
+                <div className="us-avatar-wrap">
+                    <AvatarWithStatus
+                        containerClassName="us-avatar"
+                        avatarClassName="us-avatar-img"
+                        alt={u?.displayName}
+                        src={u?.avatar}
+                        status={u?.status}
+                        imgProps={{ crossOrigin: "Anonymous" }}
+                        badgeSize={14}
+                    />
                 </div>
-            </aside>
+
+                {/* ── Identity ── */}
+                <div className="us-identity">
+                    <span className="us-display-name">{u?.displayName}</span>
+                    <span className="us-tag">
+                        {u?.username ?? u?.email}
+                        {u?.pronouns && <span className="us-dot"> • {u.pronouns}</span>}
+                    </span>
+                </div>
+
+                <div className="us-divider" />
+
+                {/* ── Bio + Member Since ── */}
+                <div className="us-card">
+                    {u?.bio && (
+                        <>
+                            <div className="us-card-label">Bio</div>
+                            <div className="us-card-text us-bio">{u.bio}</div>
+                        </>
+                    )}
+
+                    {createdAtDate && (
+                        <>
+                            <div className="us-card-label" style={{ marginTop: u?.bio ? 12 : 0 }}>
+                                Member Since
+                            </div>
+                            <div className="us-card-text">
+                                {createdAtDate.toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                })}
+                            </div>
+                        </>
+                    )}
+                </div>
+
+                <div className="us-divider" />
+
+                {/* ── Mutual Servers ── */}
+                <button type="button" className="us-row-button">
+                    <span className="us-row-label">Mutual Servers — {u?.mutualServers ?? 0}</span>
+                    <NavigateNextIcon className="us-row-chevron" />
+                </button>
+
+                <div className="us-divider" />
+
+                {/* ── Mutual Friends ── */}
+                <button type="button" className="us-row-button">
+                    <span className="us-row-label">Mutual Friends — {u?.mutualFriends ?? 0}</span>
+                    <NavigateNextIcon className="us-row-chevron" />
+                </button>
+            </div>
+
+            {/* ── Footer ── */}
+            <div className="us-footer">
+                <button type="button" className="us-footer-btn">
+                    View Full Profile
+                </button>
+            </div>
         </div>
     );
 };

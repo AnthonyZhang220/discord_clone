@@ -6,12 +6,17 @@ const directMessageSlice = createSlice({
         isDirectMessagePageOpen: false,
         currDirectMessageChannel: {},
         currDirectMessageChannelRef: "",
-        friendFilter: "",
+        friendFilter: "online",
         friendList: [],
         friendIdList: [],
+        pendingIncomingList: [],
+        pendingOutgoingList: [],
+        blockedIdList: [],
+        blockedList: [],
+        inboxCount: 0,
         directMessageChannelRefs: {},
         directMessageChannelList: [],
-        isFriendListPageOpen: false,
+        isFriendListPageOpen: true,
         isDirectMessageSidebarOpen: false,
         queryFriendList: [],
     },
@@ -49,10 +54,30 @@ const directMessageSlice = createSlice({
         setQueryFriendList: (state, action) => {
             state.queryFriendList = action.payload;
         },
+        setPendingIncomingList: (state, action) => {
+            state.pendingIncomingList = action.payload;
+        },
+        setPendingOutgoingList: (state, action) => {
+            state.pendingOutgoingList = action.payload;
+        },
+        setBlockedIdList: (state, action) => {
+            state.blockedIdList = action.payload;
+        },
+        setBlockedList: (state, action) => {
+            state.blockedList = action.payload;
+        },
+        setInboxCount: (state, action) => {
+            state.inboxCount = action.payload;
+        },
     },
 });
 
 export const {
+    setInboxCount,
+    setBlockedList,
+    setBlockedIdList,
+    setPendingOutgoingList,
+    setPendingIncomingList,
     setQueryFriendList,
     setFriendIdList,
     setFriendList,

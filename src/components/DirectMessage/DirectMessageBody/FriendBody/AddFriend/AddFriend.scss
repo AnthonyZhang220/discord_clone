@@ -6,7 +6,6 @@
     left: 0;
     right: 0;
     height: 1px;
-    -webkit-box-shadow: var(--elevation-low);
     box-shadow: var(--elevation-low);
     z-index: 1;
     pointer-events: none;
@@ -15,21 +14,10 @@
 .content {
     min-width: 0;
     min-height: 0;
-    -webkit-box-flex: 1;
-    -ms-flex: 1 1 auto;
     flex: 1 1 auto;
-    display: -webkit-box;
-    display: -ms-flexbox;
     display: flex;
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: normal;
-    -ms-flex-direction: row;
     flex-direction: row;
-    -webkit-box-pack: stretch;
-    -ms-flex-pack: stretch;
     justify-content: stretch;
-    -webkit-box-align: stretch;
-    -ms-flex-align: stretch;
     align-items: stretch;
     position: relative;
     color: hsl(240, 2%, 88%);
@@ -37,23 +25,16 @@
     .add-friend-content {
         padding: 20px 30px;
         position: relative;
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        -webkit-box-orient: vertical;
-        -webkit-box-direction: normal;
-        -ms-flex-direction: column;
         flex-direction: column;
         min-width: 0;
         min-height: 0;
-        -webkit-box-flex: 1;
-        -ms-flex: 1 1 auto;
         flex: 1 1 auto;
         background: var(--bg-overlay-chat, var(--background-primary));
 
         .add-friend-title {
             margin-bottom: 8px;
-            font-size: 16px;
+            font-size: var(--font-size-lg);
             line-height: 20px;
             text-transform: uppercase;
 
@@ -61,78 +42,41 @@
         }
 
         .add-friend-subtitle {
-            font-size: 14px;
+            font-size: var(--font-size-md);
             line-height: 20px;
             font-weight: 400;
         }
-    }
 
-    .add-friend-search-form {
-        -webkit-box-flex: 0;
-        -ms-flex: none;
-        flex: none;
-
-        border-radius: 4px;
-        overflow: hidden;
-
-        .add-friend-search-inner {
-            -webkit-box-align: center;
-            -ms-flex-align: center;
-            align-items: center;
-            border: 1px solid $servers-bg;
-            border-radius: 8px;
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            margin-top: 16px;
-            padding: 0 12px;
-            position: relative;
-            -webkit-transition: border-color 0.2s ease-in-out;
-            transition: border-color 0.2s ease-in-out;
-
-            background-color: $servers-bg;
-            color: hsl(240, 2%, 88%);
-
-            &:focus-within {
-                border: 1px solid $primary-color;
-            }
-
-            .add-friend-search-input {
-                background-color: unset;
-
-                font-size: 16px;
-                font-weight: 500;
-                letter-spacing: 0.04em;
-                line-height: 20px;
-                white-space: pre;
-
-                height: 40px;
-
-                font-size: 16px;
-                -webkit-box-sizing: border-box;
-                box-sizing: border-box;
-                width: 100%;
-                border-radius: 3px;
-                color: var(--text-normal);
-                background-color: 225 calc(1 * 6.3%) 12.5%;
-                border: none;
-            }
+        .add-friend-search-form {
+            margin: 16px 0;
         }
     }
 
+    /* compatibility for reusable SearchBox (uses .search-box / .search-inner / .search-input) */
+
     .self-id-container {
-        -webkit-box-align: center;
-        -ms-flex-align: center;
         align-items: center;
-        display: -webkit-box;
-        display: -ms-flexbox;
         display: flex;
-        margin-top: 32px;
         position: relative;
         color: hsl(240, 2%, 88%);
     }
 }
 
-.bootstrap-input-mt {
-    margin-top: 16px;
+.bootstrap-input-base {
+    width: 100%;
+    border-radius: 4px;
+    position: relative;
+    background: var(--menu-bg);
+    border: none;
+    font-size: 16px;
+    padding: 10px 12px;
+    color: var(--body-color);
+    box-sizing: border-box;
+}
+
+.bootstrap-input-base input {
+    width: 100%;
+    color: inherit;
+    background: transparent;
+    border: none;
 }
