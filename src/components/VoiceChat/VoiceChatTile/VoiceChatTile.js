@@ -1,64 +1,89 @@
-import React from "react";
-import { Avatar, Button, Typography, IconButton } from "@mui/material";
+import React, { useEffect, useRef } from "react";
+import AvatarWithStatus from "@/components/AvatarWithStatus/AvatarWithStatus";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import MicOffIcon from "@mui/icons-material/MicOff";
-import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 import { Mic } from "@mui/icons-material";
-import { LocalAudioTrack, LocalVideoTrack, RemoteUser } from "agora-rtc-react";
 import "./VoiceChatTile.scss";
 
-function VoiceChatTile({ user, volume, hasVideo, hasAudio, videoTrack, audioTrack, localUser }) {
-    // no side-effects required
+function VoiceChatTile({
+    user,
+    videoTrack,
+    hasVideo,
+    localUser,
+    isMuted,
+    isDeafen,
+    isScreenShare,
+}) {
+    const videoRef = useRef(null);
+
+    useEffect(() => {
+        if (!videoTrack || !videoRef.current) {
+            // clear any previous video element
+            if (videoRef.current) videoRef.current.innerHTML = "";
+            return;
+        }
+
+        try {
+            // Agora tracks support play(container, options)
+            if (typeof videoTrack.play === "function") {
+                videoTrack.play(videoRef.current, { fit: "cover" });
+            } else if (videoRef.current.tagName === "VIDEO") {
+                // fallback if a MediaStream is provided
+                videoRef.current.srcObject = videoTrack;
+                videoRef.current.play().catch(() => {});
+            }
+        } catch (err) {
+            // non-fatal: log for debugging
+            // console.warn("Failed to play video track", err);
+        }
+
+        return () => {
+            try {
+                if (videoTrack && typeof videoTrack.stop === "function") {
+                    // don't close track here; just stop playback if supported
+                    videoTrack.stop?.();
+                }
+            } catch (e) {
+                // ignore cleanup errors
+            }
+        };
+    }, [videoTrack]);
+    const statusLabel = isScreenShare ? "Screen" : isDeafen ? "Deafen" : isMuted ? "Muted" : "Live";
+    const statusIcon = isScreenShare ? (
+        <VideocamIcon />
+    ) : isDeafen || isMuted ? (
+        <MicOffIcon />
+    ) : (
+        <Mic />
+    );
+    const statusClass = isScreenShare ? "screen" : isDeafen ? "deafen" : isMuted ? "muted" : "live";
+
     return (
         <div className="voicechat-tile voicechat-transition">
             <div className="video-wrapper">
-                {localUser ? (
-                    <>
-                        <LocalVideoTrack track={videoTrack} play={hasVideo} disabled={!hasVideo} />
-                        <LocalAudioTrack track={audioTrack} play={false} disabled={!hasAudio} />
-                    </>
-                ) : (
-                    <div id={user.uid}>
-                        {/* <RemoteVideoTrack track={videoTrack} play={hasVideo} muted={false} />
-                            <RemoteAudioTrack track={audioTrack} play={hasAudio} /> */}
-                        <RemoteUser user={user} playVideo={hasVideo} playAudio={hasAudio} />
-                    </div>
-                )}
+                <div ref={videoRef} />
             </div>
-            <div className="video-overlay">
+            <div className={`video-overlay ${!hasVideo ? "no-video" : ""}`}>
                 <div className="overlay-container">
-                    <div className="overlay-top"></div>
                     {!hasVideo && (
-                        <Avatar
+                        <AvatarWithStatus
                             src={user.avatar}
                             alt={user.displayName}
-                            className="overlay-avatar overlay-avatar-large"
+                            containerClassName="overlay-avatar overlay-avatar-large"
                             imgProps={{ crossOrigin: "Anonymous" }}
+                            status={user?.status}
                         />
                     )}
                     <div className="overlay-bottom">
-                        <div>
-                            <Button
-                                className={
-                                    "voicechat-button " +
-                                    (volume > 50
-                                        ? "voicechat-button-high"
-                                        : "voicechat-button-normal")
-                                }
-                                variant="outlined"
-                                startIcon={hasVideo ? <VideocamIcon /> : <VideocamOffIcon />}
-                            >
-                                <Typography variant="h5">
-                                    {user.displayName}
-                                    {user.uid}
-                                </Typography>
-                            </Button>
+                        <div className="tile-name">
+                            <span className="tile-name-text">{user.displayName}</span>
                         </div>
-                        <div>
-                            <IconButton className="voicechat-iconbutton">
-                                {hasAudio ? <Mic /> : <MicOffIcon />}
-                            </IconButton>
-                        </div>
+                        {localUser && (
+                            <div className={`tile-status-badge ${statusClass}`}>
+                                {statusIcon}
+                                <span>{statusLabel}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
