@@ -9,13 +9,8 @@ import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
+    confirmPasswordReset,
 } from "firebase/auth";
-
-import GoogleButton from "./google.svg";
-import FacebookButton from "./facebook.svg";
-import TwitterButton from "./twitter.svg";
-import GithubButton from "./github.svg";
-
 import { useDispatch } from "react-redux";
 import { signInWithOAuth } from "@/utils/authentication";
 import { setUser } from "@/redux/features/authSlice";
@@ -35,11 +30,10 @@ export function RegisterPage() {
 
     const handleNewUserFormSubmit = (e) => {
         const { name, value } = e.target;
-
-        setNewUser({
-            ...newUser,
+        setNewUser((prev) => ({
+            ...prev,
             [name]: value,
-        });
+        }));
     };
 
     const createNewUser = async () => {
@@ -81,9 +75,6 @@ export function RegisterPage() {
             showError(error?.name || "Register", error?.code || error?.message);
         }
     };
-
-    //create a new account
-    React.useEffect(() => {}, [newUser.username]);
 
     return (
         <main className="register-page">
@@ -164,20 +155,134 @@ export function RegisterPage() {
     );
 }
 
+export function ResetSuccessPage() {
+    const [searchPrams] = useSearchParams();
+    const email = searchPrams.get("email");
+    return (
+        <main className="reset-success-page">
+            <Form.Root className="form-container">
+                <div className="form-wrapper">
+                    <div className="form-center">
+                        <div className="primary-title">
+                            <h3>Check your email</h3>
+                            <p className="reset-subtitle">A reset email has been sent to</p>
+                            <p className="reset-email">{email}</p>
+                            <p className="reset-subtitle">
+                                Please check your email and follow the instructions to reset your
+                                password.
+                            </p>
+                        </div>
+                        <Link to="/" className="btn" style={{ textDecoration: "none" }}>
+                            Back to Sign In
+                        </Link>
+                    </div>
+                </div>
+            </Form.Root>
+        </main>
+    );
+}
+
 export function ResetPasswordPage() {
-    const [searchparams] = useSearchParams();
     const navigate = useNavigate();
+    const [emailSignInInfo, setEmailSignInInfo] = useState({ email: "", password: "" });
+
+    const handleEmailSignInForm = (e) => {
+        e.preventDefault();
+
+        const { name, value } = e.target;
+        setEmailSignInInfo({ ...emailSignInInfo, [name]: value });
+    };
+
+    const handleResetPassword = () => {
+        const actionCodeSettings = {
+            url: "https://discordclone.antxz.com/reset/confirm",
+            handleCodeInApp: false,
+        };
+        sendPasswordResetEmail(auth, emailSignInInfo.email, actionCodeSettings).then(() => {
+            // Password reset email sent!
+            navigate({
+                pathname: "/reset/success",
+                search: createSearchParams({ email: emailSignInInfo.email }).toString(),
+            });
+        });
+    };
 
     return (
         <main className="reset-page">
             <Form.Root className="form-container">
                 <div className="form-wrapper">
                     <div className="form-center">
-                        <h4>
-                            {`A reset email has been sent to ${searchparams.get("email")}. Please check your email and follow the instructions to reset your password.`}
-                        </h4>
-                        <button type="button" className="btn" onClick={() => navigate("/")}>
-                            Sign In
+                        <div className="primary-title">
+                            <h3>Password Reset</h3>
+                        </div>
+                        <div className="input-position">
+                            <Form.Field className="form-group" name="email">
+                                <Form.Label className="input-placeholder">Email</Form.Label>
+                                <Form.Control asChild>
+                                    <input
+                                        required
+                                        className="form-style"
+                                        type="email"
+                                        name="email"
+                                        value={emailSignInInfo.email}
+                                        onChange={(e) => handleEmailSignInForm(e)}
+                                        style={{ marginBottom: "20px" }}
+                                    />
+                                </Form.Control>
+                                <Link to="/" className="link">
+                                    Sign In instead
+                                </Link>
+                            </Form.Field>
+                            <button type="button" className="btn" onClick={handleResetPassword}>
+                                Reset Password
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </Form.Root>
+        </main>
+    );
+}
+
+export function ResetConfirmPage() {
+    const [searchParams] = useSearchParams();
+    const [newPassword, setNewPassword] = useState("");
+    const navigate = useNavigate();
+
+    const oobCode = searchParams.get("oobCode");
+
+    const handleConfirm = async () => {
+        try {
+            await confirmPasswordReset(auth, oobCode, newPassword);
+            navigate("/");
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    return (
+        <main className="reset-success-page">
+            <Form.Root className="form-container">
+                <div className="form-wrapper">
+                    <div className="form-center">
+                        <div className="primary-title">
+                            <h3>Reset your password</h3>
+                        </div>
+                        <div className="input-position">
+                            <Form.Field className="form-group" name="password">
+                                <Form.Label className="input-placeholder">New Password</Form.Label>
+                                <Form.Control asChild>
+                                    <input
+                                        className="form-style"
+                                        type="password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                    />
+                                </Form.Control>
+                            </Form.Field>
+                        </div>
+                        <button className="btn" onClick={handleConfirm}>
+                            Reset Password
                         </button>
                     </div>
                 </div>
@@ -186,20 +291,36 @@ export function ResetPasswordPage() {
     );
 }
 
+const OAUTH_PROVIDERS = [
+    {
+        provider: "google",
+        label: "Sign in with Google",
+        icon: "https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg",
+    },
+    {
+        provider: "github",
+        label: "Sign in with Github",
+        icon: "https://github.githubassets.com/favicons/favicon.svg",
+    },
+];
+
+export const OAuthButton = ({ icon, label, provider, iconBg }) => (
+    <button type="button" className="social-button" onClick={() => signInWithOAuth(provider)}>
+        <span className="social-icon-wrapper" style={{ background: iconBg }}>
+            <img src={icon} alt={label} className="social-icon" />
+        </span>
+        <span>{label}</span>
+    </button>
+);
+
 export default function LoginPage() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const [emailSignInInfo, setEmailSignInInfo] = useState({ email: "", password: "" });
+    const [emailSignInInfo, setEmailSignInInfo] = useState({
+        email: "",
+        password: "",
+    });
 
-    const handleResetPassword = () => {
-        sendPasswordResetEmail(auth, emailSignInInfo.email).then(() => {
-            // Password reset email sent!
-            navigate({
-                pathname: "/reset",
-                search: createSearchParams({ email: emailSignInInfo.email }).toString(),
-            });
-        });
-    };
     const emailSignIn = async () => {
         try {
             const result = await signInWithEmailAndPassword(
@@ -290,9 +411,9 @@ export default function LoginPage() {
                             </Form.Field>
                         </div>
                         <div className="password-container">
-                            <button type="button" className="link" onClick={handleResetPassword}>
+                            <Link className="link" to="/reset">
                                 Forgot your password?
-                            </button>
+                            </Link>
                         </div>
                         <div className="btn-position">
                             <Form.Submit asChild>
@@ -308,24 +429,16 @@ export default function LoginPage() {
                             </Link>
                         </span>
                     </div>
-                    <div className="verticalSeparator"></div>
+                    <div className="horizontalSeparator"></div>
                     <div className="social-login">
-                        <GoogleButton
-                            className="social-button"
-                            onClick={() => signInWithOAuth("google")}
-                        />
-                        <FacebookButton
-                            className="social-button"
-                            onClick={() => signInWithOAuth("facebook")}
-                        />
-                        <TwitterButton
-                            className="social-button"
-                            onClick={() => signInWithOAuth("twitter")}
-                        />
-                        <GithubButton
-                            className="social-button"
-                            onClick={() => signInWithOAuth("github")}
-                        />
+                        {OAUTH_PROVIDERS.map((provider) => (
+                            <OAuthButton
+                                key={provider.provider}
+                                icon={provider.icon}
+                                label={provider.label}
+                                provider={provider.provider}
+                            />
+                        ))}
                     </div>
                 </div>
             </Form.Root>

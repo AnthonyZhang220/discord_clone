@@ -88,7 +88,7 @@ export const FriendHeader = () => {
                         placement="bottom"
                     >
                         <div>
-                            <GroupDMIcon className="friend-main-header-icon" aria-hidden="true" />
+                            <GroupDMIcon className="friend-main-header-icon" />
                         </div>
                     </Tooltip>
                 </div>
@@ -101,16 +101,15 @@ export const FriendHeader = () => {
                         }
                         placement="bottom"
                     >
-                        <button
-                            type="button"
-                            className="inbox-icon-button"
-                            onClick={openPendingInbox}
-                        >
-                            <InboxIcon />
+                        <div>
+                            <InboxIcon
+                                className="friend-main-header-icon"
+                                onClick={openPendingInbox}
+                            />
                             {inboxCount > 0 ? (
                                 <span className="inbox-count-badge">{inboxCount}</span>
                             ) : null}
-                        </button>
+                        </div>
                     </Tooltip>
                 </div>
             </div>
@@ -129,9 +128,7 @@ export const PrivateChannelHeader = () => {
                 <span className="friend-main-header-hashtag">
                     {currDirectMessageChannel.displayName}
                 </span>
-                <div>
-                    <StatusList status={currDirectMessageChannel.status} size={15} />
-                </div>
+                <StatusList status={currDirectMessageChannel.status} size={15} />
             </div>
             <div className="friend-main-header-feature">
                 <Tooltip

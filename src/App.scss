@@ -672,6 +672,10 @@ button:active,
 
 .modal-button:hover {
     background: var(--button-secondary-background-hover);
+
+    &--danger {
+        background: var(--dc-btn-danger-background);
+    }
 }
 
 .modal-button:active {
@@ -687,6 +691,11 @@ button:active,
 .modal-button-contained {
     background: var(--button-primary-background);
     color: var(--body-color);
+
+    &--danger {
+        color: var(--body-color);
+        background: var(--dc-btn-danger-background);
+    }
 }
 
 .modal-button-copy {
@@ -1158,4 +1167,17 @@ button:active,
     &:focus {
         outline: none;
     }
+}
+.verticalSeparator {
+    width: 1px;
+    align-self: stretch;
+    background: var(--dc-divider);
+    margin: 4px 0;
+}
+
+.horizontalSeparator {
+    width: 100%;
+    height: 1px;
+    background: var(--dc-divider);
+    margin: 4px 0;
 }

@@ -13,7 +13,6 @@ import {
     GithubAuthProvider,
     GoogleAuthProvider,
 } from "firebase/auth";
-import { redirect } from "react-router-dom";
 import { setIsLoggedIn, setUser } from "@/redux/features/authSlice";
 import { showError } from "@/utils/showError";
 
@@ -87,18 +86,15 @@ export const signInWithOAuth = async (provider) => {
 
 export async function signOut() {
     try {
-        await auth.signOut();
         const user = store.getState().auth.user;
-        if (user && user.id) {
+        if (user?.id) {
             const userRef = doc(db, "users", user.id);
-            await updateDoc(userRef, {
-                status: "offline",
-            });
+            await updateDoc(userRef, { status: "offline" });
         }
 
-        store.dispatch(setUser({ displayName: null, avatar: null, uid: null, createdAt: null }));
+        await auth.signOut();
         store.dispatch(setIsLoggedIn(false));
-        redirect("/");
+        window.location.href = "/";
     } catch (error) {
         showError("signOut", error?.message || String(error));
     }

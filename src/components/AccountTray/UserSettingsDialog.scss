@@ -120,11 +120,6 @@
     cursor: pointer;
 }
 
-.sidebar-items li.active > .sidebar-item,
-.sidebar-item:hover {
-    background: rgba(255, 255, 255, 0.04);
-}
-
 .dialog-panel {
     flex: 1;
     background: var(--background-primary);

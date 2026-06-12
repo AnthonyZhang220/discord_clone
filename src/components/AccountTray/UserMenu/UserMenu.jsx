@@ -1,33 +1,34 @@
-import React from "react";
+import React, { useEffect, memo } from "react";
 import AvatarWithStatus from "@/components/AvatarWithStatus/AvatarWithStatus";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { AlertDialog } from "radix-ui";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import SwapVertIcon from "@mui/icons-material/SwapVert";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { signOut } from "@/utils/authentication";
 import StatusList from "@/components/StatusList";
 import { statusFormat } from "@/utils/formatter";
 import { changeStatus } from "@/utils/authentication";
-import { setUserDetailPopover } from "@/redux/features/popoverSlice";
+import { createdAtDate } from "@/utils/formatter";
+import { MemberListItem } from "@/components/ChannelMemberList/ChannelMemberList";
+import { getSavedAccounts, switchAccount } from "@/utils/accountStore";
 
-export const UserMenu = React.memo(function UserMenu() {
-    const dispatch = useDispatch();
+export const UserMenu = memo(function UserMenu() {
     const { user } = useSelector((state) => state.auth);
     const [confirmLogoutOpen, setConfirmLogoutOpen] = React.useState(false);
+    const [loggedInAccounts, setLoggedInAccounts] = React.useState([]);
 
-    const closePopover = React.useCallback(() => dispatch(setUserDetailPopover(false)), [dispatch]);
     const setStatus = React.useCallback((s) => changeStatus(s), []);
 
-    const createdAtDate = React.useMemo(() => {
-        const raw = user?.createdAt;
-        if (!raw) return null;
-        if (typeof raw === "number") return new Date(raw * 1000);
-        if (raw.seconds) return new Date(raw.seconds * 1000);
-        const p = new Date(raw);
-        return isNaN(p.getTime()) ? null : p;
+    const createdAtDateMemo = React.useMemo(() => {
+        return createdAtDate(user?.createdAt);
     }, [user?.createdAt]);
+
+    useEffect(() => {
+        const accounts = getSavedAccounts(); // { uid: { uid, email, displayName, photoURL, refreshToken } }
+        setLoggedInAccounts(Object.values(accounts));
+    }, []);
 
     return (
         <>
@@ -57,12 +58,12 @@ export const UserMenu = React.memo(function UserMenu() {
                         <span className="user-menu-tag">{user?.username ?? user?.email}</span>
                     </div>
 
-                    {createdAtDate && (
+                    {createdAtDateMemo && (
                         <>
                             <div className="user-menu-divider" />
                             <div className="user-menu-section-label">MEMBER SINCE</div>
                             <div className="user-menu-section-value">
-                                {createdAtDate.toLocaleDateString("en-US", {
+                                {createdAtDateMemo.toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "2-digit",
                                     year: "numeric",
@@ -109,11 +110,29 @@ export const UserMenu = React.memo(function UserMenu() {
 
                     <div className="user-menu-divider" />
 
-                    <DropdownMenu.Item className="user-menu-item" onSelect={closePopover}>
-                        <SwapVertIcon className="user-menu-item-icon" />
-                        <span className="user-menu-item-label">Switch Accounts</span>
-                        <NavigateNextIcon className="user-menu-chevron" />
-                    </DropdownMenu.Item>
+                    <DropdownMenu.Sub>
+                        <DropdownMenu.SubTrigger className="user-menu-item">
+                            <SwapVertIcon className="user-menu-item-icon" />
+                            <span className="user-menu-item-label">Switch Accounts</span>
+                            <NavigateNextIcon className="user-menu-chevron" />
+                        </DropdownMenu.SubTrigger>
+
+                        <DropdownMenu.Portal>
+                            <DropdownMenu.SubContent className="user-menu-sub-paper" sideOffset={6}>
+                                {loggedInAccounts.map((account) => (
+                                    <MemberListItem
+                                        key={account.uid}
+                                        avatar={account.photoURL}
+                                        displayName={account.displayName}
+                                        email={account.email}
+                                        onClick={() => switchAccount(account.uid)}
+                                        disablePreview
+                                        avatarSize={32}
+                                    />
+                                ))}
+                            </DropdownMenu.SubContent>
+                        </DropdownMenu.Portal>
+                    </DropdownMenu.Sub>
 
                     <DropdownMenu.Item
                         className="user-menu-item user-menu-item--danger"
@@ -123,7 +142,7 @@ export const UserMenu = React.memo(function UserMenu() {
                         }}
                     >
                         <span className="user-menu-item-label">Log Out</span>
-                        <LogoutIcon className="user-menu-item-icon" />
+                        <LogoutIcon color="error" className="user-menu-item-icon" />
                     </DropdownMenu.Item>
                 </DropdownMenu.Content>
             </DropdownMenu.Portal>
@@ -145,7 +164,7 @@ export const UserMenu = React.memo(function UserMenu() {
                             <AlertDialog.Action asChild>
                                 <button
                                     type="button"
-                                    className="modal-button modal-button-contained user-menu-item--danger"
+                                    className="modal-button modal-button-contained modal-button-contained--danger user-menu-item--danger"
                                     onClick={() => {
                                         setConfirmLogoutOpen(false);
                                         signOut();

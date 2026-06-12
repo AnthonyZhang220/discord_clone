@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { setMemberDetailPopover } from "@/redux/features/popoverSlice";
 import { useDispatch } from "react-redux";
 import { handleCurrDirectMessageChannel } from "@/handlers/channelHandlers";
+import { createdAtDate } from "@/utils/formatter";
 
 export const MemberDetailContent = ({ member, onClose, showActions = true }) => {
     const { memberDetail } = useSelector((state) => state.memberList);
@@ -12,13 +13,8 @@ export const MemberDetailContent = ({ member, onClose, showActions = true }) => 
 
     const memberData = member ?? memberDetail;
 
-    const createdAtDate = React.useMemo(() => {
-        const raw = memberData?.createdAt;
-        if (!raw) return null;
-        if (typeof raw === "number") return new Date(raw * 1000);
-        if (raw.seconds && typeof raw.seconds === "number") return new Date(raw.seconds * 1000);
-        const parsed = new Date(raw);
-        return isNaN(parsed.getTime()) ? null : parsed;
+    const createdAtDateMemo = React.useMemo(() => {
+        return createdAtDate(memberData?.createdAt);
     }, [memberData?.createdAt]);
 
     const handleMessage = () => {
@@ -58,12 +54,12 @@ export const MemberDetailContent = ({ member, onClose, showActions = true }) => 
                 <span className="user-menu-tag">{memberData?.username ?? memberData?.email}</span>
             </div>
 
-            {createdAtDate && (
+            {createdAtDateMemo && (
                 <>
                     <div className="user-menu-divider" />
                     <div className="user-menu-section-label">MEMBER SINCE</div>
                     <div className="user-menu-section-value">
-                        {createdAtDate.toLocaleDateString("en-US", {
+                        {createdAtDateMemo.toLocaleDateString("en-US", {
                             month: "short",
                             day: "2-digit",
                             year: "numeric",

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useMemo, useCallback } from "react";
+import React, { useRef, useEffect, useMemo, useCallback, memo } from "react";
 import AvatarWithStatus from "@/components/AvatarWithStatus/AvatarWithStatus";
 
 import { doc, getDoc, onSnapshot, query, collection, where } from "firebase/firestore";
@@ -6,20 +6,40 @@ import { db } from "@/firebase";
 import { useDispatch, useSelector } from "react-redux";
 import MemberPreviewCard from "./MemberDetailPopover/MemberDetailPopover";
 import { setMemberList, setMemberDetail } from "@/redux/features/memberListSlice";
-
-import "./ChannelMemberList.scss";
 import { setMemberDetailPopover } from "@/redux/features/popoverSlice";
 
-const MemberListItem = React.memo(function MemberListItem({
+import "./ChannelMemberList.scss";
+
+export const MemberListItem = memo(function MemberListItem({
     id,
     displayName,
     avatar,
     status,
     muted,
     onClick,
-    setRef,
+    setRef = { current: {} },
+    disablePreview = false,
+    avatarSize,
 }) {
     const member = { id, displayName, avatar, status };
+
+    const button = (
+        <button
+            type="button"
+            className={`sidebar-item member-list-item`}
+            onClick={() => onClick(id)}
+        >
+            <AvatarWithStatus
+                containerClassName="member-list-avatar-wrap"
+                avatarClassName="avatar"
+                alt={displayName}
+                src={avatar}
+                status={muted ? undefined : status}
+                size={avatarSize}
+            />
+            <div className="member-list-text">{displayName}</div>
+        </button>
+    );
 
     return (
         <div
@@ -27,27 +47,16 @@ const MemberListItem = React.memo(function MemberListItem({
             className={`member-list-item ${muted ? "member-list-item-muted" : ""}`}
             ref={(ele) => (setRef.current[id] = ele)}
         >
-            <MemberPreviewCard member={member}>
-                <button
-                    type="button"
-                    className={`sidebar-item member-list-button`}
-                    onClick={() => onClick(id)}
-                >
-                    <AvatarWithStatus
-                        containerClassName="member-list-avatar-wrap"
-                        avatarClassName="avatar"
-                        alt={displayName}
-                        src={avatar}
-                        status={muted ? undefined : status}
-                    />
-                    <div className="member-list-text">{displayName}</div>
-                </button>
-            </MemberPreviewCard>
+            {disablePreview ? (
+                button
+            ) : (
+                <MemberPreviewCard member={member}>{button}</MemberPreviewCard>
+            )}
         </div>
     );
 });
 
-function ChannelMemberList() {
+const ChannelMemberList = memo(function ChannelMemberList() {
     const dispatch = useDispatch();
     const { selectedServer } = useSelector((state) => state.userSelectStore);
     const { memberList } = useSelector((state) => state.memberList);
@@ -143,6 +152,6 @@ function ChannelMemberList() {
             </aside>
         </div>
     );
-}
+});
 
-export default React.memo(ChannelMemberList);
+export default ChannelMemberList;

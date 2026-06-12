@@ -22,6 +22,7 @@ import "./DirectMessageMenu.scss";
 function DirectMessageMenu() {
     const dispatch = useDispatch();
     const { user } = useSelector((state) => state.auth);
+
     const { directMessageChannelRefs, isFriendListPageOpen, directMessageChannelList } =
         useSelector((state) => state.directMessage);
 
@@ -31,7 +32,7 @@ function DirectMessageMenu() {
     }, [dispatch]);
 
     useEffect(() => {
-        if (!user.id) return undefined;
+        if (!user.id) return;
 
         const q = query(
             collection(db, "privatechannels"),
@@ -59,7 +60,7 @@ function DirectMessageMenu() {
         return () => {
             unsubscribe();
         };
-    }, [user.id, dispatch]);
+    }, [user?.id, dispatch]);
 
     const refsCount = Object.keys(directMessageChannelRefs).length;
     const [search, setSearch] = useState("");

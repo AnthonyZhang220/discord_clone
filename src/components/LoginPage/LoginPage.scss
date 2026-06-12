@@ -1,4 +1,5 @@
 .reset-page,
+.reset-success-page,
 .login-page,
 .register-page {
     /* Keep full-screen auth backdrop and center content at all sizes. */
@@ -17,8 +18,8 @@
     overflow: auto;
 
     .form-container {
-        width: min(900px, 100%);
         margin: 0 auto;
+        width: min(460px, 100%);
         padding: clamp(20px, 3vw, 32px);
         background: linear-gradient(180deg, rgba(43, 45, 49, 0.96) 0%, rgba(35, 36, 40, 0.96) 100%);
         border: 1px solid var(--dc-divider);
@@ -32,6 +33,7 @@
         .form-wrapper {
             width: 100%;
             display: flex;
+            flex-direction: column;
             align-items: stretch;
             justify-content: center;
             gap: clamp(18px, 3vw, 30px);
@@ -138,6 +140,10 @@
                     cursor: pointer;
                 }
 
+                .btn-secondary {
+                    color: var(--dc-text-normal);
+                }
+
                 .btn:hover {
                     background-color: var(--dc-brand-hover);
                     box-shadow: 0 10px 24px rgba(44, 57, 165, 0.35);
@@ -177,37 +183,89 @@
                 }
             }
 
-            .verticalSeparator {
-                width: 1px;
-                align-self: stretch;
-                background: var(--dc-divider);
-                margin: 4px 0;
-            }
-
             .social-login {
                 overflow: visible;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                width: min(332px, 100%);
                 min-width: 0;
                 gap: 10px;
-
-                .social-button {
-                    width: min(332px, 100%);
-                    max-width: 100%;
-                    height: auto;
-                    margin: 0;
-                    cursor: pointer;
-                    display: block;
-                    transition: transform 0.12s ease;
-
-                    &:hover {
-                        transform: translateY(-1px);
-                    }
-                }
             }
+        }
+    }
+}
+
+.social-button {
+    width: 100%;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #3c3c3c;
+    transition:
+        transform 0.12s ease,
+        box-shadow 0.12s ease;
+
+    .social-icon {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+    }
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+.reset-success-page {
+    .form-center {
+        align-items: center;
+
+        .primary-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+
+            h3 {
+                font-size: clamp(22px, 2.6vw, 30px);
+                font-weight: 700;
+                color: var(--dc-header-primary);
+                margin: 0 0 4px;
+            }
+
+            .reset-subtitle {
+                color: var(--dc-text-muted);
+                font-size: var(--font-size-md);
+                font-weight: 400;
+                line-height: 1.5;
+                margin: 0;
+                text-align: center;
+            }
+
+            .reset-email {
+                color: #fff;
+                font-size: 18px;
+                font-weight: 700;
+                margin: 0;
+                word-break: break-all;
+                text-align: center;
+            }
+        }
+
+        .btn {
+            margin-top: 8px;
+            text-decoration: none;
         }
     }
 }
@@ -215,7 +273,8 @@
 @media screen and (max-width: 830px) {
     .login-page,
     .register-page,
-    .reset-page {
+    .reset-page,
+    .reset-success-page {
         .form-container {
             .form-wrapper {
                 flex-direction: column;
@@ -244,7 +303,8 @@
 @media screen and (max-width: 486px) {
     .login-page,
     .register-page,
-    .reset-page {
+    .reset-page,
+    .reset-success-page {
         .form-container {
             width: 100%;
             max-width: 100%;

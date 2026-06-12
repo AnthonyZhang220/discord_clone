@@ -26,6 +26,7 @@
         align-items: center;
         min-width: 0;
         overflow: hidden;
+        gap: 8px;
 
         .friend-main-header-text {
             font-size: var(--font-size-xl);
@@ -33,7 +34,6 @@
         }
 
         .friend-main-header-icon {
-            color: var(--server-marker-unread);
             margin-right: 6px;
             display: inline-flex;
             align-items: baseline;

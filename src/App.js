@@ -4,7 +4,11 @@ import Chat from "./components/Chat/Chat";
 import ServerList from "./components/ServerList/ServerList";
 import Channel from "./components/Channel/Channel";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import LoginPage, { ResetPasswordPage } from "./components/LoginPage/LoginPage";
+import LoginPage, {
+    ResetPasswordPage,
+    ResetSuccessPage,
+    ResetConfirmPage,
+} from "./components/LoginPage/LoginPage";
 import { RegisterPage } from "./components/LoginPage/LoginPage";
 import { db, auth } from "./firebase";
 import { Outlet } from "react-router-dom";
@@ -19,7 +23,9 @@ import { getSelectStore } from "./utils/userSelectStore";
 import { setUser, setIsLoggedIn } from "./redux/features/authSlice";
 import { getBannerColor } from "./utils/getBannerColor";
 import { joinVoiceChannel, loadVoiceChatSession } from "./redux/features/voiceChatSlice";
+import { saveAccount } from "./utils/accountStore";
 import ToastManager from "./components/ToastManager/ToastManager";
+import { showError } from "@/utils/showError";
 import "./App.scss";
 
 function App() {
@@ -97,6 +103,7 @@ function App() {
 
         const finalizeLogin = async (authUser) => {
             const payload = await resolveUserPayload(authUser);
+            saveAccount(authUser);
             dispatch(setUser(payload));
             getSelectStore();
             dispatch(setIsLoggedIn(true));
@@ -186,16 +193,24 @@ function App() {
                     dispatch(setIsLoggedIn(false));
                     try {
                         const cur = window.location.pathname || "";
-                        if (cur !== "/") {
+                        const publicPaths = [
+                            "/",
+                            "/register",
+                            "/reset",
+                            "/reset/success",
+                            "/reset/confirm",
+                        ];
+                        if (!publicPaths.some((path) => cur.startsWith(path))) {
                             navigate("/");
                         }
                     } catch (e) {
+                        showError("Error", e, { log: false });
                         navigate("/");
                     }
                 }
             } catch (error) {
                 // eslint-disable-next-line no-console
-                console.error("Error fetching user data", error);
+                showError("Error", error, { log: false });
             }
         });
 
@@ -215,6 +230,8 @@ function App() {
             <Routes>
                 <Route path="/" element={<LoginPage />} />
                 <Route path="/reset" element={<ResetPasswordPage />} />
+                <Route path="/reset/success" element={<ResetSuccessPage />} />
+                <Route path="/reset/confirm" element={<ResetConfirmPage />} />
                 <Route path="/register" element={<RegisterPage />} />
                 <Route
                     element={

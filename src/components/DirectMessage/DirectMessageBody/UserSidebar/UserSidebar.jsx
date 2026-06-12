@@ -1,16 +1,12 @@
 import React from "react";
 import AvatarWithStatus from "@/components/AvatarWithStatus/AvatarWithStatus";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import { createdAtDate } from "@/utils/formatter";
 import "./UserSidebar.scss";
 
 export const UserSidebar = ({ currDirectMessageChannel }) => {
-    const createdAtDate = React.useMemo(() => {
-        const raw = currDirectMessageChannel?.createdAt;
-        if (!raw) return null;
-        if (typeof raw === "number") return new Date(raw * 1000);
-        if (raw.seconds && typeof raw.seconds === "number") return new Date(raw.seconds * 1000);
-        const parsed = new Date(raw);
-        return isNaN(parsed.getTime()) ? null : parsed;
+    const createdAtDateMemo = React.useMemo(() => {
+        return createdAtDate(currDirectMessageChannel?.createdAt);
     }, [currDirectMessageChannel?.createdAt]);
 
     const u = currDirectMessageChannel;
@@ -61,7 +57,7 @@ export const UserSidebar = ({ currDirectMessageChannel }) => {
                                 Member Since
                             </div>
                             <div className="us-card-text">
-                                {createdAtDate.toLocaleDateString("en-US", {
+                                {createdAtDateMemo.toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",
                                     year: "numeric",

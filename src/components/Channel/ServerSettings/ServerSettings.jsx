@@ -53,7 +53,7 @@ export default function ServerSettings({ onClose }) {
                 }}
             >
                 <span className="user-menu-item-label">Delete Server</span>
-                <DeleteForeverIcon className="user-menu-item-icon" />
+                <DeleteForeverIcon color="error" className="user-menu-item-icon" />
             </DropdownMenu.Item>
 
             <AlertDialog.Root open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
@@ -76,7 +76,8 @@ export default function ServerSettings({ onClose }) {
                             <AlertDialog.Action asChild>
                                 <button
                                     type="button"
-                                    className="modal-button modal-button-contained user-menu-item--danger"
+                                    className="modal-button modal-button-contained
+                                    modal-button-contained--danger user-menu-item--danger"
                                     onClick={confirmDeleteServer}
                                 >
                                     Delete Server

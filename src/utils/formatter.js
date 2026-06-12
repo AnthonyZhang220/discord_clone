@@ -61,3 +61,12 @@ export const convertTime = (time) => {
 
     return formattedTime;
 };
+
+export const createdAtDate = (createdAt) => {
+    const raw = createdAt;
+    if (!raw) return null;
+    if (typeof raw === "number") return new Date(raw * 1000);
+    if (raw.seconds) return new Date(raw.seconds * 1000);
+    const p = new Date(raw);
+    return isNaN(p.getTime()) ? null : p;
+};
